@@ -1,1 +1,20 @@
 // add links to research here
+Digital Filter Design
+https://theaudioprogrammer.com/digital-filter-design-create-an-fir-filter-via-windowing/
+
+FAST FIR FILTERING
+https://flylib.com/books/en/2.729.1/fast_fir_filtering_using_the_fft.html
+
+Exceptions
+https://www.cs.umd.edu/~meesh/411/CA-online/chapter/exception-handling-and-floating-point-pipelines/index.html
+https://people.cs.pitt.edu/~don/coe1502/current/Unit4a/Unit4a.html
+
+Twiddle Factors
+https://technobyte.org/twiddle-factors-dsp-dft-fft-idft/
+
+FFT Stuff
+https://arxiv.org/ftp/arxiv/papers/1806/1806.03716.pdf
+https://www.intechopen.com/chapters/53909
+https://ieeexplore.ieee.org/document/7050487
+https://www.ti.com/lit/an/spna071a/spna071a.pdf?ts=1634245199378&ref_url=https%253A%252F%252Fwww.google.com%252F
+https://mathworld.wolfram.com/FastFourierTransform.html
