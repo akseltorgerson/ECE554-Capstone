@@ -17,22 +17,22 @@ module butterfly_unit_tb();
 		
 		begin
 			if(realAOut != realAout_ex) begin
-				$display("OOPSIES");
+				$display("ERROR: Real Out A: %h not equal to expected: %h", realAOut, realAout_ex);
 				$stop();
 			end
 		
 			if(imagAOut != imagAOut_ex) begin
-				$display("OOPSIES");
+				$display("ERROR: Imag Out A: %h not equal to expected: %h", imagAOut, imagAOut_ex);
 				$stop();
 			end
 		
 			if(realBOut != realBOut_ex) begin
-				$display("OOPSIES");
+				$display("ERROR: Real Out B: %h not equal to expected: %h", realBOut, realBOut_ex);
 				$stop();
 			end
 			
 			if(imagBOut != imagBOut_ex) begin
-				$display("OOPSIES");
+				$display("ERROR: Imag Out B: %h not equal to expected: %h", imagBOut, imagBOut_ex);
 				$stop();
 			end
 		end
@@ -47,6 +47,7 @@ module butterfly_unit_tb();
 	assign imag_B_out_ex = imag_A - (imag_B * twiddle_factor);
 	
 	initial begin
+		// initial tests (easy test)
 		clk = 0;
 		real_A = 32'h00000001;
 		imag_A = 32'h0;
