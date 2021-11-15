@@ -1,5 +1,5 @@
 
-module control_unit(opcode, isJAL, regDst, rsWrite, regWrite, aluSrc, isSignExtend, isIType1, isBranch, nop, memWrite, memRead, memtoReg, isJR, isSLBI, aluOp, isJump, branchOp, pcSrc, startI, startF, loadF);
+module control_unit(opcode, isJAL, regDst, rsWrite, regWrite, aluSrc, isSignExtend, isIType1, isBranch, nop, halt, memWrite, memRead, memtoReg, isJR, isSLBI, aluOp, isJump, branchOp, startI, startF, loadF);
 
     //Determines the isntructions
     input [4:0] opcode;
@@ -15,7 +15,8 @@ module control_unit(opcode, isJAL, regDst, rsWrite, regWrite, aluSrc, isSignExte
     output reg aluSrc; 
     output reg isSignExtend; 
     output reg isIType1; 
-    output reg isBranch; 
+    output reg isBranch;
+    output reg halt;
     output reg nop;
     output reg memWrite; 
     output reg memRead; 
@@ -26,8 +27,9 @@ module control_unit(opcode, isJAL, regDst, rsWrite, regWrite, aluSrc, isSignExte
     output reg [3:0] aluOp;
     output reg isJump;
     //TODO: Check on this from 552, could be changed 
-    output reg [1:0] branchOp; 
-    output reg pcSrc;
+    output reg [1:0] branchOp;
+    //pcSrc not needed in single cycle implementation
+    //output reg pcSrc;
     output reg startI; 
     output reg startF;
     output reg loadF;
@@ -41,6 +43,7 @@ module control_unit(opcode, isJAL, regDst, rsWrite, regWrite, aluSrc, isSignExte
         isSignExtend = 1'b0;
         isIType1 = 1'b0;
         isBranch = 1'b0;
+        halt = 1'b0;
         nop = 1'b0;
         memWrite = 1'b0;
         memRead = 1'b0;
@@ -50,16 +53,17 @@ module control_unit(opcode, isJAL, regDst, rsWrite, regWrite, aluSrc, isSignExte
         aluOp 4'b0000;
         isJump = 1'b0;
         branchOp = 2'b00;
-        pcSrc = 1'b0;
+        //pcSrc = 1'b0;
         // Possibly want to just make these an output of the fetch stage
         // This way the instruction can go to the accelerator as fast as possible
         startI = 1'b0;
         startF = 1'b0;
         loadF = 1'b0;
         case(opcode)
-            /* Would be where halt goes but it is done in fetch stage
-            5'b00000
-            */
+            //Halt
+            5'b00000: begin
+                halt = 1'b1;
+            end
 ////////////////////////Special Instructions////////////////////////////////////
             //nop
             5'b00001: begin
@@ -125,7 +129,7 @@ module control_unit(opcode, isJAL, regDst, rsWrite, regWrite, aluSrc, isSignExte
                 //Add operation
 				aluOp = 4'b0000;
 				memRead = 1'b1;
-				memtoReg = 1'b1;
+				memToReg = 1'b1;
 				isSignExtend = 1'b1;
 				isIType1 = 1'b1;
 				regWrite = 1'b1;
@@ -201,28 +205,28 @@ module control_unit(opcode, isJAL, regDst, rsWrite, regWrite, aluSrc, isSignExte
 				branchOp = 2'b00;
                 //Branch Operation
 				aluOp = 4'b1111;
-				pcSrc = 1'b1;
+				//pcSrc = 1'b1;
 			end
             //BNEZ
 			5'b01101: begin
 				isBranch = 1'b1;
 				branchOp = 2'b01;
 				aluOp = 4'b1111;
-				pcSrc = 1'b1;
+				//pcSrc = 1'b1;
 			end
             //BLTZ
 			5'b01110: begin
 				isBranch = 1'b1;
 				branchOp = 2'b10;
 				aluOp = 4'b1111;
-				pcSrc = 1'b1;
+				//pcSrc = 1'b1;
 			end
             //BGEZ
 			5'b01111: begin
 				isBranch = 1'b1;
 				branchOp = 2'b11;
 				aluOp = 4'b1111;
-				pcSrc = 1'b1;
+				//pcSrc = 1'b1;
 			end
             //LBI
 			5'b10100: begin
@@ -240,27 +244,27 @@ module control_unit(opcode, isJAL, regDst, rsWrite, regWrite, aluSrc, isSignExte
             //JR
 			5'b00101: begin
 				isJR = 1'b1;
-				pcSrc = 1'b1;
+				//pcSrc = 1'b1;
 			end
 			//JALR
 			5'b00111: begin
 				isJAL = 1'b1;
 				isJR = 1'b1;
 				regWrite = 1'b1;
-				pcSrc = 1'b1;
+				//pcSrc = 1'b1;
 			end
 /////////////////////// J Format Instructions//////////////////////////////////////
             //J
 			5'b00100: begin
 				isJump = 1'b1;
-				pcSrc = 1'b1;
+				//pcSrc = 1'b1;
 			end
 			//JAL
 			5'b00110: begin
 				isJAL = 1'b1;
 				isJump = 1'b1;
 				regWrite = 1'b1;
-				pcSrc = 1'b1;
+				//pcSrc = 1'b1;
 			end
 /////////////////////// Extra Credit Instructions//////////////////////////////////
 // TODO: Maybe want these from 552 for exceptions, not sure if do it this way    //
