@@ -1,5 +1,5 @@
 
-module control_unit(opcode, isJAL, regDst, rsWrite, regWrite, aluSrc, isSignExtend, isIType1, isBranch, nop, halt, memWrite, memRead, memtoReg, isJR, isSLBI, aluOp, isJump, branchOp, startI, startF, loadF);
+module control_unit(opcode, isJAL, regDst, rsWrite, regWrite, aluSrc, isSignExtend, isIType1, isBranch, nop, halt, memWrite, memRead, memtoReg, isJR, isSLBI, aluOp, isJump, startI, startF, loadF);
 
     //Determines the isntructions
     input [4:0] opcode;
@@ -23,11 +23,10 @@ module control_unit(opcode, isJAL, regDst, rsWrite, regWrite, aluSrc, isSignExte
     output reg memToReg; 
     output reg isJR; 
     output reg isSLBI;
-    //TODO: Might only need to be 2 bits unless we are adding in rotates
     output reg [3:0] aluOp;
     output reg isJump;
     //TODO: Check on this from 552, could be changed 
-    output reg [1:0] branchOp;
+    //output reg [1:0] branchOp;
     //pcSrc not needed in single cycle implementation
     //output reg pcSrc;
     output reg startI; 
@@ -52,7 +51,7 @@ module control_unit(opcode, isJAL, regDst, rsWrite, regWrite, aluSrc, isSignExte
         isSLBI = 1'b0;
         aluOp 4'b0000;
         isJump = 1'b0;
-        branchOp = 2'b00;
+        //branchOp = 2'b00;
         //pcSrc = 1'b0;
         // Possibly want to just make these an output of the fetch stage
         // This way the instruction can go to the accelerator as fast as possible
@@ -202,41 +201,41 @@ module control_unit(opcode, isJAL, regDst, rsWrite, regWrite, aluSrc, isSignExte
             //BEQZ
 			5'b01100: begin 
 				isBranch = 1'b1;
-				branchOp = 2'b00;
+				//branchOp = 2'b00;
                 //Branch Operation
-				aluOp = 4'b1111;
+				aluOp = 4'b0100;
 				//pcSrc = 1'b1;
 			end
             //BNEZ
 			5'b01101: begin
 				isBranch = 1'b1;
-				branchOp = 2'b01;
-				aluOp = 4'b1111;
+				//branchOp = 2'b01;
+				aluOp = 4'b0101;
 				//pcSrc = 1'b1;
 			end
             //BLTZ
 			5'b01110: begin
 				isBranch = 1'b1;
-				branchOp = 2'b10;
-				aluOp = 4'b1111;
+				//branchOp = 2'b10;
+				aluOp = 4'b0110;
 				//pcSrc = 1'b1;
 			end
             //BGEZ
 			5'b01111: begin
 				isBranch = 1'b1;
-				branchOp = 2'b11;
-				aluOp = 4'b1111;
+				//branchOp = 2'b11;
+				aluOp = 4'b0111;
 				//pcSrc = 1'b1;
 			end
             //LBI
 			5'b10100: begin
-				aluOp = 4'b1101;
+				aluOp = 4'b1011;
 				rsWrite = 1'b1;
 				regWrite = 1'b1;
 			end
             //SLBI
 			5'b10010: begin
-				aluOp = 4'b1110;
+				aluOp = 4'b1100;
 				rsWrite = 1'b1;
 				isSLBI = 1'b1;
 				regWrite = 1'b1;
