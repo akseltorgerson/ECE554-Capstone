@@ -1,5 +1,5 @@
 
-module control_unit(opcode, isJAL, regDst, rsWrite, regWrite, aluSrc, isSignExtend, isIType1, isBranch, nop, halt, memWrite, memRead, memtoReg, isJR, isSLBI, aluOp, isJump, startI, startF, loadF);
+module control_unit(opcode, isJAL, regDst, rsWrite, regWrite, aluSrc, isSignExtend, isIType1, isBranch, nop, halt, memWrite, memRead, memToReg, isJR, isSLBI, aluOp, isJump, startI, startF, loadF);
 
     //Determines the isntructions
     input [4:0] opcode;
@@ -49,7 +49,7 @@ module control_unit(opcode, isJAL, regDst, rsWrite, regWrite, aluSrc, isSignExte
         memToReg = 1'b0;
         isJR = 1'b0;
         isSLBI = 1'b0;
-        aluOp 4'b0000;
+        aluOp = 4'b0000;
         isJump = 1'b0;
         //branchOp = 2'b00;
         //pcSrc = 1'b0;
@@ -192,10 +192,10 @@ module control_unit(opcode, isJAL, regDst, rsWrite, regWrite, aluSrc, isSignExte
 			end
             //SLE
 			5'b11110: begin
-				RegDst = 1'b1;
-				ALUSrc = 1'b1;
-				ALUOp = 4'b1010;
-				RegWrite = 1'b1;
+				regDst = 1'b1;
+				aluSrc = 1'b1;
+				aluOp = 4'b1010;
+				regWrite = 1'b1;
 			end
 ////////////////////////I Format Type 2/////////////////////////////////////////////
             //BEQZ

@@ -28,6 +28,6 @@ module fetch_stage(
     prgoram_counter iPC(.clk(clk), .rst(rst), .halt(halt), .nextAddr(nextPC), .currAddr(currPC));
     
     //Add four to the current PC (if there is no branch)
-    cla_32bit iPCAdder(.A(currPC), .B(16'h00000004), .Cin(1'b0), .Sum(pcPlus4), .Cout(cout), .P(P), .G(G));
+    cla_32bit iPCAdder(.A(currPC), .B(16'h4), .Cin(1'b0), .Sum(pcPlus4), .Cout(cout), .P(P), .G(G));
 
 endmodule
