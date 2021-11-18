@@ -47,24 +47,29 @@ module butterfly_unit_tb();
 	assign imag_B_out_ex = imag_A - (imag_B * twiddle_factor);
 	
 	initial begin
-		// initial tests (easy test)
+		// initial tests (long test)
 		clk = 0;
-		real_A = 32'h00000001;
-		imag_A = 32'h0;
-		real_B = 32'h00000001;
-		imag_B = 32'h0;
-		twiddle_factor = 32'h00000002;
-		
-		@(posedge clk);
-		
-		compare_outputs(.realAOut(real_A_out), 
-						.realAout_ex(real_A_out_ex),
-						.realBOut(real_B_out),
-						.realBOut_ex(real_B_out_ex),
-						.imagAOut(imag_A_out),
-						.imagAOut_ex(imag_A_out_ex),
-						.imagBOut(imag_B_out),
-						.imagBOut_ex(imag_B_out_ex));
+						
+		for (real_A = $signed(32'h80000000); real_A < $signed(32'h6FFFFFFF); real_A++) begin
+			for (imag_A = $signed(32'h80000000); imag_A < $signed(32'h6FFFFFFF); imag_A++) begin
+				for (real_B = $signed(32'h80000000); real_B < $signed(32'h6FFFFFFF); real_B++) begin
+					for (imag_B = $signed(32'h80000000); imag_B < $signed(32'h6FFFFFFF); imag_B++) begin
+						for (twiddle_factor = $signed(32'h80000000); twiddle_factor < $signed(32'h6FFFFFFF); twiddle_factor++) begin
+							@(posedge clk);
+							
+							compare_outputs(.realAOut(real_A_out), 
+										.realAout_ex(real_A_out_ex),
+										.realBOut(real_B_out),
+										.realBOut_ex(real_B_out_ex),
+										.imagAOut(imag_A_out),
+										.imagAOut_ex(imag_A_out_ex),
+										.imagBOut(imag_B_out),
+										.imagBOut_ex(imag_B_out_ex));
+						end
+					end
+				end
+			end
+		end
 		
 		$display("YAHOOO!! All Tests Passed");
 		$stop();
