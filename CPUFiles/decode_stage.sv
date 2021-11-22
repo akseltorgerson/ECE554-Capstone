@@ -1,17 +1,20 @@
 module decode_stage(
     //Inputs
-    clk, rst, instr, pcPlus4, writebackData,
+    clk, rst, instr, pcPlus4, writebackData, fftCalculating,
     //Outputs
     read1Data, read2Data, aluSrc, isSignExtend, isIType1, isBranch, halt, nop, memWrite, memRead,
-    memToReg, isJR, isSLBI, isJump, aluOp, startI, startF, loadF
+    memToReg, isJR, isSLBI, isJump, aluOp, startI, startF, loadF, blockInstruction
 );
 
     input clk, rst;
+    //Control signal for if the fft is currently calculating on data
+    input fftCalculating;
+
     input [31:0] instr, pcPlus4, writebackData;
 
     output [31:0] read1Data, read2Data;
     //Control signals
-    output aluSrc, isSignExtend, isSLBI, isIType1, isBranch, halt, nop, memWrite, memRead, memToReg, isJR, isJump;
+    output aluSrc, isSignExtend, isSLBI, isIType1, isBranch, halt, nop, memWrite, memRead, memToReg, isJR, isJump, blockInstruction;
     output [3:0] aluOp;
 
     //Accelerator Control Signals
@@ -25,7 +28,8 @@ module decode_stage(
 
     //Inputs: opcode
     //Outputs: Everything else
-    control_unit iControlUnit(.opcode(instr[31:27]), 
+    control_unit iControlUnit(.opcode(instr[31:27]),
+                              .fftCalculating(fftCalculating),
                               .isJAL(isJAL),
                               .regDst(regDst),
                               .rsWrite(rsWrite),
@@ -45,7 +49,8 @@ module decode_stage(
                               .isJump(isJump),
                               .startI(startI),
                               .startF(startF),
-                              .loadF(loadF)
+                              .loadF(loadF),
+                              .blockInstruction(blockInstruction)
                              );
     
     //Inputs: clk, rst, read1RegSel, read2RegSel, writeRegSel, writeData, write

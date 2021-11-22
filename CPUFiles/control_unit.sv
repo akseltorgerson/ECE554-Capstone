@@ -1,8 +1,15 @@
 
-module control_unit(opcode, isJAL, regDst, rsWrite, regWrite, aluSrc, isSignExtend, isIType1, isBranch, nop, halt, memWrite, memRead, memToReg, isJR, isSLBI, aluOp, isJump, startI, startF, loadF);
+module control_unit(
+    //Inputs
+    opcode, fftCalculating,
+    //Outputs
+    blockInstruction, isJAL, regDst, rsWrite, regWrite, aluSrc, isSignExtend, isIType1, isBranch, nop, halt, memWrite, memRead, memToReg, isJR, isSLBI, aluOp, isJump, startI, startF, loadF
+);
 
     //Determines the isntructions
     input [4:0] opcode;
+    //A control flag to let know that the fft is currently calculating on data
+    input fftCalculating;
 
     // Halt is not actually an output of the Control Unit
     // It will be set in the fetch stage module
@@ -32,6 +39,7 @@ module control_unit(opcode, isJAL, regDst, rsWrite, regWrite, aluSrc, isSignExte
     output reg startI; 
     output reg startF;
     output reg loadF;
+    output reg blockInstruction;
 
     always @(*) begin
         isJAL = 1'b0;
@@ -58,6 +66,7 @@ module control_unit(opcode, isJAL, regDst, rsWrite, regWrite, aluSrc, isSignExte
         startI = 1'b0;
         startF = 1'b0;
         loadF = 1'b0;
+        blockInstruction = 1'b0;
         case(opcode)
             //Halt
             5'b00000: begin
@@ -71,10 +80,13 @@ module control_unit(opcode, isJAL, regDst, rsWrite, regWrite, aluSrc, isSignExte
             //STARTF
             5'b00010: begin
                 startF = 1'b1;
+                //TODO: can this be done?
+                blockInstruction = fftCalculating ? 1'b1 : 1'b0;
             end
             //STARTI
             5'b00011: begin
                 startI = 1'b1;
+                blockInstruction = fftCalculating ? 1'b1 : 1'b0;
             end
             //LOADF
             5'b11111: begin

@@ -1,6 +1,6 @@
 module fetch_stage(
     //Inputs
-    clk, rst, halt, nextPC, stallDMAMem, mmuDataValid, blockInstruction, mmuDataIn
+    clk, rst, halt, nextPC, stallDMAMem, mmuDataValid, blockInstruction, mmuDataIn,
     //Outputs
     instr, pcPlus4, cacheMiss, mmuDataOut, cacheEvictValid
 );
