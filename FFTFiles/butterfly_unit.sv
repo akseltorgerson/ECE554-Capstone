@@ -19,11 +19,7 @@ module butterfly_unit
 	cla_32bit crB(.A(real_A), .B(~(mult_B_real)), .Cin(1'b1), .Sum(real_B_out), .Cout(), .P(), .G());
 	cla_32bit ciB(.A(imag_A), .B(~(mult_B_imag)), .Cin(1'b1), .Sum(imag_B_out), .Cout(), .P(), .G());
 	
-	///////////////////////////
-	//////// Operations ///////
-	///////////////////////////
-	
-	assign mult_B_real = twiddle_factor * real_B;
-	assign mult_B_imag = twiddle_factor * imag_B;
+	cla_multiplier mult_R(.A(twiddle_factor), .B(real_B), .en(1'b1), .product(mult_B_real));
+	cla_multiplier mult_I(.A(twiddle_factor), .B(imag_B), .en(1'b1), .product(mult_B_imag));
 	
 endmodule

@@ -9,6 +9,8 @@ module butterfly_unit_tb();
 	//////// DUT ///////////
 	butterfly_unit iDUT(.*);
 	
+	
+	
 	/////// Functions & Tasks /////////
 	
 	task compare_outputs;
@@ -49,6 +51,40 @@ module butterfly_unit_tb();
 	initial begin
 		// initial tests (long test)
 		clk = 0;
+		real_A = 32'h00000008;
+		imag_A = 32'h00000008;
+		real_B = 32'h00000008;
+		imag_B = 32'h00000008;
+		twiddle_factor = 32'h00000007;
+		
+		@(posedge clk);
+		
+		compare_outputs(.realAOut(real_A_out), 
+										.realAout_ex(real_A_out_ex),
+										.realBOut(real_B_out),
+										.realBOut_ex(real_B_out_ex),
+										.imagAOut(imag_A_out),
+										.imagAOut_ex(imag_A_out_ex),
+										.imagBOut(imag_B_out),
+										.imagBOut_ex(imag_B_out_ex));
+		
+		// negative test
+		real_A = 32'h00000008;
+		imag_A = 32'h00000008;
+		real_B = -32'h00000008;
+		imag_B = -32'h00000008;
+		twiddle_factor = 32'h00000007;
+		
+		@(posedge clk);
+		
+		compare_outputs(.realAOut(real_A_out), 
+										.realAout_ex(real_A_out_ex),
+										.realBOut(real_B_out),
+										.realBOut_ex(real_B_out_ex),
+										.imagAOut(imag_A_out),
+										.imagAOut_ex(imag_A_out_ex),
+										.imagBOut(imag_B_out),
+										.imagBOut_ex(imag_B_out_ex));
 						
 		for (real_A = $signed(32'h80000000); real_A < $signed(32'h6FFFFFFF); real_A++) begin
 			for (imag_A = $signed(32'h80000000); imag_A < $signed(32'h6FFFFFFF); imag_A++) begin
