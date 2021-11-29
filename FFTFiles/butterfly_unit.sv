@@ -21,7 +21,8 @@ module butterfly_unit
 	cla_32bit ciB(.A(imag_A), .B(~(mult_B_imag)), .Cin(1'b1), .Sum(imag_B_out), .Cout(), .P(), .G());
 	
 	////// MULTIPLICATION ////////////
-	// (x+yi)(u+vi) = (xu-yv) + (xv+yu)i
+	// 	 B   *  twiddle  =       MULT B
+	// (x+yi) * (u+vi)   = (xu-yv) + (xv+yu)i
 	cla_multiplier mult_R_1(.A(real_B), .B(twiddle_real), .en(1'b1), .product(mult_B_real_left));
 	cla_multiplier mult_R_2(.A(imag_B), .B(twiddle_imag), .en(1'b1), .product(mult_B_real_right));
 	cla_multiplier mult_I_1(.A(real_B), .B(twiddle_imag), .en(1'b1), .product(mult_B_imag_left));
