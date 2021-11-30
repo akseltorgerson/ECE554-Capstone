@@ -1,8 +1,8 @@
 module cla_32bit(
     //Inputs
-    A, B, Cin, Sum,
+    A, B, Cin, 
     //Outputs 
-    Cout, P, G
+    Sum, Cout, P, G
 );
     input [31:0] A, B;
     input Cin;
