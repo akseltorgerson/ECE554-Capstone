@@ -7,7 +7,7 @@ module dff(q, d, clk, rst);
 
     assign #(1) q = state;
 
-    always @(posedge clk) begin
+    always @(posedge clk, posedge rst) begin
         state = rst ? 0 : d;
     end
     
