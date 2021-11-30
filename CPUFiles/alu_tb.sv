@@ -1,10 +1,10 @@
 module alu_tb();
 
-    logic [31:0] input1;
-    logic [31:0] input2;
+    logic signed  [31:0] input1;
+    logic signed [31:0] input2;
     logic [3:0] operation;
-    logic [31:0] actualOutput;
-    logic [31:0] expectedOutput;
+    logic signed [31:0] actualOutput;
+    logic signed [31:0] expectedOutput;
     logic actualIsTaken;
     logic expectedIsTaken;
 
@@ -279,7 +279,7 @@ module alu_tb();
         //Explicitly Check that input1 == input2 clears output 
         //(because rand might not cover it)
         input1 = 32'h4657;
-        input2 = 32'h3647;
+        input2 = 32'h4647;
         expectedOutput = 32'h0;
 
         #5;
@@ -287,6 +287,95 @@ module alu_tb();
         if(expectedIsTaken != actualIsTaken || (expectedIsTaken != actualIsTaken)) begin
                 errors++;
                 $display("Less Than operation failed");
+        end
+
+        //----------- Test 11: Less Than Operation -------------------- 
+        $display("Starting Test 11...");
+
+        for(i = 0; i < 16; i++) begin
+            input1 = $random();
+            input2 = $random();
+            operation = 4'hA;
+            expectedIsTaken = 1'b0;
+
+            if(input1 <= input2)begin
+                expectedOutput = 32'h1;
+            end else begin
+                expectedOutput = 32'h0;
+            end
+
+            #5;
+            
+            if(expectedOutput != actualOutput || (expectedIsTaken != actualIsTaken)) begin
+                errors++;
+                $display("Less Than Or Equal operation failed");
+            end
+        end
+        //Explicitly Check that input1 == input2 sets output 
+        //(because rand might not cover it)
+        input1 = 32'h7AEB2;
+        input2 = 32'hAEB2;
+        expectedOutput = 32'h1;
+
+        #5;
+        
+        if(expectedIsTaken != actualIsTaken || (expectedIsTaken != actualIsTaken)) begin
+                errors++;
+                $display("Less Than Or Equal operation failed");
+        end
+
+        //----------- Test 12: Pass Through (LBI) -------------------- 
+        $display("Starting Test 12...");
+
+        for(i = 0; i < 16; i++) begin
+            input1 = $random();
+            input2 = $random();
+            operation = 4'hB;
+            expectedIsTaken = 1'b0;
+            expectedOutput = input2;
+
+            #5;
+            
+            if(expectedOutput != actualOutput || (expectedIsTaken != actualIsTaken)) begin
+                errors++;
+                $display("Pass Through operation failed");
+            end
+        end
+        
+        //----------- Test 13: SLBI (A << 16) | B -------------------- 
+        $display("Starting Test 13...");
+
+        for(i = 0; i < 16; i++) begin
+            input1 = $random();
+            input2 = $random();
+            operation = 4'hC;
+            expectedIsTaken = 1'b0;
+            expectedOutput = {input1[15:0], input2[15:0]}; 
+
+            #5;
+            
+            if(expectedOutput != actualOutput || (expectedIsTaken != actualIsTaken)) begin
+                errors++;
+                $display("SLBI operation failed");
+            end
+        end
+
+        //----------- Test 13: Unused Operations -------------------- 
+        $display("Starting Test 13...");
+
+        for(i = 0; i < 16; i++) begin
+            input1 = $random();
+            input2 = $random();
+            operation = $urandom_range(13, 15);
+            expectedIsTaken = 1'b0;
+            expectedOutput = 32'b0;
+
+            #5;
+            
+            if(expectedOutput != actualOutput || (expectedIsTaken != actualIsTaken)) begin
+                errors++;
+                $display("Unused operation failed");
+            end
         end
 
         if(errors == 0) begin
