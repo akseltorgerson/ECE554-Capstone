@@ -24,7 +24,7 @@ module cla_32bit_tb();
             Cin = 1'b0;
             expectedSum = input1 + input2;
 
-            #5
+            #5;
 
             if(expectedSum != actualSum) begin
                 errors++;
