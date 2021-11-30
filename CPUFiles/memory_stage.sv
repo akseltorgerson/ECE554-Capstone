@@ -34,7 +34,25 @@ module memory_stage(
     output cacheEvictValid;
     output stallDMAMem;
 
+    wire cacheEn;
+    wire cacheHit;
+
+    // TODO will obviously need some sort of state machine here
     //Instantiate memory here
+    dCache dCache(  .clk(clk), 
+                    .rst(rst), 
+                    .addr(aluResult), 
+                    .en(cacheEn), 
+                    .blkIn(mmuDataIn), 
+                    .dataIn(read2Data), 
+                    .rNw(memRead), 
+                    .loadLine(mmuDataValid), 
+                    .dataOut(memoryOut), 
+                    .hit(cacheHit), 
+                    .miss(cacheMiss), 
+                    .load(cacheLoad), 
+                    .blkOut(mmuDataOut), 
+                    .cacheEvictValid(cacheEvictValid));
 
 
 endmodule

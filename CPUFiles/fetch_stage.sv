@@ -2,7 +2,7 @@ module fetch_stage(
     //Inputs
     clk, rst, halt, nextPC, stallDMAMem, mmuDataValid, blockInstruction, mmuDataIn,
     //Outputs
-    instr, pcPlus4, cacheMiss, mmuDataOut, cacheEvictValid
+    instr, pcPlus4, cacheMiss//, mmuDataOut, cacheEvictValid
 );
 
     input clk, rst, halt;
@@ -32,20 +32,32 @@ module fetch_stage(
     output cacheMiss;
 
     //Data being evicted out of the cache, written back into the host memory
-    output [511:0] mmuDataOut;
+    // TODO do not think we need this for iCache
+    //output [511:0] mmuDataOut;
 
     //Control signal for the memory controller to let it know that the data bus is valid for eviction
-    output cacheEvictValid;
+    // TODO do not think we need this either
+    //output cacheEvictValid;
 
     wire [31:0] currPC;
 
     wire stallPC;
+
+    // cache signals
+    wire cacheHit;
+    wire cacheMiss;
+    wire cacheLoad;
+    wire cacheEn;
 
     //These signals are not important (but can be used later if need be)
     wire cout, P, G;
 
     //The instruction memeory
     // Instantiate module here
+    // TODO these might not be right, must check with ALEC
+    iCache iCache(.clk(clk), .rst(rst), .addr(currPC), .en(cacheEn), .blkIn(mmuDataIn), .instrOut(instr), .hit(cacheHit), .miss(cacheMiss), .loadLine(cacheLoad));
+    // TODO I think we're going to need some sort of state machine here to control this.
+
 
     //The halt signal will be ~ inside PC so when it is 0, it writes on the next clk cycle
     prgoram_counter iPC(.clk(clk), .rst(rst), .halt(halt), .nextAddr(nextPC), .currAddr(currPC), .stallPC(stallPC));
