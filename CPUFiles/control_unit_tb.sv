@@ -1,6 +1,6 @@
 module control_unit_tb();
     //Input Stimulus
-    logic opcode;
+    logic [4:0] opcode;
     logic fftCalculating;
     
     //Outputs of Control Unit DUT
@@ -55,7 +55,7 @@ module control_unit_tb();
                      .fftCalculating(fftCalculating),
                      .isJAL(isJALActual),
                      .regDst(regDstActual),
-                     .rsWrtie(rsWriteActual),
+                     .rsWrite(rsWriteActual),
                      .regWrite(regWriteActual),
                      .aluSrc(aluSrcActual),
                      .isSignExtend(isSignExtendActual),
@@ -77,7 +77,7 @@ module control_unit_tb();
 
     initial begin
         $display("Starting test...");
-        for(int i 0; i < 200; i++)begin
+        for(int i = 0; i < 200; i++)begin
             opcode = $urandom_range(0, 31);
             // Could give a seed here
             fftCalculating = $random();
@@ -224,13 +224,13 @@ module control_unit_tb();
                 //SEQ
                 5'b11100: begin
                     regDstExpected = 1'b1;
-                    aluSrcexpected = 1'b1;
+                    aluSrcExpected = 1'b1;
                     aluOpExpected = 4'b1000;
                     regWriteExpected = 1'b1;
                 end
                 //SLT
                 5'b11101: begin
-                    regDstexpected = 1'b1;
+                    regDstExpected = 1'b1;
                     aluSrcExpected = 1'b1;
                     aluOpExpected = 4'b1001;
                     regWriteExpected = 1'b1;
