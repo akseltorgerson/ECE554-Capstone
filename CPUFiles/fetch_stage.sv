@@ -28,7 +28,7 @@ module fetch_stage(
     //The current PC plus 4 (to get the next instruction if there is no branch or jump)
     output [31:0] pcPlus4;
 
-    //Lets the mmu know there was a miss in the instruction cache and to start a DMA request
+    //Lets the mc know there was a miss in the instruction cache and to start a DMA request
     output cacheMiss;
 
     wire [31:0] currPC;
@@ -36,14 +36,20 @@ module fetch_stage(
     wire stallPC;
 
     // cache signals
-    wire cacheHit;
-    wire cacheMiss;
+    logic cacheHit;
 
     //These signals are not important (but can be used later if need be)
     wire cout, P, G;
 
     //The instruction memeory
-    iCache iCache(.clk(clk), .rst(rst), .addr(currPC), .blkIn(mcDataIn), .loadLine(mcDataValid), .instrOut(instr), .hit(cacheHit), .miss(cacheMiss));
+    iCache iCache(  .clk(clk), 
+                    .rst(rst), 
+                    .addr(currPC), 
+                    .blkIn(mcDataIn), 
+                    .ld(mcDataValid), 
+                    .instrOut(instr), 
+                    .hit(cacheHit), 
+                    .miss(cacheMiss));
     // TODO I think we're going to need some sort of state machine here to control this.
 
     //The halt signal will be ~ inside PC so when it is 0, it writes on the next clk cycle
