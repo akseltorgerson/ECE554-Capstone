@@ -1,8 +1,8 @@
 module fetch_stage(
     //Inputs
-    clk, rst, halt, nextPC, stallDMAMem, mmuDataValid, blockInstruction, mmuDataIn,
+    clk, rst, halt, nextPC, stallDMAMem, mcDataValid, blockInstruction, mcDataIn,
     //Outputs
-    instr, pcPlus4, cacheMiss//, mmuDataOut, cacheEvictValid
+    instr, pcPlus4, cacheMiss
 );
 
     input clk, rst, halt;
@@ -14,10 +14,10 @@ module fetch_stage(
     input blockInstruction;
 
     //Control signal from the memory controller to let the instruction cache know the data is valid for the cache
-    input mmuDataValid;
+    input mcDataValid;
 
     //Data from the memory controller via a DMA request to fill the instruction cache
-    input [511:0] mmuDataIn;
+    input [511:0] mcDataIn;
 
     //The next address that the PC should point to
     input [31:0] nextPC;
@@ -31,14 +31,6 @@ module fetch_stage(
     //Lets the mmu know there was a miss in the instruction cache and to start a DMA request
     output cacheMiss;
 
-    //Data being evicted out of the cache, written back into the host memory
-    // TODO do not think we need this for iCache
-    //output [511:0] mmuDataOut;
-
-    //Control signal for the memory controller to let it know that the data bus is valid for eviction
-    // TODO do not think we need this either
-    //output cacheEvictValid;
-
     wire [31:0] currPC;
 
     wire stallPC;
@@ -46,17 +38,13 @@ module fetch_stage(
     // cache signals
     wire cacheHit;
     wire cacheMiss;
-    wire cacheLoad;
 
     //These signals are not important (but can be used later if need be)
     wire cout, P, G;
 
     //The instruction memeory
-    // Instantiate module here
-    // TODO these might not be right, must check with ALEC
-    iCache iCache(.clk(clk), .rst(rst), .addr(currPC), .blkIn(mmuDataIn), .instrOut(instr), .hit(cacheHit), .miss(cacheMiss), .loadLine(mmuDataValid));
+    iCache iCache(.clk(clk), .rst(rst), .addr(currPC), .blkIn(mcDataIn), .loadLine(mcDataValid), .instrOut(instr), .hit(cacheHit), .miss(cacheMiss));
     // TODO I think we're going to need some sort of state machine here to control this.
-
 
     //The halt signal will be ~ inside PC so when it is 0, it writes on the next clk cycle
     prgoram_counter iPC(.clk(clk), .rst(rst), .halt(halt), .nextAddr(nextPC), .currAddr(currPC), .stallPC(stallPC));
