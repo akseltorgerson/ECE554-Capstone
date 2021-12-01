@@ -31,7 +31,7 @@ module fetch_stage(
     //Lets the mc know there was a miss in the instruction cache and to start a DMA request
     output cacheMiss;
 
-    wire [31:0] currPC;
+    //wire [31:0] currPC;
 
     wire stallPC;
 
@@ -40,6 +40,20 @@ module fetch_stage(
 
     //These signals are not important (but can be used later if need be)
     wire cout, P, G;
+
+    // state variables
+    typedef enum logic [1:0] {IDLE = 2'b0, REQUEST = 1'b1, WAIT = 2'b2} state;
+    state currState;
+    state nextState;
+
+    //Control logic for if the PC needs to be stalled
+    assign stallPC = stallDMAMem | blockInstruction | cacheMiss;
+
+    //The halt signal will be ~ inside PC so when it is 0, it writes on the next clk cycle
+    prgoram_counter iPC(.clk(clk), .rst(rst), .halt(halt), .nextAddr(nextPC), .currAddr(currPC), .stallPC(stallPC));
+    
+    //Add four to the current PC (if there is no branch)
+    cla_32bit iPCAdder(.A(currPC), .B(16'h4), .Cin(1'b0), .Sum(pcPlus4), .Cout(cout), .P(P), .G(G));
 
     //The instruction memeory
     iCache iCache(  .clk(clk), 
@@ -50,14 +64,31 @@ module fetch_stage(
                     .instrOut(instr), 
                     .hit(cacheHit), 
                     .miss(cacheMiss));
-    // TODO I think we're going to need some sort of state machine here to control this.
 
-    //The halt signal will be ~ inside PC so when it is 0, it writes on the next clk cycle
-    prgoram_counter iPC(.clk(clk), .rst(rst), .halt(halt), .nextAddr(nextPC), .currAddr(currPC), .stallPC(stallPC));
-    
-    //Add four to the current PC (if there is no branch)
-    cla_32bit iPCAdder(.A(currPC), .B(16'h4), .Cin(1'b0), .Sum(pcPlus4), .Cout(cout), .P(P), .G(G));
+    always_ff @(posedge rst) begin
+        currState <= IDLE;
+    end
 
-    //Control logic for if the PC needs to be stalled
-    assign stallPC = stallDMAMem | blockInstruction | cacheMiss;
+    always_ff @(posedge clk) begin
+        currState <= nxtState;
+    end
+
+    // TODO might want to put this in an iCacheController module
+    always_comb begin
+        // Must assign all signals
+        nextState = 2'b0;
+
+        case(currState) begin
+            IDLE: begin
+                nextState = (cacheMiss) ? REQUEST : IDLE; 
+            end
+            REQUEST: begin
+                nextState = (mcDataValid) ? WAIT : REQUEST;
+            end
+            WAIT: begin
+                nextState = IDLE;
+            end
+        end
+    end
+
 endmodule
