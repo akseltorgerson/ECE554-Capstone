@@ -257,7 +257,7 @@ module alu_tb();
         //----------- Test 10: Less Than Operation -------------------- 
         $display("Starting Test 10...");
 
-        for(i = 0; i < 16; i++) begin
+        for(i = 0; i < 50; i++) begin
             input1 = $random();
             input2 = $random();
             operation = 4'h9;
@@ -289,10 +289,10 @@ module alu_tb();
                 $display("Less Than operation failed");
         end
 
-        //----------- Test 11: Less Than Operation -------------------- 
+        //----------- Test 11: Less Than or Equal Operation -------------------- 
         $display("Starting Test 11...");
 
-        for(i = 0; i < 16; i++) begin
+        for(i = 0; i < 50; i++) begin
             input1 = $random();
             input2 = $random();
             operation = 4'hA;
