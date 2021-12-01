@@ -67,6 +67,7 @@ module fetch_stage(
 
     always_ff @(posedge rst) begin
         currState <= IDLE;
+        nextState <= IDLE;
     end
 
     always_ff @(posedge clk) begin
@@ -76,7 +77,7 @@ module fetch_stage(
     // TODO might want to put this in an iCacheController module
     always_comb begin
         // Must assign all signals
-        nextState = 2'b0;
+        nextState = IDLE;
 
         case(currState) begin
             IDLE: begin

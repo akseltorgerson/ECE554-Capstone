@@ -44,6 +44,13 @@ module memory_stage(
     // control signals for cache state machine
     wire cacheHit;
 
+    // state variables
+    typedef enum logic [3:0] {  IDLE = 2'b0,
+                                READ = 2'b1, EVICT_RD = 2'b10, LOAD_RD = 2'b11, WAIT_RD = 2'b100,
+                                WRITE = 2'b101, EVICT_WR = 2'b110, LOAD_WR = 2'b111, WAIT_WR = 2'b1000} state;
+    state currState;
+    state nextState;
+
     //Instantiate memory here
     dCache dCache(  .clk(clk), 
                     .rst(rst), 
@@ -61,9 +68,47 @@ module memory_stage(
                     .evict(cacheEvict), 
                     .blkOut(mcDataOut));
 
-    // TODO might want to put this state machine in a dCacheController module
+    always_ff @(posedge rst) begin
+        currState <= IDLE;
+        nextState <= IDLE;
+    end
+
+    always_ff @(posedge clk) begin
+        currState <= nextState;
+    end
     
-
-
+    // TODO might want to put this state machine in a dCacheController module
+    always_comb begin
+        nextState = IDLE;
+        case(currState) begin
+            IDLE: begin
+                nextState = (memRead) ? READ : (memWrite) ? : WRITE : IDLE;
+            end
+            READ: begin
+                nextState = (cacheHit) ? IDLE : (cacheEvict) ? EVICT_RD : LOAD_RD;
+            end
+            EVICT_RD: begin
+                nextState = (evictDone) ? LOAD_RD : EVICT_RD;
+            end
+            LOAD_RD: begin
+                nextState = (mcDataValid) ? WAIT_RD : LOAD_RD;
+            end
+            WAIT_RD: begin
+                nextState = READ;
+            end
+            WRITE: begin
+                nextState = (cacheHit) ? IDLE : (cacheEvict) ? EVICT_WR : LOAD_WR;
+            end
+            EVICT_WR: begin
+                nextState = (evictDone) ? LOAD_WR : EVICT_WR;
+            end
+            LOAD_WR: begin
+                nextState = (mcDataValid) ? WAIT_WR : LOAD_WR;
+            end
+            WAIT_WR: begin
+                nextState = WRITE;
+            end
+        end
+    end
 
 endmodule
