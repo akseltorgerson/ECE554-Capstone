@@ -44,7 +44,6 @@ module memory_stage(
     // control signals for cache state machine
     wire cacheHit;
 
-    // TODO will obviously need some sort of state machine here
     //Instantiate memory here
     dCache dCache(  .clk(clk), 
                     .rst(rst), 
@@ -61,6 +60,10 @@ module memory_stage(
                     .miss(cacheMiss), 
                     .evict(cacheEvict), 
                     .blkOut(mcDataOut));
+
+    // TODO might want to put this state machine in a dCacheController module
+    
+
 
 
 endmodule
