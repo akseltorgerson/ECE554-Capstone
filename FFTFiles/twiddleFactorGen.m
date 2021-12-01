@@ -24,4 +24,4 @@ for fm = 1:1:(fft_length/2)
         fprintf(fid,']');
     end
 end
-    fclose(fid);
+fclose(fid);
