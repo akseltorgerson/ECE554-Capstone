@@ -88,7 +88,7 @@ module alu(
             //ANDN
             4'b0011: begin
                 aNew = A;
-                bNew = B;
+                bNew = ~B;
                 regOut = outAnd;
             end
             //BEQZ
@@ -101,11 +101,11 @@ module alu(
             end
             //BLTZ
             4'b0110: begin
-                regIsTaken = A[15];
+                regIsTaken = A[31];
             end
             //BGEZ
             4'b0111: begin
-                regIsTaken = ~A[15];
+                regIsTaken = ~A[31];
             end
             //Equal
             4'b1000: begin
@@ -116,14 +116,14 @@ module alu(
                 carryNew = 1'b1;
                 aNew = A;
                 bNew = ~B;
-                regOut = (outAdd == 32'h0) ? 32'h0 : {31'b0, outAdd[31]};
+                regOut = (A[31] == 1'b1) && (B[31] == 1'b0) ? 32'h1 : (A[31] == 1'b0) && (B[31] == 1'b1) ? 32'h0 : (outAdd == 32'h00000000) ? 32'h0 : {31'b0, outAdd[31]};	  
             end
             //Less than or equal
             4'b1010: begin
                 carryNew = 1'b1;
                 aNew = A;
                 bNew = ~B;
-                regOut = (outAdd == 32'h0) ? 32'h0 : {31'b0, outAdd[31]};
+                regOut = (A[31] == 1'b1) && (B[31] == 1'b0) ? 32'h1 : (A[31] == 1'b0) && (B[31] == 1'b1) ? 32'h0 : (outAdd == 32'h00000000) ? 32'h1 : {31'b0, outAdd[31]};
             end
             //Pass Through (LBI)
             4'b1011: begin

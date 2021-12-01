@@ -162,7 +162,7 @@ module alu_tb();
             input1 = $random();
             input2 = $random();
             operation = 4'h6;
-            if(input1 < 32'b0)begin
+            if(input1 < 0)begin
                 expectedIsTaken = 1'b1;
             end else begin
                 expectedIsTaken = 1'b0;
@@ -194,7 +194,7 @@ module alu_tb();
             input1 = $random();
             input2 = $random();
             operation = 4'h7;
-            if(input1 >= 32'h0)begin
+            if(input1 >= 0)begin
                 expectedIsTaken = 1'b1;
             end else begin
                 expectedIsTaken = 1'b0;
@@ -273,7 +273,7 @@ module alu_tb();
             
             if(expectedOutput != actualOutput || (expectedIsTaken != actualIsTaken)) begin
                 errors++;
-                $display("Less Than operation failed");
+                $display("Less Than operation failed, ExpectedOutput: %b ActualOutput: %b | input1: %b input2: %b", expectedOutput, actualOutput, input1, input2);
             end
         end
         //Explicitly Check that input1 == input2 clears output 
@@ -314,7 +314,7 @@ module alu_tb();
         //Explicitly Check that input1 == input2 sets output 
         //(because rand might not cover it)
         input1 = 32'h7AEB2;
-        input2 = 32'hAEB2;
+        input2 = 32'h7AEB2;
         expectedOutput = 32'h1;
 
         #5;
