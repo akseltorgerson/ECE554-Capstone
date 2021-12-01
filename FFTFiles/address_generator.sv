@@ -41,7 +41,7 @@ module  address_generator
     ///// modules ////
     //////////////////
 
-    assign stageDifference = (stageCount - numFactorBits)
+    assign stageDifference = (stageCount - numFactorBits);
 
     assign twiddle_int = ~stageDifference[5] ? 
                             cycleCount << stageDifference : 
@@ -90,7 +90,7 @@ module  address_generator
                     end
                     9'b10xxxxxxx: begin
                         indexA_reg = {3'b100, cycleCount[6:0]};
-                    
+                    end
                     9'b11xxxxxxx: begin
                         indexA_reg = {3'b110, cycleCount[6:0]};
                     end
