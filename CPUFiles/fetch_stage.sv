@@ -47,7 +47,6 @@ module fetch_stage(
     wire cacheHit;
     wire cacheMiss;
     wire cacheLoad;
-    wire cacheEn;
 
     //These signals are not important (but can be used later if need be)
     wire cout, P, G;
@@ -55,7 +54,7 @@ module fetch_stage(
     //The instruction memeory
     // Instantiate module here
     // TODO these might not be right, must check with ALEC
-    iCache iCache(.clk(clk), .rst(rst), .addr(currPC), .en(cacheEn), .blkIn(mmuDataIn), .instrOut(instr), .hit(cacheHit), .miss(cacheMiss), .loadLine(cacheLoad));
+    iCache iCache(.clk(clk), .rst(rst), .addr(currPC), .blkIn(mmuDataIn), .instrOut(instr), .hit(cacheHit), .miss(cacheMiss), .loadLine(mmuDataValid));
     // TODO I think we're going to need some sort of state machine here to control this.
 
 

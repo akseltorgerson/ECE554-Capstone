@@ -12,7 +12,6 @@ module iCache (
     input clk,
     input rst,
     input [31:0] addr,
-    input en,
     input [511:0] blkIn,
     // loading a line
     input loadLine,
@@ -20,8 +19,7 @@ module iCache (
     output [31:0] instrOut,
     output hit,
     output miss
-    // TODO I don't think we need to worry about evicting blocks in the iCache
-    //output [511:0] blkOut
+
     );
 
     reg [OFFSET_BITS-1:0] offset;
@@ -40,34 +38,33 @@ module iCache (
     // reset
     always @(posedge rst) begin
         for (int i = 0; i < BLOCKS; i++) begin
-            dataArray[i] = 512'b0;
-            tagArray[i] = 21'b0;
-            validArray[i] = 1'b0;
+            dataArray[i] <= 512'b0;
+            tagArray[i] <= 21'b0;
+            validArray[i] <= 1'b0;
         end
     end
 
-
     always @(posedge clk) begin
         // if the cache is enabled, and were reading
-        if (en && rNw) begin
+        if (!loadLine) begin
             // if the supplied index matches the tagArray at that index and its valid, hit
-            if ((index == tagArray[index]) && validArray[index]) begin
-                hit = 1'b1;
-                miss = 1'b0;
+            if (validArray[index] && index == tagArray[index])) begin
+                hit <= 1'b1;
+                miss <= 1'b0;
                 // TODO might have to flop this
                 instrOut = dataArray[index][offset];
             end
             // the supplied index either does not match the tag, or the valid bit is 0, either way its a miss
             else begin
-                hit = 1'b0;
-                miss = 1'b1;
+                hit <= 1'b0;
+                miss <= 1'b1;
             end    
         end
         // if the cache is enabled and were writing a block of data
-        else if (en && !rNw) begin
-            dataArray[index] = blkIn;
-            tagArray[index] = tag;
-            validArray[index] = 1'b1;
+        else if (loadLine) begin
+            dataArray[index] <= blkIn;
+            tagArray[index] <= tag;
+            validArray[index] <= 1'b1;
         end
     end
 endmodule

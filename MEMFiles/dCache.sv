@@ -35,6 +35,7 @@ module iCache (
     reg [BLOCK_SIZE-1:0] dataArray [BLOCKS-1:0];
     reg [TAG_BITS-1:0] tagArray [BLOCKS-1:0];
     reg validArray [BLOCKS-1:0];
+    reg dirtyArray [BLOCKS-1:0];
 
     assign offset = addr[3:0]; 
     assign index = addr[13:4];
@@ -46,6 +47,7 @@ module iCache (
             dataArray[i] = 512'b0;
             tagArray[i] = 21'b0;
             validArray[i] = 1'b0;
+            dirtyArray[i] = 1'b0;
         end
     end
 
