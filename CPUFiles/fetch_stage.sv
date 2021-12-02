@@ -56,7 +56,7 @@ module fetch_stage(
     cla_32bit iPCAdder(.A(currPC), .B(16'h4), .Cin(1'b0), .Sum(pcPlus4), .Cout(cout), .P(P), .G(G));
 
     //The instruction memeory
-    iCache iCache(  .clk(clk), 
+    instr_cache iInstrCache(  .clk(clk), 
                     .rst(rst), 
                     .addr(currPC), 
                     .blkIn(mcDataIn), 

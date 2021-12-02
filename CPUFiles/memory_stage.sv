@@ -58,7 +58,7 @@ module memory_stage(
     wire cacheBlkOut;
 
     //Instantiate memory here
-    dCache dCache(  .clk(clk), 
+    data_cache iDataCache(  .clk(clk), 
                     .rst(rst), 
                     .en(memWrite || memRead),
                     .addr(aluResult),  
