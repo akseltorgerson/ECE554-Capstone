@@ -73,21 +73,25 @@ module fetch_stage(
     always_ff @(posedge clk) begin
         currState <= nextState;
     end
+
     /* THIS IS CAUSING COMPILER ISSUES WILL FIX LATER
+
     // TODO might want to put this in an iCacheController module
     always_comb begin
         // Must assign all signals
         nextState = IDLE;
-
+        stallPc = 1'b0;
         case(currState)
             IDLE: begin
                 nextState = (cacheMiss) ? REQUEST : IDLE; 
             end
             REQUEST: begin
                 nextState = (mcDataValid) ? WAIT : REQUEST;
+                stallPC = 1'b1;
             end
             WAIT: begin
                 nextState = IDLE;
+                stallPC = 1'b1;
             end
         endcase
     end
