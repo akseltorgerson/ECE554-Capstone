@@ -51,22 +51,28 @@ module memory_stage(
     state currState;
     state nextState;
 
+    //Intermediate signals for the state machine
+    wire [31:0] memoryOutCache;
+    wire cacheMissInternal;
+    wire cacheEvictInternal;
+    wire cacheBlkOut;
+
     //Instantiate memory here
     dCache dCache(  .clk(clk), 
                     .rst(rst), 
                     .en(memWrite || memRead),
                     .addr(aluResult),  
                     .blkIn(mcDataIn), 
-                    //TODO do we write read2Data or aluResult?
                     .dataIn(read2Data), 
                     .rd(memRead),
                     .wr(memWrite), 
-                    .ld(mcDataValid), 
-                    .dataOut(memoryOut), 
+                    .ld(mcDataValid),
+                    //Outputs 
+                    .dataOut(memoryOutCache), 
                     .hit(cacheHit), 
-                    .miss(cacheMiss), 
-                    .evict(cacheEvict), 
-                    .blkOut(mcDataOut));
+                    .miss(cacheMissInternal), 
+                    .evict(cacheEvictInternal), 
+                    .blkOut(cacheBlkOut));
 
     always_ff @(posedge rst) begin
         currState <= IDLE;
@@ -80,35 +86,61 @@ module memory_stage(
     // TODO might want to put this state machine in a dCacheController module
     always_comb begin
         nextState = IDLE;
+        memoryOut = 32'h00000000;
+        cacheMiss = 1'b0;
+        cacheEvict = 1'b0;
+        //TODO: Need to figure out where to set this
+        aluResultMC = 32'h00000000;
+        stallDMAMem = 1'b0;
+        mcDataOut = 512'b0;
         case(currState) begin
             IDLE: begin
                 nextState = (memRead) ? READ : (memWrite) ? : WRITE : IDLE;
             end
             READ: begin
                 nextState = (cacheHit) ? IDLE : (cacheEvict) ? EVICT_RD : LOAD_RD;
+                memoryOut = memoryOutCache;
             end
             EVICT_RD: begin
                 nextState = (evictDone) ? LOAD_RD : EVICT_RD;
+                cacheMiss = cacheMissInternal;
+                cacheEvict = cacheEvictInternal;
+                //TODO: Is this right?
+                mcDataOut = cacheBlkOut;
+                stallDMAMem = 1'b1;
             end
             LOAD_RD: begin
                 nextState = (mcDataValid) ? WAIT_RD : LOAD_RD;
+                cacheMiss = cacheMissInternal;
+                stallDMAMem = 1'b1;
             end
             WAIT_RD: begin
                 nextState = READ;
+                cacheMiss = cacheMissInternal;
+                stallDMAMem = 1'b1;
             end
             WRITE: begin
                 nextState = (cacheHit) ? IDLE : (cacheEvict) ? EVICT_WR : LOAD_WR;
             end
             EVICT_WR: begin
                 nextState = (evictDone) ? LOAD_WR : EVICT_WR;
+                cacheMiss = cacheMissInternal;
+                cacheEvict = cacheEvictInternal;
+                //TODO: is this right?
+                mcDataOut = cacheBlkOut;
+                stallDMAMem = 1'b1;
             end
             LOAD_WR: begin
                 nextState = (mcDataValid) ? WAIT_WR : LOAD_WR;
+                cacheMiss = cacheMissInternal;
+                stallDMAMem = 1'b1;
             end
             WAIT_WR: begin
                 nextState = WRITE;
+                cacheMiss = cacheMissInternal;
+                stallDMAMem = 1'b1
             end
-        end
+        endcase
     end
 
 endmodule
