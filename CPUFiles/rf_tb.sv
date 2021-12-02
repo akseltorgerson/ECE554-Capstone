@@ -152,7 +152,7 @@ module rf_tb();
 	@(negedge clk);
 	read1DataExpected = 32'h00001234;
 	if(read1DataActual != read1DataExpected || read2DataActual != read2DataExpected)begin
-            $display("Test 69 Failed");
+            $display("Test 7 Failed");
             errors++;
         end
         if(errors == 0)begin
