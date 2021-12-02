@@ -41,8 +41,8 @@ module fetch_stage(
     //These signals are not important (but can be used later if need be)
     wire cout, P, G;
 
-    // state variables
-    typedef enum logic [1:0] {IDLE = 2'b0, REQUEST = 1'b1, WAIT = 2'b2} state;
+    // state variables, TODO: BE CAREFULL Might need to define last stage so all are defined for bits
+    typedef enum logic [1:0] {IDLE = 2'b0, REQUEST = 2'b01, WAIT = 2'b10} state;
     state currState;
     state nextState;
 
@@ -71,15 +71,15 @@ module fetch_stage(
     end
 
     always_ff @(posedge clk) begin
-        currState <= nxtState;
+        currState <= nextState;
     end
-
+    /* THIS IS CAUSING COMPILER ISSUES WILL FIX LATER
     // TODO might want to put this in an iCacheController module
     always_comb begin
         // Must assign all signals
         nextState = IDLE;
 
-        case(currState) begin
+        case(currState)
             IDLE: begin
                 nextState = (cacheMiss) ? REQUEST : IDLE; 
             end
@@ -89,7 +89,7 @@ module fetch_stage(
             WAIT: begin
                 nextState = IDLE;
             end
-        end
+        endcase
     end
-
+	*/
 endmodule

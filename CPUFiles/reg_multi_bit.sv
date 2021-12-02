@@ -8,7 +8,7 @@ module reg_multi_bit(clk, rst, write, wData, rData);
 
     wire [width -1:0] dataIn;
 
-    dff iDff [width -1:0] (.q(rData), .d(dataIn), .clk(clk), .rst(rst));
+    dff iDff[width -1:0] (.q(rData), .d(dataIn), .clk(clk), .rst(rst));
 
     assign dataIn = write ? wData : rData;
 
