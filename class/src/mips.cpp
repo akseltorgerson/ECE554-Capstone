@@ -146,71 +146,59 @@ namespace priscas
 	bool i_inst(opcode operation)
 	{
 		return
-			operation == ADDI ? true :
-			operation == ADDIU ? true:
-			operation == ANDI ? true :
-			operation == ORI ? true :
-			operation == XORI ? true :
-			operation == LB ? true :
-			operation == LBU ? true :
-			operation == LH ? true :
-			operation == LHU ? true :
-			operation == LUI ? true :
-			operation == LW ? true :
-			operation == LWL ? true :
-			operation == SB ? true :
-			operation == SH ? true :
-			operation == SW ? true :
-			operation == BEQ ? true :
-			operation == BNE ? true :
-			operation == BLEZ ? true :
-			operation == BGTZ ? true :
-			operation == SLTI ? true :
-			operation == SLTIU ? true :
-			operation == SWL ? true : false ;
+			operation == ADDI ||
+			operation == SUBI ||
+			operation == XORI ||
+			operation == ANDNI || 
+			operation == ST || 
+			operation == LD || 
+			operation == STU ||
+			operation == LBI ||
+			operation = SLBI;
 	}
 
 	bool j_inst(opcode operation)
 	{
 		return
-			operation == JUMP ? true :
-			operation == JAL ? true: false;
+			operation == J ||
+			operation == JAL ||
+			operation == JALR;
 	}
 
 	bool mem_inst(opcode operation)
 	{
 		return
-			(mem_write_inst(operation) || mem_read_inst(operation))?
-			true : false;
+			(mem_write_inst(operation) || mem_read_inst(operation));
 	}
 
 	bool mem_write_inst(opcode operation)
 	{
-		return
-			(operation == SW || operation == SB || operation == SH )?
-			true : false;
+		return operation == ST || operation == STU;
 	}
 
 	bool mem_read_inst(opcode operation)
 	{
-		return
-			(operation == LW || operation == LBU || operation == LHU )?
-			true : false;
+		return operation == LD
 	}
 
 	bool reg_write_inst(opcode operation, funct func)
 	{
 		return
-			(mem_read_inst(operation)) || (operation == R_FORMAT && func != JR) || (operation == ADDI) || (operation == ORI)
-			|| (operation == ANDI) || (operation == XORI) || (operation == SLTI) || (operation == SLTIU) || (operation == ADDIU) || (operation == JAL);
+			(mem_read_inst(operation) || r_inst(operation) ||
+			(operation == R_FORMAT && func != JR) || 
+			operation == ADDI ||
+			operation == SUBI ||
+			operation == XORI ||
+			operation == ANDNI ||
+			operation == JAL ||
+			operation == JALR ||
+			operation == LBI ||
+			operation == SLBI);
 	}
 
-	bool shift_inst(funct f)
+	bool shift_inst(opcode operation)
 	{
-		return
-			f == SLL ? true :
-			f == SRL ? true :
-			false;
+		return operation == SLBI
 	}
 
 	bool jorb_inst(opcode operation, funct fcode)
@@ -220,11 +208,8 @@ namespace priscas
 
 		bool is_jr = operation == R_FORMAT && fcode == JR;
 
-		bool is_branch =
-			operation == BEQ ? true :
-			operation == BNE ? true :
-			operation == BLEZ ? true :
-			operation == BGTZ ? true : false;
+		bool is_branch = operation == BNEZ ||
+		operation == BLTZ || operation == BGEZ;
 
 		return is_jump || is_branch || is_jr;
 	}
@@ -284,35 +269,34 @@ namespace priscas
 
 		// Mnemonic resolution
 		
-		if("add" == args[0]) { current_op = priscas::R_FORMAT; f_code = priscas::ADD; }
-		else if("addiu" == args[0]) { current_op = priscas::ADDIU; }
-		else if("addu" == args[0]) { current_op = priscas::R_FORMAT; f_code = priscas::ADDU; }
-		else if("addi" == args[0]) { current_op = priscas::ADDI; }
-		else if("beq" == args[0]) { current_op = priscas::BEQ; }
-		else if("bne" == args[0]) { current_op = priscas::BNE; }
-		else if("sub" == args[0]) { current_op = priscas::R_FORMAT; f_code = priscas::SUB; }
-		else if("and" == args[0]) { current_op = priscas::R_FORMAT; f_code = priscas::AND; }
-		else if("andi" == args[0]) { current_op = priscas::ANDI; }
-		else if("or" == args[0]) { current_op = priscas::R_FORMAT; f_code = priscas::OR; }	
-		else if("ori" == args[0]) { current_op = priscas::ORI; }	
-		else if("nor" == args[0]) { current_op = priscas::R_FORMAT; f_code = priscas::NOR; }	
-		else if("xori" ==  args[0]) { current_op = priscas::XORI; }
-		else if("lbu" == args[0]) { current_op = priscas::LBU; }
-		else if("lhu" == args[0]) { current_op = priscas::LHU; }
-		else if("lw" == args[0]) { current_op = priscas::LW; }
-		else if("sb" == args[0]) { current_op = priscas::SB; }
-		else if("sh" == args[0]) { current_op = priscas::SH; }
-		else if("sw" == args[0]) { current_op = priscas::SW; }
-		else if("sll" == args[0]) { current_op = priscas::R_FORMAT; f_code = priscas::SLL; }
-		else if("srl" == args[0]) { current_op = priscas::R_FORMAT; f_code = priscas::SRL; }
-		else if("slt" == args[0]) { current_op = priscas::R_FORMAT; f_code = priscas::SLT; }	
-		else if("slti" == args[0]) { current_op = priscas::SLTI;}
-		else if("sltiu" == args[0]) { current_op = priscas::SLTIU; }	
-		else if("sltu" == args[0]) { current_op = priscas::R_FORMAT; f_code = priscas::SLTU; }
-		else if("subu" == args[0]) { current_op = priscas::R_FORMAT; f_code = priscas::SUBU; }
-		else if("j" == args[0]) { current_op = priscas::JUMP;}
-		else if("jal" == args[0]) { current_op = priscas::JAL;}	
-		else if("jr" == args[0]) { current_op = priscas::R_FORMAT; f_code = priscas::JR;}
+		if ("halt" == args[0]) {current_op = priscas::HALT;}
+		else if ("nop" == args[0]) {current_op = priscas::NOP;}
+		else if ("startf" == args[0]) {current_op = priscas::STARTF;}
+		else if ("loadf" == args[0]) {current_op = priscas::LOADF;}
+		else if ("addi" == args[0]) {current_op = priscas::ADDI;}
+		else if ("subi" == args[0]) {current_op = priscas::SUBI;}
+		else if ("xori" == args[0]) {current_op = priscas::XORI;}
+		else if ("andni" == args[0]) {current_op = priscas::ANDNI;}
+		else if ("st" == args[0]) {current_op = priscas::ST;}
+		else if ("ld" == args[0]) {current_op = priscas::LD;}
+		else if ("stu" == args[0]) {current_op = priscas::STU;}
+		else if ("lbi" == args[0]) {current_op = priscas::LBI;}
+		else if ("slbi" == args[0]) {current_op = priscas::SLBI;}
+		else if ("j" == args[0]) {current_op = priscas::J;}
+		else if ("jal" == args[0]) {current_op = priscas::JAL;}
+		else if ("jalr" == args[0]) {current_op = priscas::JALR;}
+		else if ("bnez" == args[0]) {current_op = priscas::BNEZ;}
+		else if ("bltz" == args[0]) {current_op = priscas::BLTZ;}
+		else if ("bgez" == args[0]) {current_op = priscas::BGEZ;}
+		else if ("j" == args[0]) {current_op = priscas::J;}
+		else if ("add" == args[0]) {current_op = priscas::R_FORMAT;f_code == priscas::ADD }
+		else if ("sub" == args[0]) {current_op = priscas::R_FORMAT;f_code == priscas::SUB }
+		else if ("xor" == args[0]) {current_op = priscas::R_FORMAT;f_code == priscas::XOR }
+		else if ("andn" == args[0]) {current_op = priscas::R_FORMAT;f_code == priscas::ANDN }
+		else if ("seq" == args[0]) {current_op = priscas::R_FORMAT;f_code == priscas::SEQ }
+		else if ("slt" == args[0]) {current_op = priscas::R_FORMAT;f_code == priscas::SLT }
+		else if ("sle" == args[0]) {current_op = priscas::R_FORMAT;f_code == priscas::SLE }
+		else if ("jr" == args[0]) {current_op = priscas::R_FORMAT;f_code == priscas::JR }				
 		else
 		{
 			throw mt_bad_mnemonic();

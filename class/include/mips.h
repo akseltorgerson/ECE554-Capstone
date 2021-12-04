@@ -94,51 +94,53 @@ namespace priscas
 	// MIPS Processor Opcodes
 	enum opcode
 	{
-		R_FORMAT = 0,
-		DUMMY = 1,
-		JUMP = 2,
-		JAL = 3,
-		BEQ = 4,
-		BNE = 5,
-		BLEZ = 6,
-		BGTZ = 7,
-		ADDI =  8,
-		ADDIU = 9,
-		SLTI = 10,
-		SLTIU = 11,
-		ANDI = 12,
-		ORI = 13,
-		XORI = 14,
-		LUI = 15,
-		LB = 32,
-		LH = 33,
-		LWL = 34,
-		LW = 35,
-		LBU = 36,
-		LHU = 37,
-		LWR = 38,
-		SB = 40,
-		SH = 41,
-		SWL = 42,
-		SW = 43,
+
+		HALT = 0,
+		NOP = 1,
+		STARTF = 2,
+		STARTI = 3,
+		LOADF = 31,
+
+		R_FORMAT = 32,
+
+		// I INSTRUCTIONS
+		ADDI = 8,
+		SUBI = 9,
+		XORI = 10,
+		ANDNI = 11,
+
+		ST = 16,
+		LD = 17,
+		STU = 19,
+		
+		LBI = 20,
+		SLBI = 18,
+
+		// J INSTRUCTIONS
+		J = 4,
+		JAL = 6,
+		JALR = 7
+
+		// BRANCH
+		BNEZ = 13,
+		BLTZ = 14,
+		BGEZ = 15,
+
 		SYS_RES = -1	// system reserved for shell interpreter
 	};
 
 	// Function codes for R-Format Instructions
 	enum funct
 	{
-		SLL = 0,
-		SRL = 2,
-		JR = 8,
-		ADD = 32,
-		ADDU = 33,
-		SUB = 34,
-		SUBU = 35,
-		AND = 36,
-		OR = 37,
-		NOR = 39,
-		SLT = 42,
-		SLTU = 43,
+		ADD = 24,
+		SUB = 25,
+		XOR = 26,
+		ANDN = 27,
+		SEQ = 28,
+		SLT = 29,
+		SLE = 30,
+		JR = 5,
+		
 		NONE = -1	// default, if not R format
 	};
 
@@ -156,11 +158,8 @@ namespace priscas
 		{
 					ADD = 0,
 					SUB = 1,
-					SLL = 2,
-					SRL = 3,
-					OR = 4,
-					AND = 5,
-					XOR = 6
+					ANDN = 2,
+					XOR = 3
 		};
 	}
 
