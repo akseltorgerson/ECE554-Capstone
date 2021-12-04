@@ -73,4 +73,15 @@ module decode_stage(
     //Data being written back to the register file
     assign writeData = isJAL ? pcPlus4 : writebackData;
 
+    //-----------------------Exception Handling-------------------------------
+    //Note: The way this is written is that complexArithmetic will get asserted over realImagLoad if both occur in one instr
+    
+    //ComplexArithmeticException (TODO: declare this as an output of this stage)
+    assign complexArithmeticEx = ((instr[31:29] == 3'b110) && (instr[26] != instr[22])) ? 1'b1 : 1'b0;
+    //fftException (not sure how to do this)
+
+    //fftNotCompleteException (not sure how to do this)
+
+    //RealImaginaryLoadException First part here is for ADDI SUBI next part for SUB ADD
+    assign realImagLoadEx = ((instr[31:29] == 3'b010) && (instr[26 != instr[22]])) || ((instr[31:29] == 3'b110) && (instr[26] == instr[22]) && (instr[26] != instr[18])) ? 1'b1 : 1'b0;
 endmodule

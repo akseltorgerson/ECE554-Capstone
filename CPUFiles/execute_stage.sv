@@ -27,7 +27,7 @@ module execute_stage(
     wire jumpOrTaken;
     wire isTaken;
 
-    cla_32bit iCLA(.A(offest),
+    cla_32bit iCLA(.A(offset),
                    .B(pcPlus4),
                    .Cin(1'b0),
                    .Sum(offsetPCPlus4),
@@ -66,4 +66,6 @@ module execute_stage(
 
     assign aluResult = aluResultInterior;
 
+    //---------------------Exception Handling-----------------------------
+    
 endmodule
