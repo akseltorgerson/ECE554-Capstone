@@ -80,13 +80,13 @@ module control_unit(
             //STARTF
             5'b00010: begin
                 //TODO: Might have to not set the startF or StartI instruction if it is calculating
-                startF = 1'b1;
+                startF = fftCalculating ? 1'b0: 1'b1;
                 //TODO: can this be done?
                 blockInstruction = fftCalculating ? 1'b1 : 1'b0;
             end
             //STARTI
             5'b00011: begin
-                startI = 1'b1;
+                startI = fftCalculating ? 1'b0 : 1'b1;
                 blockInstruction = fftCalculating ? 1'b1 : 1'b0;
             end
             //LOADF
