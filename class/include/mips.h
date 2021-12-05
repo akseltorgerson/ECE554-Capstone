@@ -103,29 +103,34 @@ namespace priscas
 
 		R_FORMAT = 32,
 
-		// I INSTRUCTIONS
+		// I INSTRUCTIONS 1
+		// 3 + opcode
 		ADDI = 8,
 		SUBI = 9,
 		XORI = 10,
 		ANDNI = 11,
-
 		ST = 16,
 		LD = 17,
 		STU = 19,
+
+		// I INSTRUCTIONS 2
+		// 2 + opcode
 		
+		JR = 5,
+		JALR = 7,
 		LBI = 20,
 		SLBI = 18,
 
-		// J INSTRUCTIONS
-		J = 4,
-		JAL = 6,
-		JALR = 7
-
-		// BRANCH
+		BEQZ = 12,
 		BNEZ = 13,
 		BLTZ = 14,
 		BGEZ = 15,
 
+
+		// J INSTRUCTIONS
+		J = 4,
+		JAL = 6,
+		
 		SYS_RES = -1	// system reserved for shell interpreter
 	};
 
@@ -139,7 +144,6 @@ namespace priscas
 		SEQ = 28,
 		SLT = 29,
 		SLE = 30,
-		JR = 5,
 		
 		NONE = -1	// default, if not R format
 	};
@@ -166,7 +170,9 @@ namespace priscas
 	// Format check functions
 	/* Checks if an instruction is I formatted.
 	 */
-	bool i_inst(opcode operation);
+	bool i_inst1(opcode operation);
+
+	bool i_inst2(opcode operation);
 
 	/* Checks if an instruction is R formatted.
 	 */
@@ -209,7 +215,7 @@ namespace priscas
 	/* "Generic" MIPS-32 architecture
 	 * encoding function asm -> binary
 	 */
-	BW_32 generic_mips32_encode(int rs, int rt, int rd, int funct, int imm_shamt_jaddr, opcode op);
+	BW_32 generic_mips32_encode(int rs, int rt, int rd, int funct, int imm_shamt_jaddr, opcode op, int filter, uint32_t signum);
 
 	/* For calculating a label offset in branches
 	 */
