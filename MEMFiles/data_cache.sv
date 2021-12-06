@@ -84,7 +84,7 @@ module data_cache (
     assign tag = addr[31:8];
     assign valid = validArray[index];
     assign dirty = dirtyArray[index];
-    assign tagMatch = (index == tagArray[index]);
+    assign tagMatch = (tag == tagArray[index]);
     assign read = (en & rd & !wr & !ld);
     assign write = (en & !rd & wr & !ld);
     assign load = (en & !rd & !wr & ld);
@@ -99,7 +99,7 @@ module data_cache (
     assign blkInUnpacked[6] = blkIn[223:192];
     assign blkInUnpacked[7] = blkIn[255:224];
     assign blkInUnpacked[8] = blkIn[287:256];
-    assign blkInUnpacked[9] = blkIn[329:288];
+    assign blkInUnpacked[9] = blkIn[319:288];
     assign blkInUnpacked[10] = blkIn[351:320];
     assign blkInUnpacked[11] = blkIn[383:352];
     assign blkInUnpacked[12] = blkIn[415:384];
