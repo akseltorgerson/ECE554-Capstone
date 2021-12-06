@@ -8,7 +8,7 @@ localparam OFFSET_BITS = 4;
 localparam INDEX_BITS = 7;
 localparam TAG_BITS = 21;
 
-module iCache (
+module instr_cache (
     input clk,
     input rst,
     input [31:0] addr,
@@ -22,7 +22,7 @@ module iCache (
 
     );
 
-    genvar i;
+    genvar i, j, k;
 
     // register array for cache
     reg [WORD_SIZE-1:0] dataArray [BLOCKS-1:0][WORDS-1:0];
@@ -38,16 +38,16 @@ module iCache (
     logic tagMatch;
 
     // output signals that need to be flopped
-    logic [WORD_SIZE-1:0] instrOutInt;
-    logic hitInt;
-    logic missInt;
+    //logic [WORD_SIZE-1:0] instrOutInt;
+    //logic hitInt;
+    //logic missInt;
 
     // internal assignments
     assign offset = addr[OFFSET_BITS-1:0]; 
     assign index = addr[OFFSET_BITS+INDEX_BITS-1:OFFSET_BITS];
     assign tag = addr[WORD_SIZE-1:OFFSET_BITS+INDEX_BITS];
     assign valid = validArray[index];
-    assign tagMatch = (index == tagArray[index]);
+    assign tagMatch = (tag == tagArray[index]);
 
     // Unpack blkIn
     assign blkInUnpacked[0] = blkIn[31:0];
@@ -69,19 +69,15 @@ module iCache (
 
     // Cache assignments
     // Update tag array
-    always @(rst, ld) begin
-        if (rst) begin
-            tagArray[index] = 21'b0;
-        end else if (ld) begin
+    always @(posedge clk) begin
+        if (ld) begin
             tagArray[index] = tag;
         end
     end
 
     // Update valid array
-    always @(rst, ld) begin
-        if (rst) begin
-            validArray[index] = 1'b0;
-        end else if (ld) begin
+    always @(posedge clk) begin
+        if (ld) begin
             validArray[index] = 1'b1;
         end
     end
@@ -89,27 +85,40 @@ module iCache (
     // Update data array
     generate
     for (i = 0; i < WORDS; i++) begin
-        always @(rst, ld) begin
-            if (rst) begin
-                dataArray[index][i] = 32'b0;
-            end else if (ld) begin
+        always @(posedge clk) begin
+            if (ld) begin
                 dataArray[index][i] = {blkInUnpacked[i]};
             end
         end
     end
     endgenerate
 
+    // Reset sequence
+    generate
+        for (j = 0; j < BLOCKS; j++) begin
+            for (k = 0; k < WORDS; k++) begin
+                always @(posedge rst) begin
+                    if (rst) begin
+                        dataArray[j][k] = 32'b0;
+                        tagArray[j] = {TAG_BITS{1'b0}};
+                        validArray[j] = 1'b0;
+                    end
+                end
+            end
+        end
+    endgenerate
+
     // output assignments
-    assign instrOutInt = (hit) ? dataArray[index][offset] : instrOutInt;
-    assign hitInt = (valid & tagMatch);
-    assign missInt = (~hitInt);
+    assign instrOut = (hit) ? dataArray[index][offset] : instrOut;
+    assign hit = (valid & tagMatch);
+    assign miss = (~hit);
 
     // Flop outputs
-    always @(posedge clk) begin
-        instrOut <= instrOutInt;
-        hit <= hitInt;
-        miss <= missInt;
-    end
+    //always @(posedge clk) begin
+    //    instrOut <= instrOutInt;
+    //    hit <= hitInt;
+    //    miss <= missInt;
+    //end
 
 /*
     always @(posedge clk) begin

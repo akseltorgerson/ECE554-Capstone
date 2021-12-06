@@ -1,12 +1,12 @@
-// 64KB instruction cache
+// 32KB instruction cache
 
-localparam BLOCKS = 16;       // 128 cache lines
+localparam BLOCKS = 256;       // 1024 cache lines
 localparam BLOCK_SIZE = 512;    // 512b (64B) cache line size
 localparam WORDS = 16;          // 16 words per line
 localparam WORD_SIZE = 32;      // 32 bit words
 localparam OFFSET_BITS = 4;     // 2^4 = 16 (words per line)
-localparam INDEX_BITS = 4;     // 2^10 = 1024
-localparam TAG_BITS = 24;       // 32 - 4 - 10 = 18
+localparam INDEX_BITS = 8;     // 2^10 = 1024
+localparam TAG_BITS = 20;       // 32 - 4 - 10 = 18
 
 module data_cache (
     input clk,
@@ -72,16 +72,16 @@ module data_cache (
     logic load;
 
     // output signals that need to be flopped
-    logic [WORD_SIZE-1:0] dataOutInt;
-    logic hitInt;
-    logic missInt;
-    logic evictInt;
-    logic [BLOCK_SIZE:0] blkOutInt;
+    //logic [WORD_SIZE-1:0] dataOutInt;
+    //logic hitInt;
+    //logic missInt;
+    //logic evictInt;
+    //logic [BLOCK_SIZE:0] blkOutInt;
 
     // internal assignments
     assign offset = addr[OFFSET_BITS-1:0]; 
     assign index = addr[OFFSET_BITS+INDEX_BITS-1:OFFSET_BITS];
-    assign tag = addr[31:8];
+    assign tag = addr[WORD_SIZE-1:OFFSET_BITS+INDEX_BITS];
     assign valid = validArray[index];
     assign dirty = dirtyArray[index];
     assign tagMatch = (tag == tagArray[index]);
@@ -166,10 +166,10 @@ module data_cache (
     generate
         for (j = 0; j < BLOCKS; j++) begin
             for (k = 0; k < WORDS; k++) begin
-                always @(posedge clk) begin
+                always @(posedge rst) begin
                     if (rst) begin
                         dataArray[j][k] = 32'b0;
-                        tagArray[j] = {24'b0};
+                        tagArray[j] = {TAG_BITS{1'b0}};
                         dirtyArray[j] = 1'b0;
                         validArray[j] = 1'b0;
                     end

@@ -46,8 +46,8 @@ module memory_stage(
 
     // state variables
     typedef enum logic [3:0] {  IDLE = 2'b0,
-                                READ = 2'b1, EVICT_RD = 2'b10, LOAD_RD = 2'b11, WAIT_RD = 2'b100,
-                                WRITE = 2'b101, EVICT_WR = 2'b110, LOAD_WR = 2'b111, WAIT_WR = 2'b1000} state;
+                                READ = 2'b1, EVICT_RD = 2'b10, LOAD_RD = 2'b11, WAIT_RD = 3'b100,
+                                WRITE = 3'b101, EVICT_WR = 3'b110, LOAD_WR = 3'b111, WAIT_WR = 4'b1000} state;
     state currState;
     state nextState;
 
