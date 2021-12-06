@@ -60,6 +60,7 @@ module execute_stage(
     assign pcNotJR = jumpOrTaken ? offsetPCPlus4 : pcPlus4;
 
     //isJR referres to JR or JALR
+    //TODO: Assign this to the exception handler address if there is an exception
     assign nextPC = isJR ? aluResultInterior : pcNotJR;
 
     assign bInputALU = aluSrc ? read2Data : iTypeWire;

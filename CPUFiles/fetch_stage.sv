@@ -31,9 +31,11 @@ module fetch_stage(
     //Lets the mc know there was a miss in the instruction cache and to start a DMA request
     output cacheMiss;
 
-    //wire [31:0] currPC;
+    wire [31:0] currPC;
 
     wire stallPC;
+
+    wire cacheAddr;
 
     // cache signals
     logic cacheHit;
@@ -52,18 +54,18 @@ module fetch_stage(
     //The halt signal will be ~ inside PC so when it is 0, it writes on the next clk cycle
     prgoram_counter iPC(.clk(clk), .rst(rst), .halt(halt), .nextAddr(nextPC), .currAddr(currPC), .stallPC(stallPC));
     
-    //Add four to the current PC (if there is no branch)
+    //Add four to the current PC (if there is no branch, this will be where the next instruction is)
     cla_32bit iPCAdder(.A(currPC), .B(16'h4), .Cin(1'b0), .Sum(pcPlus4), .Cout(cout), .P(P), .G(G));
 
     //The instruction memeory
-    instr_cache iInstrCache(  .clk(clk), 
-                    .rst(rst), 
-                    .addr(currPC), 
-                    .blkIn(mcDataIn), 
-                    .ld(mcDataValid), 
-                    .instrOut(instr), 
-                    .hit(cacheHit), 
-                    .miss(cacheMiss));
+    instr_cache iInstrCache(.clk(clk), 
+                            .rst(rst), 
+                            .addr(currPC), 
+                            .blkIn(mcDataIn), 
+                            .ld(mcDataValid), 
+                            .instrOut(instr), 
+                            .hit(cacheHit), 
+                            .miss(cacheMiss));
 
     always_ff @(posedge rst) begin
         currState <= IDLE;
@@ -80,18 +82,20 @@ module fetch_stage(
     always_comb begin
         // Must assign all signals
         nextState = IDLE;
-        stallPc = 1'b0;
+        //stallPC = 1'b0;
+        cacheAddr = 32'h00000000;
         case(currState)
             IDLE: begin
+                cacheAddr = currPC;
                 nextState = (cacheMiss) ? REQUEST : IDLE; 
             end
             REQUEST: begin
                 nextState = (mcDataValid) ? WAIT : REQUEST;
-                stallPC = 1'b1;
+                //stallPC = 1'b1;
             end
             WAIT: begin
                 nextState = IDLE;
-                stallPC = 1'b1;
+                //stallPC = 1'b1;
             end
         endcase
     end

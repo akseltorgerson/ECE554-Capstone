@@ -12,4 +12,4 @@ module epc_register(
                        .rst(rst),
                        .write(write),
                        .wData(epcIn),
-                       .rData(epcOut)):
+                       .rData(epcOut));
