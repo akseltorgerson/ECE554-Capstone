@@ -1,14 +1,14 @@
 // 64KB instruction cache
 
-localparam BLOCKS = 1024;       // 128 cache lines
+localparam BLOCKS = 16;       // 128 cache lines
 localparam BLOCK_SIZE = 512;    // 512b (64B) cache line size
 localparam WORDS = 16;          // 16 words per line
 localparam WORD_SIZE = 32;      // 32 bit words
 localparam OFFSET_BITS = 4;     // 2^4 = 16 (words per line)
-localparam INDEX_BITS = 10;     // 2^10 = 1024
-localparam TAG_BITS = 18;       // 32 - 4 - 10 = 18
+localparam INDEX_BITS = 4;     // 2^10 = 1024
+localparam TAG_BITS = 24;       // 32 - 4 - 10 = 18
 
-module iCache (
+module data_cache (
     input clk,
     input rst,
 
@@ -50,7 +50,7 @@ module iCache (
     );
 
     // TODO talk to winor or josh about cache coherency
-    genvar i;
+    genvar i, j, k;
 
     // register arrays for cache
     reg [WORD_SIZE-1:0] dataArray [BLOCKS-1:0][WORDS-1:0];
@@ -81,7 +81,7 @@ module iCache (
     // internal assignments
     assign offset = addr[OFFSET_BITS-1:0]; 
     assign index = addr[OFFSET_BITS+INDEX_BITS-1:OFFSET_BITS];
-    assign tag = addr[WORD_SIZE-1:OFFSET_BITS+INDEX_BITS];
+    assign tag = addr[31:8];
     assign valid = validArray[index];
     assign dirty = dirtyArray[index];
     assign tagMatch = (index == tagArray[index]);
@@ -127,30 +127,24 @@ module iCache (
 
     // Cache assignments
     // Update tag array
-    always @(rst, load) begin
-        if (rst) begin
-            tagArray[index] = 18'b0;
-        end else if (load) begin
+    always @(posedge clk) begin
+        if (load) begin
             tagArray[index] = tag;
         end
     end      
 
     // Update dirty array
-    always @(rst, load, write) begin
-        if (rst) begin
+    always @(posedge clk) begin
+        if (load) begin
             dirtyArray[index] = 1'b0;
-        end else if (load) begin
-            dirtyArray[index] = 1'b0;
-        end else if (write) begin
+        end else if (write & hit) begin
             dirtyArray[index] = 1'b1;
         end
     end
 
     // Update valid array
-    always @(rst, load) begin
-        if (rst) begin
-            validArray[index] = 1'b0;
-        end else if (load) begin
+    always @(posedge clk) begin
+        if (load) begin
             validArray[index] = 1'b1;
         end
     end
@@ -158,10 +152,8 @@ module iCache (
     // Update data array
     generate
     for (i = 0; i < WORDS; i++) begin
-        always @(rst, write, hit, load) begin
-            if (rst) begin
-                dataArray[index][i] = 32'b0;
-            end else if (write & hit && offset == i) begin
+        always @(posedge clk) begin
+            if (write & hit && offset == i) begin
                 dataArray[index][i] = dataIn;
             end else if (load) begin
                 dataArray[index][i] = {blkInUnpacked[i]};
@@ -170,21 +162,38 @@ module iCache (
     end
     endgenerate
 
+    // Reset sequence
+    generate
+        for (j = 0; j < BLOCKS; j++) begin
+            for (k = 0; k < WORDS; k++) begin
+                always @(posedge clk) begin
+                    if (rst) begin
+                        dataArray[j][k] = 32'b0;
+                        tagArray[j] = {24'b0};
+                        dirtyArray[j] = 1'b0;
+                        validArray[j] = 1'b0;
+                    end
+                end
+            end
+        end
+    endgenerate
+
+
     // output assignments
-    assign dataOutInt = (read & hit) ? dataArray[index][offset] : 32'b0;
-    assign hitInt = (valid & tagMatch);
-    assign missInt = (~hit);
-    assign evictInt = (miss & dirty & valid);
-    assign blkOutInt = (evictInt) ? blkOutPacked : 512'b0;
+    assign dataOut = (read & hit) ? dataArray[index][offset] : 32'b0;
+    assign hit = (valid & tagMatch);
+    assign miss = (~hit);
+    assign evict = (miss & dirty & valid);
+    assign blkOut = (evict) ? blkOutPacked : 512'b0;
 
     // Flop outputs
-    always @(posedge clk) begin
-        dataOut <= dataOutInt;
-        hit <= hitInt;
-        miss <= missInt;
-        evict <= evictInt;
-        blkOut <= blkOutInt;
-    end
+    //always @(posedge clk) begin
+    //    dataOut <= dataOutInt;
+    //    hit <= hitInt;
+    //    miss <= missInt;
+    //    evict <= evictInt;
+    //    blkOut <= blkOutInt;
+    //end
 
 /* TODO I think this is right, untested, but above is using assign statements
     always @(posedge clk) begin
