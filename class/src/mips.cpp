@@ -250,14 +250,14 @@ namespace priscas
 			w = (w.AsUInt32() | ((rs & ((1 << 4) - 1) ) << 23 ));
 
 			if (op != priscas:ADDI && op != priscas::SUBI) {
-				w = w.AsUInt32() & ((uint32_t)0xFBBFFFFF)
+				w = w.AsUInt32() & ((uint32_t)0xFBBFFFFF);
 			}
 			w = (w.AsUInt32() | ((op & ((1 << 5) - 1) ) << 27 ));
 		}
 		if (i_inst2(op))
 		{
 			w = (w.AsUInt32() | (imm_shamt_jaddr & ((1 << 23) - 1)));
-			w = (w.AsUInt32() | ( ((rs & ((1 << 4) - 1)) << 23)) & ((uint32_t)0xFBFFFFFF) );
+			w = (w.AsUInt32() | ( ((rs & ((1 << 4) - 1)) << 24)) & ((uint32_t)0xFBFFFFFF) );
 			w = (w.AsUInt32() | ((op & ((1 << 5) - 1) ) << 27 ));
 		}
 
