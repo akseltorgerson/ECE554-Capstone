@@ -276,7 +276,7 @@ namespace priscas
 		if (op == priscas::STARTF)
 		{
 			if (filter)
-				w = w.AsUInt32() | 0x00000100
+				w = w.AsUInt32() | 0x00000100;
 			w = (w.AsUInt32() | ((signum & ((1 << 18) - 1) ) << 9 ));
 			w = (w.AsUInt32() | ((op & ((1 << 5) - 1) ) << 27 ));
 		}
