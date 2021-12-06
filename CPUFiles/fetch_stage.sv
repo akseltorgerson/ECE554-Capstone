@@ -76,8 +76,6 @@ module fetch_stage(
         currState <= nextState;
     end
 
-    /* THIS IS CAUSING COMPILER ISSUES WILL FIX LATER
-
     // TODO might want to put this in an iCacheController module
     always_comb begin
         // Must assign all signals
@@ -99,5 +97,5 @@ module fetch_stage(
             end
         endcase
     end
-	*/
+
 endmodule
