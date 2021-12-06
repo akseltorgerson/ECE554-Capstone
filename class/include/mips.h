@@ -101,7 +101,6 @@ namespace priscas
 		STARTI = 3,
 		LOADF = 31,
 
-		R_FORMAT = 32,
 
 		// I INSTRUCTIONS 1
 		// 3 + opcode
@@ -130,13 +129,9 @@ namespace priscas
 		// J INSTRUCTIONS
 		J = 4,
 		JAL = 6,
-		
-		SYS_RES = -1	// system reserved for shell interpreter
-	};
 
-	// Function codes for R-Format Instructions
-	enum funct
-	{
+		// R Format
+
 		ADD = 24,
 		SUB = 25,
 		XOR = 26,
@@ -145,8 +140,9 @@ namespace priscas
 		SLT = 29,
 		SLE = 30,
 		
-		NONE = -1	// default, if not R format
+		SYS_RES = -1	// system reserved for shell interpreter
 	};
+
 
 	int friendly_to_numerical(const char *);
 
@@ -200,7 +196,7 @@ namespace priscas
 	/* Checks if an instruction performs
 	 * a register write
 	 */
-	bool reg_write_inst(opcode operation, funct func);
+	bool reg_write_inst(opcode operation);
 
 	/* Check if a special R-format
 	 * shift instruction
@@ -210,12 +206,12 @@ namespace priscas
 	/* Check if a Jump or
 	 * Branch Instruction
 	 */
-	bool jorb_inst(opcode operation, funct fcode);
+	bool jorb_inst(opcode operation);
 
 	/* "Generic" MIPS-32 architecture
 	 * encoding function asm -> binary
 	 */
-	BW_32 generic_mips32_encode(int rs, int rt, int rd, int funct, int imm_shamt_jaddr, opcode op, int filter, uint32_t signum);
+	BW_32 generic_mips32_encode(int rs, int rt, int rd, int imm_shamt_jaddr, opcode op, int filter, uint32_t signum);
 
 	/* For calculating a label offset in branches
 	 */

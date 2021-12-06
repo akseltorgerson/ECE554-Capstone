@@ -138,9 +138,13 @@ namespace priscas
 	bool r_inst(opcode operation)
 	{
 		return
-		
-			operation == R_FORMAT ? true :
-			false ;
+			operation == ADD ||
+			operation == SUB ||
+			operation == XOR ||
+			operation == ANDN ||
+			operation == SEQ ||
+			operation == SLT ||
+			operation == SLE;
 	}
 
 	bool i_inst1(opcode operation)
@@ -194,11 +198,10 @@ namespace priscas
 		return operation == LD;
 	}
 
-	bool reg_write_inst(opcode operation, funct func)
+	bool reg_write_inst(opcode operation)
 	{
 		return
 			(mem_read_inst(operation) || r_inst(operation) ||
-			(operation == R_FORMAT) || 
 			operation == ADDI ||
 			operation == SUBI ||
 			operation == XORI ||
@@ -214,12 +217,12 @@ namespace priscas
 		return operation == SLBI;
 	}
 
-	bool jorb_inst(opcode operation, funct fcode)
+	bool jorb_inst(opcode operation)
 	{
 		// First check jumps
 		bool is_jump = j_inst(operation);
 
-		bool is_jr = operation == R_FORMAT && fcode == JR;
+		bool is_jr = operation == JR;
 
 		bool is_branch = operation == BNEZ ||
 		operation == BLTZ || operation == BGEZ;
@@ -227,7 +230,7 @@ namespace priscas
 		return is_jump || is_branch || is_jr;
 	}
 
-	BW_32 generic_mips32_encode(int rs, int rt, int rd, int funct, int imm_shamt_jaddr, opcode op, int filter, uint32_t signum)
+	BW_32 generic_mips32_encode(int rs, int rt, int rd, int imm_shamt_jaddr, opcode op, int filter, uint32_t signum)
 	{
 		BW_32 w = 0;
 
@@ -238,7 +241,7 @@ namespace priscas
 			w = (w.AsUInt32() | ((rt & ((1 << 4) - 1) ) << 19 ));
 			w = (w.AsUInt32() | ((rs & ((1 << 4) - 1) ) << 23 ));
 			if (op != priscas:ADD && op != priscas::SUB) {
-				w = w.AsUInt32() & ((uint32_t)0xFBBBFFFF)
+				w = w.AsUInt32() & ((uint32_t)0xFBBBFFFF);
 			}
 			w = (w.AsUInt32() | ((op & ((1 << 5) - 1) ) << 27 ));
 		}
@@ -257,7 +260,7 @@ namespace priscas
 		if (i_inst2(op))
 		{
 			w = (w.AsUInt32() | (imm_shamt_jaddr & ((1 << 23) - 1)));
-			w = (w.AsUInt32() | ( ((rs & ((1 << 4) - 1)) << 24)) & ((uint32_t)0xFBFFFFFF) );
+			w = (w.AsUInt32() | ( ((rs & ((1 << 4) - 1)) << 23)) & ((uint32_t)0xFBFFFFFF) );
 			w = (w.AsUInt32() | ((op & ((1 << 5) - 1) ) << 27 ));
 		}
 
@@ -301,7 +304,6 @@ namespace priscas
 			return std::shared_ptr<BW>(new BW_32());
 
 		priscas::opcode current_op = priscas::SYS_RES;
-		priscas::funct f_code = priscas::NONE;
 
 		int rs = 0;
 		int rt = 0;
@@ -333,13 +335,13 @@ namespace priscas
 		else if ("bltz" == args[0]) {current_op = priscas::BLTZ;}
 		else if ("bgez" == args[0]) {current_op = priscas::BGEZ;}
 		else if ("j" == args[0]) {current_op = priscas::J;}
-		else if ("add" == args[0]) {current_op = priscas::R_FORMAT;f_code = priscas::ADD; }
-		else if ("sub" == args[0]) {current_op = priscas::R_FORMAT;f_code = priscas::SUB; }
-		else if ("xor" == args[0]) {current_op = priscas::R_FORMAT;f_code = priscas::XOR; }
-		else if ("andn" == args[0]) {current_op = priscas::R_FORMAT;f_code = priscas::ANDN; }
-		else if ("seq" == args[0]) {current_op = priscas::R_FORMAT;f_code = priscas::SEQ; }
-		else if ("slt" == args[0]) {current_op = priscas::R_FORMAT;f_code = priscas::SLT; }
-		else if ("sle" == args[0]) {current_op = priscas::R_FORMAT;f_code = priscas::SLE; }
+		else if ("add" == args[0]) {current_op = priscas::ADD; }
+		else if ("sub" == args[0]) {current_op = priscas::SUB; }
+		else if ("xor" == args[0]) {current_op = priscas::XOR; }
+		else if ("andn" == args[0]) {current_op = priscas::ANDN; }
+		else if ("seq" == args[0]) {current_op = priscas::SEQ; }
+		else if ("slt" == args[0]) {current_op = priscas::SLT; }
+		else if ("sle" == args[0]) {current_op = priscas::SLE; }
 		else if ("jr" == args[0]) {current_op = priscas::JR;}				
 		else
 		{
