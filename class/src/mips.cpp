@@ -458,7 +458,7 @@ namespace priscas
 						rs = priscas::get_reg_num(args[2].c_str());
 				}
 			}
-			else if (i_inst2(operation)) {
+			else if (i_inst2(current_op)) {
 				imm = priscas::get_imm(args[2].c_str());
 			}
 			else if (current_op == priscas::STARTF)
