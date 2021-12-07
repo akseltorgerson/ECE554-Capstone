@@ -57,7 +57,7 @@ module cpu(//Inputs                   //TODO: These 3 signals were changed in na
     logic stallFFT;
 
     //The current PC plus 4 (to get the next instruction if no branch)
-    logic [31:0] pcPlus4;
+    logic [31:0] pcPlus1;
 
     //Control signal indicating that there was a cache miss in the fetch stage
     //Will need to do a DMA request to retrieve the data when this occurs
@@ -105,7 +105,7 @@ module cpu(//Inputs                   //TODO: These 3 signals were changed in na
     logic memToReg;
 
     //Goes to execute to determine whether the nextPC will be
-    //aluResult or pcNotJR(offsetPCplus4 or just pcPlus4)
+    //aluResult or pcNotJR(offsetPCplus1 or just pcPlus1)
     logic isJR;
 
     //Goes into execute to determine extension for IFormType2
@@ -192,7 +192,7 @@ module cpu(//Inputs                   //TODO: These 3 signals were changed in na
         .mcDataIn(mcInstrIn),
         //Outputs
         .instr(instruction),
-        .pcPlus4(pcPlus4),
+        .pcPlus1(pcPlus1),
         .cacheMiss(cacheMissFetch)
     );
 
@@ -200,7 +200,7 @@ module cpu(//Inputs                   //TODO: These 3 signals were changed in na
         .clk(clk),
         .rst(rst),
         .instr(instruction),
-        .pcPlus4(pcPlus4),
+        .pcPlus1(pcPlus1),
         .writebackData(writebackData),
         .fftCalculating(fftCalculating),
         //Outputs
@@ -230,7 +230,7 @@ module cpu(//Inputs                   //TODO: These 3 signals were changed in na
 
     execute_stage iExecute(
         .instr(instruction),
-        .pcPlus4(pcPlus4),
+        .pcPlus1(pcPlus1),
         .read1Data(read1Data),
         .read2Data(read2Data),
         .isSignExtend(isSignExtend),
