@@ -256,7 +256,7 @@ module cpu(//Inputs                   //TODO: These 3 signals were changed in na
         .halt(halt),
         .mcDataIn(mcDataIn),
         .mcDataValid(mcDataValid),
-	.evictDone(evictDone),
+	    .evictDone(evictDone),
         //Outputs
         .memoryOut(memoryOut),
         .cacheMiss(cacheMissMemory),
