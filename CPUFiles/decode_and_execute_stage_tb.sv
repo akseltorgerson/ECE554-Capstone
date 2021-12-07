@@ -7,6 +7,7 @@ module decode_and_execute_stage_tb();
     //Control Signals
     logic haltActual, nopActual, memWriteActual, memReadActual, memToRegActual, blockInstructionActual, startIActual, startFActual, loadFActual;
     logic haltExpected, nopExpected, memWriteExpected, memReadExpected, memToRegExpected, blockInstructionExpected, startIExpected, startFExpected, loadFExpected;
+    logic realImagLoadEx, complexArithmeticEx, invalidFilterEx;
     //------------------ I/O between decode and execute stages---------------
     logic [3:0] aluOp; //Output of decode, input to execute
     logic [31:0] instr, pcPlus4; //Inputs to both decode and execute
@@ -46,7 +47,10 @@ module decode_and_execute_stage_tb();
                          .startI(startIActual),
                          .startF(startFActual),
                          .loadF(loadFActual),
-                         .blockInstruction(blockInstructionActual));
+                         .blockInstruction(blockInstructionActual),
+                         .realImagLoadEx(),
+                         .complexArithmeticEx(),
+                         .invalidFilterEx());
     
     execute_stage iExecute(.instr(instr),
                            .pcPlus4(pcPlus4),
