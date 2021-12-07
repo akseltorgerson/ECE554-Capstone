@@ -271,7 +271,7 @@ namespace priscas
 		}
 		if (op == priscas::HALT || op == priscas::NOP)
 		{
-			w = (w.AsUInt32() | ((op & ((1 << 5) - 1) ) << 27 ));
+			// w = (w.AsUInt32() | ((op & ((1 << 5) - 1) ) << 27 ));
 		}
 		if (op == priscas::STARTF)
 		{
@@ -496,7 +496,6 @@ namespace priscas
 
 		// Pass the values of rs, rt, rd to the processor's encoding function
 		BW_32 inst = generic_mips32_encode(rs, rt, rd, imm, current_op, filter, signum);
-		printf("inst %x", inst);
 		return std::shared_ptr<BW>(new BW_32(inst));
 	}
 
