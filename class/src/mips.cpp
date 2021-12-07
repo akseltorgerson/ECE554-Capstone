@@ -358,7 +358,7 @@ namespace priscas
 					(j_inst(current_op) && args.size() != 2) ||
 					(current_op == priscas::HALT && args.size() != 1) ||
 					(current_op == priscas::NOP && args.size() != 1) ||
-					(current_op == priscas:STARTF && args.size() != 3) ||
+					(current_op == priscas::STARTF && args.size() != 3) ||
 					((current_op == priscas::STARTI ||  current_op == priscas::LOADF) && args.size () != 2)		
 				)
 			{
@@ -466,7 +466,7 @@ namespace priscas
 			else if (current_op == priscas::STARTF)
 			{
 				// Get the filter as an integer. Either 1 or 0
-				filter = priscas::get_imm(args[2].c_str())
+				filter = priscas::get_imm(args[2].c_str());
 			}
 		}
 
