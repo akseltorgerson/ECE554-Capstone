@@ -1,6 +1,6 @@
 module decode_stage(
     //Inputs
-    clk, rst, instr, pcPlus4, writebackData, fftCalculating,
+    clk, rst, instr, pcPlus1, writebackData, fftCalculating,
     //Outputs
     read1Data, read2Data, aluSrc, isSignExtend, isIType1, isBranch, halt, nop, memWrite, memRead,
     memToReg, isJR, isSLBI, isJump, aluOp, startI, startF, loadF, blockInstruction, realImagLoadEx, complexArithmeticEx, invalidFilterEx
@@ -10,7 +10,7 @@ module decode_stage(
     //Control signal for if the fft is currently calculating on data
     input fftCalculating;
 
-    input [31:0] instr, pcPlus4, writebackData;
+    input [31:0] instr, pcPlus1, writebackData;
 
     output [31:0] read1Data, read2Data;
     //Control signals
@@ -84,7 +84,7 @@ module decode_stage(
     assign writeRegSel = isJAL ? 4'b1111 : (rsWrite ? instr[26:23] : (regDst ? instr[18:15] : instr[22:19]));
 
     //Data being written back to the register file
-    assign writeData = isJAL ? pcPlus4 : writebackData;
+    assign writeData = isJAL ? pcPlus1 : writebackData;
 
     //-----------------------Exception Handling-------------------------------
     //Note: The way this is written is that complexArithmetic will get asserted over realImagLoad if both occur in one instr

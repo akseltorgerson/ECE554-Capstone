@@ -29,7 +29,7 @@ module cause_register(
     always_comb begin
         dataIn = 32'h00000000;
         write = 1'b0;
-	err = 1'b0;
+	    err = 1'b0;
         case({realImagLoadEx, complexArithmeticEx, fftNotCompleteEx, memAccessEx, memWriteEx, invalidJMPEx, invalidFilterEx})
             //-------------realImagLoad Exception---------------
             //Details: If try to load real into imag reg or vice versa
