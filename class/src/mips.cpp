@@ -271,7 +271,8 @@ namespace priscas
 		}
 		if (op == priscas::HALT || op == priscas::NOP)
 		{
-			// w = (w.AsUInt32() | ((op & ((1 << 5) - 1) ) << 27 ));
+			printf("\n\ntest, %x", ((op & ((1 << 5) - 1) ) << 27 ));
+			w = (w.AsUInt32() | ((op & ((1 << 5) - 1) ) << 27 ));
 		}
 		if (op == priscas::STARTF)
 		{
