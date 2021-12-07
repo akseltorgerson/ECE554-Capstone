@@ -40,7 +40,7 @@ module  address_generator
     logic [4:0] stagePlus1;
 
     //////////////////
-    ///// modules ////
+    ///// comb logic ////
     //////////////////
 
     assign stagePlus1 = stageCount + 5'b00001;
