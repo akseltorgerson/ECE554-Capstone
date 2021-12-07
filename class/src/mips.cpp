@@ -367,11 +367,7 @@ namespace priscas
 			// Now first argument parsing
 			if(r_inst(current_op))
 			{
-					// if(f_code == priscas::JR)
-					// {
-					// 	if((rs = priscas::friendly_to_numerical(args[1].c_str())) <= priscas::INVALID)
-					// 	rs = priscas::get_reg_num(args[1].c_str());
-					// }
+
 					if((rd = priscas::friendly_to_numerical(args[1].c_str())) <= priscas::INVALID)
 						rd = priscas::get_reg_num(args[1].c_str());
 
@@ -424,7 +420,7 @@ namespace priscas
 					rs = priscas::get_reg_num(args[2].c_str());
 			}
 						
-			else if(i_inst1(current_op) || i_inst2(current_op))
+			else if(i_inst1(current_op))
 			{
 				if(mem_inst(current_op))
 				{
@@ -461,6 +457,9 @@ namespace priscas
 					if((rs = priscas::friendly_to_numerical(args[2].c_str())) <= priscas::INVALID)
 						rs = priscas::get_reg_num(args[2].c_str());
 				}
+			}
+			else if (i_inst2(operation)) {
+				imm = priscas::get_imm(args[2].c_str());
 			}
 			else if (current_op == priscas::STARTF)
 			{
@@ -506,10 +505,7 @@ namespace priscas
 	{
 		std::vector<char> numbers;
 		int len = strlen(reg_str);
-		if(len <= 1) {
-			printf("butthole, %s", reg_str);
-			throw priscas::mt_bad_imm();
-		}
+		if(len <= 1) throw priscas::mt_bad_imm();
 		if(reg_str[0] != '$') throw priscas::mt_parse_unexpected("$", reg_str);
 		for(int i = 1; i < len; i++)
 		{
