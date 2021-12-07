@@ -492,6 +492,7 @@ namespace priscas
 					imm = priscas::get_imm(args[3].c_str());
 				}
 			}
+
 		}
 
 		// Pass the values of rs, rt, rd to the processor's encoding function
@@ -505,7 +506,10 @@ namespace priscas
 	{
 		std::vector<char> numbers;
 		int len = strlen(reg_str);
-		if(len <= 1) throw priscas::mt_bad_imm();
+		if(len <= 1) {
+			printf("butthole")
+			throw priscas::mt_bad_imm();
+		}
 		if(reg_str[0] != '$') throw priscas::mt_parse_unexpected("$", reg_str);
 		for(int i = 1; i < len; i++)
 		{
