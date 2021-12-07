@@ -77,7 +77,6 @@ module memory_stage_tb();
             end else begin
                 numHits += 1;
             end
-
             if (cacheMiss) begin
                 if (cacheEvict) begin
                     $display("ERROR: No data has been modified yet, should not see evict");
@@ -91,7 +90,6 @@ module memory_stage_tb();
                             errors += 1;
                         end
                     end
-
                     // Data requested from the MC is now valid
                     mcDataValid = 1'b1;
                     // TODO blkStartIndex will need to be changed for when accessing blocks larger
@@ -114,8 +112,8 @@ module memory_stage_tb();
                                 testMemory[blkStartIndex+1],
                                 testMemory[blkStartIndex]};
 
+                    // subtract from our loop index so we can read the block we just attempted to
                     i -= 1;
-
                     @(posedge clk);
                     mcDataValid = 1'b0;
                     // WAIT PHASE

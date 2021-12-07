@@ -120,18 +120,19 @@ module memory_stage(
                 cacheAddr = aluResult;
                 cacheEnable = 1'b1;
                 cacheEvict = 1'b1;
-                mcDataOut = cacheBlkOut;
                 stallDMAMem = 1'b1;
+                mcDataOut = cacheBlkOut;
                 nextState = (evictDone) ? LOAD_RD : EVICT_RD;
             end
             LOAD_RD: begin
                 cacheAddr = aluResult;
                 cacheEnable = 1'b1;
-                stallDMAMem = 1'b1;
                 cacheLoad = 1'b1;
+                stallDMAMem = 1'b1;
                 cacheBlkIn = mcDataIn;
                 nextState = (mcDataValid) ? WAIT_RD : LOAD_RD;
             end
+            // TODO Pretty sure we dont need wait
             WAIT_RD: begin
                 stallDMAMem = 1'b1;
                 nextState = READ;
