@@ -109,7 +109,8 @@ module instr_cache (
     endgenerate
 
     // output assignments
-    assign instrOut = (hit) ? dataArray[index][offset] : instrOut;
+    // instrOut is a NOP on a miss
+    assign instrOut = (hit) ? dataArray[index][offset] : 32'h08000000;
     assign hit = (valid & tagMatch);
     assign miss = (~hit);
 

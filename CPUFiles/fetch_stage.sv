@@ -25,7 +25,8 @@ module fetch_stage(
     //The instruction to decode
     output [31:0] instr;
 
-    //The current PC plus 4 (to get the next instruction if there is no branch or jump)
+    // The current PC plus 1 (to get the next instruction if there is no branch or jump)
+    // TODO should be pcPlus1;
     output [31:0] pcPlus4;
 
     //Lets the mc know there was a miss in the instruction cache and to start a DMA request
@@ -55,7 +56,7 @@ module fetch_stage(
     program_counter iPC(.clk(clk), .rst(rst), .halt(halt), .nextAddr(nextPC), .currAddr(currPC), .stallPC(stallPC));
     
     //Add four to the current PC (if there is no branch, this will be where the next instruction is)
-    cla_32bit iPCAdder(.A(currPC), .B(32'h4), .Cin(1'b0), .Sum(pcPlus4), .Cout(cout), .P(P), .G(G));
+    cla_32bit iPCAdder(.A(currPC), .B(32'h1), .Cin(1'b0), .Sum(pcPlus4), .Cout(cout), .P(P), .G(G));
 
     //The instruction memeory
     instr_cache iInstrCache(.clk(clk), 
