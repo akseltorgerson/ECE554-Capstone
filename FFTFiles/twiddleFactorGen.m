@@ -1,5 +1,6 @@
 % Program for generating n-length FFT's twiddle factor
 
+
 fft_length = input('Enter FFT length:');
 
 for mm = 0:1:(fft_length-1)
@@ -16,12 +17,8 @@ end
 fid = fopen('twiddleFactors.txt','wt');
 
 for fm = 1:1:(fft_length/2)
-    if (fm == 1)
-        fprintf(fid,'[');
-    end
-    fprintf(fid,'%.10f, %.10f,\n',real_twiddle(fm), im_twiddle(fm));
-    if (fm == fft_length/2)
-        fprintf(fid,']');
-    end
+    fprintf(fid,'%.10f\n',real_twiddle(fm));
+    fprintf(fid,'%.10f\n',im_twiddle(fm));
 end
+
 fclose(fid);
