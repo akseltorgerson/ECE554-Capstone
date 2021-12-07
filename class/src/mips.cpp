@@ -285,7 +285,7 @@ namespace priscas
 			w = (w.AsUInt32() | ((signum & ((1 << 18) - 1) ) << 9 ));
 			w = (w.AsUInt32() | ((op & ((1 << 5) - 1) ) << 27 ));
 		}
-		printf("w:%x",w)
+		printf("w:%x",w);
 		return w;
 	}
 
