@@ -37,6 +37,7 @@
 #include <cstring>
 #include <cstddef>
 #include <memory>
+#include <stdio.h>
 #include "ISA.h"
 #include "mt_exception.h"
 #include "primitives.h"
