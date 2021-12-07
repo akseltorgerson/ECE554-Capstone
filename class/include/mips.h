@@ -85,11 +85,6 @@ namespace priscas
 		INVALID = -1
 	};
 
-	// instruction formats
-	enum format
-	{
-		R, I, J	
-	};
 
 	// MIPS Processor Opcodes
 	enum opcode
@@ -201,7 +196,7 @@ namespace priscas
 	/* Check if a special R-format
 	 * shift instruction
 	 */
-	bool shift_inst(funct f);
+	bool shift_inst(opcode operation);
 
 	/* Check if a Jump or
 	 * Branch Instruction
