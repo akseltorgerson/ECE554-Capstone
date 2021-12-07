@@ -299,7 +299,6 @@ namespace priscas
 	// Main interpretation routine
 	mBW MIPS_32::assemble(const Arg_Vec& args, const BW& baseAddress, syms_table& jump_syms) const
 	{
-		printf("#d",args.size());
 		if(args.size() < 1)
 			return std::shared_ptr<BW>(new BW_32());
 
@@ -507,7 +506,10 @@ namespace priscas
 	{
 		std::vector<char> numbers;
 		int len = strlen(reg_str);
-		if(len <= 1) throw priscas::mt_bad_imm();
+		if(len <= 1) {
+			printf("butthole, %s", reg_str)
+			throw priscas::mt_bad_imm();
+		}
 		if(reg_str[0] != '$') throw priscas::mt_parse_unexpected("$", reg_str);
 		for(int i = 1; i < len; i++)
 		{
