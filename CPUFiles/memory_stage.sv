@@ -37,6 +37,8 @@ module memory_stage(
     //Signal to stall because there is a DMA request in process
     output reg stallDMAMem;
 
+    // TODO add some sort of dataValid signal that tells the next unit the data out is valid
+
     // state variables
     typedef enum logic [3:0] {  IDLE = 4'b0,
                                 READ = 4'b1, EVICT_RD = 4'b10, LOAD_RD = 4'b11, WAIT_RD = 4'b100,
@@ -105,8 +107,6 @@ module memory_stage(
         case(currState)
             IDLE: begin              
 		        nextState = (memRead) ? READ : ((memWrite) ? WRITE : IDLE);
-                // Dont think this is right
-                memoryOut = cacheDataOut;
             end
             READ: begin
                 cacheAddr = aluResult;

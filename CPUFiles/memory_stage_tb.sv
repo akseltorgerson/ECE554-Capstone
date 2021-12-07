@@ -56,7 +56,7 @@ module memory_stage_tb();
 
         // Load test memory with ascending data
         for (i = 0; i < 8192; i++) begin
-            testMemory[i] = i;
+            testMemory[i] = i+1;
         end
 
         // RESET
@@ -66,14 +66,19 @@ module memory_stage_tb();
         rst = 1'b0;
         memRead = 1'b1;
         @(posedge clk);
-        for (i = 0; i < 4096; i++) begin
 
+        for (i = 0; i < 4096; i++) begin
             // test reading the cache
             aluResult = i;
             @(posedge clk);
-            // should see a miss on the first access of each block
-            if (cacheMiss) begin
+            // READ PHASE
+            if (memoryOut != testMemory[i]) begin
                 numMisses += 1;
+            end else begin
+                numHits += 1;
+            end
+
+            if (cacheMiss) begin
                 if (cacheEvict) begin
                     $display("ERROR: No data has been modified yet, should not see evict");
                     errors += 1;
@@ -109,6 +114,8 @@ module memory_stage_tb();
                                 testMemory[blkStartIndex+1],
                                 testMemory[blkStartIndex]};
 
+                    i -= 1;
+
                     @(posedge clk);
                     mcDataValid = 1'b0;
                     // WAIT PHASE
@@ -116,17 +123,10 @@ module memory_stage_tb();
                         $display("ERROR: Cache should still be stalling in wait phase");
                         errors += 1;
                     end
-                    @(posedge clk);
-                    // BACK TO IDLE; BLOCK SHOULD BE IN CACHE
-                    if (cacheMiss) begin
-                        $display("ERROR: Cache should not be missing after block is loaded");
-                    end else begin
-                        numHits += 1;
-                    end
                 end
-            end else begin
-                numHits += 1;
             end
+            @(posedge clk);
+            // BACK TO IDLE
         end
 
         if (numMisses != 256) begin
