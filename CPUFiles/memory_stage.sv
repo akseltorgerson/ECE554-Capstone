@@ -107,6 +107,9 @@ module memory_stage(
         case(currState)
             IDLE: begin              
 		        nextState = (memRead) ? READ : ((memWrite) ? WRITE : IDLE);
+                //NOTE: this might be right or not
+                //Stall because can't get next instruction until read/write the memory
+                stallDMAMem = memRead | memWrite;
             end
             READ: begin
                 cacheAddr = aluResult;
@@ -114,6 +117,8 @@ module memory_stage(
                 cacheRead = 1'b1;
                 memoryOut = cacheDataOut;
                 cacheMiss = cacheMissOut;
+                //NOTE: Need to stall here if there is a miss?
+                stallDMAMem = cacheMissOut;
                 nextState = (cacheHitOut) ? IDLE : (cacheEvictOut) ? EVICT_RD : LOAD_RD;
             end
             EVICT_RD: begin
@@ -142,6 +147,8 @@ module memory_stage(
                 cacheEnable = 1'b1;
                 cacheWrite = 1'b1;
                 cacheDataIn = read2Data;
+                //NOTE: Need to stall here if there is a miss?
+                stallDMAMem = cacheMissOut;
                 nextState = (cacheHitOut) ? IDLE : (cacheEvictOut) ? EVICT_WR : LOAD_WR;
             end
             EVICT_WR: begin
