@@ -233,7 +233,7 @@ namespace priscas
 	BW_32 generic_mips32_encode(int rs, int rt, int rd, int imm_shamt_jaddr, opcode op, int filter, uint32_t signum)
 	{
 		BW_32 w = 0;
-		printf("rs: %x, rt: %x, rd: %x, imm: %x, op: %x, filter: %x, sig: %x", rs, rt, rd, imm_shamt_jaddr, op, filter, signum);
+		printf("rs: %x, rt: %x, rd: %x, imm: %x, op: %x, filter: %x, sig: %x\n", rs, rt, rd, imm_shamt_jaddr, op, filter, signum);
 		if(r_inst(op))
 		{
 			//first 15 bits are zero as don't cares
@@ -285,7 +285,7 @@ namespace priscas
 			w = (w.AsUInt32() | ((signum & ((1 << 18) - 1) ) << 9 ));
 			w = (w.AsUInt32() | ((op & ((1 << 5) - 1) ) << 27 ));
 		}
-
+		printf("w:%x",w)
 		return w;
 	}
 
