@@ -114,36 +114,4 @@ module instr_cache (
     assign hit = (valid & tagMatch);
     assign miss = (~hit);
 
-    // Flop outputs
-    //always @(posedge clk) begin
-    //    instrOut <= instrOutInt;
-    //    hit <= hitInt;
-    //    miss <= missInt;
-    //end
-
-/*
-    always @(posedge clk) begin
-        // if the cache is enabled, and were reading
-        if (!loadLine) begin
-            // if the supplied index matches the tagArray at that index and its valid, hit
-            if (validArray[index] && index == tagArray[index])) begin
-                hit <= 1'b1;
-                miss <= 1'b0;
-                // TODO might have to flop this
-                instrOut = dataArray[index][offset];
-            end
-            // the supplied index either does not match the tag, or the valid bit is 0, either way its a miss
-            else begin
-                hit <= 1'b0;
-                miss <= 1'b1;
-            end    
-        end
-        // if the cache is enabled and were writing a block of data
-        else if (loadLine) begin
-            dataArray[index] <= blkIn;
-            tagArray[index] <= tag;
-            validArray[index] <= 1'b1;
-        end
-    end
-    */
 endmodule

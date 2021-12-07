@@ -115,7 +115,7 @@ module fetch_stage_tb();
                             testMemory[blkStartIndex+3],
                             testMemory[blkStartIndex+2],
                             testMemory[blkStartIndex+1],
-                            testMemory[blkStartIndex]};          
+                            testMemory[blkStartIndex]};
 
                 i -= 1;
 

@@ -103,18 +103,22 @@ module memory_stage(
         stallDMAMem = 1'b0; //Output of memory stage
         
         case(currState)
-            IDLE: begin                
-		nextState = (memRead) ? READ : ((memWrite) ? WRITE : IDLE);
+            IDLE: begin              
+		        nextState = (memRead) ? READ : ((memWrite) ? WRITE : IDLE);
+                // Dont think this is right
+                memoryOut = cacheDataOut;
             end
             READ: begin
                 cacheAddr = aluResult;
                 cacheEnable = 1'b1;
                 cacheRead = 1'b1;
                 memoryOut = cacheDataOut;
+                cacheMiss = cacheMissOut;
                 nextState = (cacheHitOut) ? IDLE : (cacheEvictOut) ? EVICT_RD : LOAD_RD;
             end
             EVICT_RD: begin
                 cacheAddr = aluResult;
+                cacheEnable = 1'b1;
                 cacheEvict = 1'b1;
                 mcDataOut = cacheBlkOut;
                 stallDMAMem = 1'b1;
@@ -122,7 +126,7 @@ module memory_stage(
             end
             LOAD_RD: begin
                 cacheAddr = aluResult;
-                cacheMiss = 1'b1;
+                cacheEnable = 1'b1;
                 stallDMAMem = 1'b1;
                 cacheLoad = 1'b1;
                 cacheBlkIn = mcDataIn;

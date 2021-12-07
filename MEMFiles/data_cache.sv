@@ -180,7 +180,7 @@ module data_cache (
 
 
     // output assignments
-    assign dataOut = (read & hit) ? dataArray[index][offset] : 32'b0;
+    assign dataOut = (read & hit) ? dataArray[index][offset] : 32'h0;
     assign hit = (valid & tagMatch);
     assign miss = (~hit);
     assign evict = (miss & dirty & valid);
