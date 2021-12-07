@@ -507,7 +507,7 @@ namespace priscas
 		std::vector<char> numbers;
 		int len = strlen(reg_str);
 		if(len <= 1) {
-			printf("butthole, %s", reg_str)
+			printf("butthole, %s", reg_str);
 			throw priscas::mt_bad_imm();
 		}
 		if(reg_str[0] != '$') throw priscas::mt_parse_unexpected("$", reg_str);
