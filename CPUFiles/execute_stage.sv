@@ -1,11 +1,11 @@
 module execute_stage(
     //Inputs
-    instr, pcPlus4, read1Data, read2Data, isSignExtend, isIType1,
+    instr, pcPlus1, read1Data, read2Data, isSignExtend, isIType1,
     isBranch, aluSrc, isJump, isJR, isSLBI, aluOp,
     //Outputs
     nextPC, aluResult
 );
-    input [31:0] instr, pcPlus4, read1Data, read2Data;
+    input [31:0] instr, pcPlus1, read1Data, read2Data;
     input [3:0] aluOp;
     //Control signals (isTaken comes from the ALU not the Control Unit)
     input isSignExtend, isIType1, isBranch, aluSrc, isJump, isJR, isSLBI;
@@ -18,7 +18,7 @@ module execute_stage(
     wire [31:0] iTypeWire;
     wire [31:0] extendedIType2;
     wire [31:0] offset;
-    wire [31:0] offsetPCPlus4;
+    wire [31:0] offsetPCPlus1;
     wire [31:0] pcNotJR;
     wire [31:0] bInputALU;
     //Not used currently but can be later if needed
@@ -28,9 +28,9 @@ module execute_stage(
     wire isTaken;
 
     cla_32bit iCLA(.A(offset),
-                   .B(pcPlus4),
+                   .B(pcPlus1),
                    .Cin(1'b0),
-                   .Sum(offsetPCPlus4),
+                   .Sum(offsetPCPlus1),
                    .Cout(Cout),
                    .P(P),
                    .G(G)
@@ -57,7 +57,7 @@ module execute_stage(
 
     //pseudo control signal
     assign jumpOrTaken = (isTaken & isBranch) | (isJump);
-    assign pcNotJR = jumpOrTaken ? offsetPCPlus4 : pcPlus4;
+    assign pcNotJR = jumpOrTaken ? offsetPCPlus1 : pcPlus1;
 
     //isJR referres to JR or JALR
     //TODO: Assign this to the exception handler address if there is an exception
