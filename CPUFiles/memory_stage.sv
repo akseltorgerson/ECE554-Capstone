@@ -23,41 +23,41 @@ module memory_stage(
     input evictDone;
 
     //Result of a memory read
-    output [31:0] memoryOut;
+    output reg [31:0] memoryOut;
     
     //Control signal for the mc if we are requesting a block
-    output cacheMiss;
+    output reg cacheMiss;
 
     //Control signal for the mc if we are evicting a block
-    output cacheEvict;
+    output reg cacheEvict;
 
     //Data to be output if there is a cache evict
-    output [511:0] mcDataOut;
+    output reg [511:0] mcDataOut;
     
     //Signal to stall because there is a DMA request in process
-    output stallDMAMem;
+    output reg stallDMAMem;
 
     // state variables
     typedef enum logic [3:0] {  IDLE = 4'b0,
                                 READ = 4'b1, EVICT_RD = 4'b10, LOAD_RD = 4'b11, WAIT_RD = 4'b100,
-                                WRITE = 4'b101, EVICT_WR = 3'b110, LOAD_WR = 3'b111, WAIT_WR = 4'b1000} state;
+                                WRITE = 4'b101, EVICT_WR = 4'b110, LOAD_WR = 4'b111, WAIT_WR = 4'b1000} state;
     state currState;
     state nextState;
 
     //Intermediate signals for the state machine
-    wire [31:0] cacheDataOut;
-    wire cacheMissOut;
-    wire cacheHitOut;
-    wire cacheEvictOut;
-    wire [511:0] cacheBlkOut;
+    logic [31:0] cacheDataOut;
+    logic cacheMissOut;
+    logic cacheHitOut;
+    logic cacheEvictOut;
+    logic [511:0] cacheBlkOut;
 
-    wire [31:0] cacheAddr;
-    wire cacheEnable;
-    wire [511:0] cacheBlkIn;
-    wire [31:0] cacheDataIn;
-    wire cacheRead;
-    wire cacheWrite;
-    wire cacheLoad;
+    logic [31:0] cacheAddr;
+    logic cacheEnable;
+    logic [511:0] cacheBlkIn;
+    logic [31:0] cacheDataIn;
+    logic cacheWrite;
+    logic cacheRead;
+    logic cacheLoad;
 
     //Instantiate memory here
     data_cache iDataCache(  .clk(clk), 
@@ -102,8 +102,9 @@ module memory_stage(
         
         stallDMAMem = 1'b0; //Output of memory stage
         
-        case(currState) begin
-            IDLE: begin                nextState = (memRead) ? READ : (memWrite) ? : WRITE : IDLE;
+        case(currState)
+            IDLE: begin                
+		nextState = (memRead) ? READ : ((memWrite) ? WRITE : IDLE);
             end
             READ: begin
                 cacheAddr = aluResult;

@@ -1,17 +1,26 @@
 module cpu(//Inputs                   //TODO: These 3 signals were changed in name so add them in right place
-            fftCalculating, clk, rst, mcDataValid, mcInstrValid, mcDataIn, mcInstrIn,
+            fftCalculating, clk, rst, mcDataValid, mcInstrValid, mcDataIn, mcInstrIn, evictDone,
            //Outputs
-           startI, startF, loadF, sigNum, filter, dCacheOut, dCacheEvict, aluReuslt
+           startI, startF, loadF, sigNum, filter, dCacheOut, dCacheEvict, aluResult
            //TODO: need to add in other accelerator and memory controller signals
            );
     
     input clk, rst, fftCalculating;
 
-    //Lets the caches know that the data from the MC is valid and ready to write
+    //Lets the dCache know that the data from the MC is valid and ready to write
     input mcDataValid;
 
-    //Data from the memory controller to be used on a DMA request
+    //Lets the iCache know that the data from the MC is valid and ready to write
+    input mcInstrValid;
+
+    //Data from the memory controller to be used on a DMA request (for memory stage i.e dCache)
     input [511:0] mcDataIn;
+
+    //Data from the memory controller to be used on a DMA request (for fetch stage i.e iCache)
+    input [511:0] mcInstrIn;
+
+    //From memory controller, lets memory know succefully stored into host memory
+    input evictDone;
 
     //Output control signals for the accelerator
     //TODO: Determine the filter signal
@@ -24,8 +33,8 @@ module cpu(//Inputs                   //TODO: These 3 signals were changed in na
     //For the machine controller to evict the data and WRITE to host mem
     output dCacheEvict;
 
-    //For the machine controller (used as an address)
-    output aluResult;
+    //Address used for the MC on a DMA request
+    output [31:0] aluResult;
 
     //---------------------------------Wires First Used in Fetch Stage--------------------------------
     logic [31:0] instruction;
@@ -106,7 +115,7 @@ module cpu(//Inputs                   //TODO: These 3 signals were changed in na
     logic isJump;
 
     //Goes into execute to determine what operation the ALU is doing
-    logic aluOp;
+    logic [3:0] aluOp;
 
         //-------------- Exceptions----------------
 
@@ -143,8 +152,34 @@ module cpu(//Inputs                   //TODO: These 3 signals were changed in na
         //None all declared before
     //-----------------------------------------------------------------------------------------------
 
+    //---------------------------- Wires in Cause Register (TODO: will change these) ----------------
+
+    logic fftNotCompleteEx;
+
+    logic memAccessEx;
+    logic memWriteEx;
+    logic invalidJMPEx;
+    
+    logic [31:0] causeDataOut;
+
+    logic exception;
+
+    logic err;
+
+    //------------------------------------------------------------------------------------------------
+
+    //------------------------------ Wires first used in EPC------------------------------------------
+    
+    logic [31:0] epcIn;
+
+    logic [31:0] epcOut;
+
+    //------------------------------------------------------------------------------------------------
+
     //sigNum will equal the instruction's 26-9 bits
     assign sigNum = instruction[26:9];
+
+    assign filter = instruction[8];
 
     fetch_stage iFetch(
         .clk(clk),
@@ -221,6 +256,7 @@ module cpu(//Inputs                   //TODO: These 3 signals were changed in na
         .halt(halt),
         .mcDataIn(mcDataIn),
         .mcDataValid(mcDataValid),
+	.evictDone(evictDone),
         //Outputs
         .memoryOut(memoryOut),
         .cacheMiss(cacheMissMemory),
@@ -240,27 +276,26 @@ module cpu(//Inputs                   //TODO: These 3 signals were changed in na
     cause_register iCR(
         .clk(clk),
         .rst(rst),
-        .realImagLoadEx(), //done
-        .complexArithmeticEx(), //done
-        .fftNotCompleteEx(), //This and the ones below need to talk to aksel about
-        .memAccessEx(),
-        .memWriteEx(),
-        .invalidJMPEx(),
-        .invalidFilterEx(), //done
-        .invalidWaveEx(), //probably not needed
+        .realImagLoadEx(realImagLoadEx),
+        .complexArithmeticEx(complexArithmeticEx),
+        .fftNotCompleteEx(fftNotCompleteEx),
+        .memAccessEx(memAccessEx),
+        .memWriteEx(memWriteEx),
+        .invalidJMPEx(invalidJMPEx),
+        .invalidFilterEx(invalidFilterEx),
         //Outputs
-        .causeDataOut(),
-        .exception(),
-        .err()
+        .causeDataOut(causeDataOut),
+        .exception(exception),
+        .err(err)
     );
 
     epc_register iEPC(
         .clk(clk),
         .rst(rst),
-        .epcIn(),
-        .write(),
+        .epcIn(epcIn),
+        .write(exception),
         //Outputs
-        .epcOut()
+        .epcOut(epcOut)
     );
     
 
