@@ -2,7 +2,7 @@ module memory_stage(
     //Inputs
     aluResult, read2Data, clk, rst, memWrite, memRead, halt, mcDataIn, mcDataValid, evictDone,
     //Outputs
-    memoryOut, cacheMiss, aluResultMC, mcDataOut, cacheEvict, stallDMAMem
+    memoryOut, cacheMiss, mcDataOut, cacheEvict, stallDMAMem
 );
 
     input clk, rst;
@@ -19,126 +19,147 @@ module memory_stage(
     //Data from the mc to be written to the cache
     input [511:0] mcDataIn;
 
-    // TODO added this signal to let the mem stage know that the evict has completed
+    // Signal from the MC to let the memory_stage know that an evict has completed
     input evictDone;
 
     //Result of a memory read
     output [31:0] memoryOut;
     
-    //Control signal for the mc if there is a miss in the cache
-    //This will be when we are REQUESTING a block from host mem
+    //Control signal for the mc if we are requesting a block
     output cacheMiss;
 
-    //Control signal for the mc if there is a block that needs to be evicted
-    //This will be when we want to WRITE a block to host mem
+    //Control signal for the mc if we are evicting a block
     output cacheEvict;
-
-    // Also an input, needs to be output to the mc on cache miss as the address
-    output [31:0] aluResultMC;
 
     //Data to be output if there is a cache evict
     output [511:0] mcDataOut;
     
+    //Signal to stall because there is a DMA request in process
     output stallDMAMem;
 
-    // control signals for cache state machine
-    wire cacheHit;
-
     // state variables
-    typedef enum logic [3:0] {  IDLE = 2'b0,
-                                READ = 2'b1, EVICT_RD = 2'b10, LOAD_RD = 2'b11, WAIT_RD = 3'b100,
-                                WRITE = 3'b101, EVICT_WR = 3'b110, LOAD_WR = 3'b111, WAIT_WR = 4'b1000} state;
+    typedef enum logic [3:0] {  IDLE = 4'b0,
+                                READ = 4'b1, EVICT_RD = 4'b10, LOAD_RD = 4'b11, WAIT_RD = 4'b100,
+                                WRITE = 4'b101, EVICT_WR = 3'b110, LOAD_WR = 3'b111, WAIT_WR = 4'b1000} state;
     state currState;
     state nextState;
 
     //Intermediate signals for the state machine
-    wire [31:0] memoryOutCache;
-    wire cacheMissInternal;
-    wire cacheEvictInternal;
-    wire cacheBlkOut;
+    wire [31:0] cacheDataOut;
+    wire cacheMissOut;
+    wire cacheHitOut;
+    wire cacheEvictOut;
+    wire [511:0] cacheBlkOut;
+
+    wire [31:0] cacheAddr;
+    wire cacheEnable;
+    wire [511:0] cacheBlkIn;
+    wire [31:0] cacheDataIn;
+    wire cacheRead;
+    wire cacheWrite;
+    wire cacheLoad;
 
     //Instantiate memory here
     data_cache iDataCache(  .clk(clk), 
                     .rst(rst), 
-                    .en(memWrite || memRead),
-                    .addr(aluResult),  
-                    .blkIn(mcDataIn), 
-                    .dataIn(read2Data), 
-                    .rd(memRead),
-                    .wr(memWrite), 
-                    .ld(mcDataValid),
+                    .en(cacheEnable),
+                    .addr(cacheAddr),  
+                    .blkIn(cacheBlkIn), 
+                    .dataIn(cacheDataIn), 
+                    .rd(cacheRead),
+                    .wr(cacheWrite), 
+                    .ld(cacheLoad),
                     //Outputs 
-                    .dataOut(memoryOutCache), 
-                    .hit(cacheHit), 
-                    .miss(cacheMissInternal), 
-                    .evict(cacheEvictInternal), 
+                    .dataOut(cacheDataOut), 
+                    .hit(cacheHitOut), 
+                    .miss(cacheMissOut), 
+                    .evict(cacheEvictOut), 
                     .blkOut(cacheBlkOut));
 
-    always_ff @(posedge rst) begin
-        currState <= IDLE;
-        nextState <= IDLE;
-    end
-
-    always_ff @(posedge clk) begin
-        currState <= nextState;
+    always_ff @(posedge clk, posedge rst) begin
+        if (rst) begin
+            currState <= IDLE;
+        end else begin
+            currState <= nextState;
+        end
     end
     
-    // TODO might want to put this state machine in a dCacheController module
     always_comb begin
         nextState = IDLE;
-        memoryOut = 32'h00000000;
-        cacheMiss = 1'b0;
-        cacheEvict = 1'b0;
-        //TODO: Need to figure out where to set this
-        aluResultMC = 32'h00000000;
-        stallDMAMem = 1'b0;
+        //Outputs of Cache
+        memoryOut = 32'b0; //output of memory stage
+        cacheMiss = 1'b0; //output of memory stage
+        cacheEvict = 1'b0; //output of the memory stage
         mcDataOut = 512'b0;
+        //Inputs of the cache
+        cacheAddr = 32'b0;
+        cacheEnable = 1'b0;
+        cacheBlkIn = 512'b0;
+        cacheDataIn = 32'b0;
+        cacheRead = 1'b0;
+        cacheWrite = 1'b0;
+        cacheLoad = 1'b0;
+        
+        stallDMAMem = 1'b0; //Output of memory stage
+        
         case(currState) begin
-            IDLE: begin
-                nextState = (memRead) ? READ : (memWrite) ? : WRITE : IDLE;
+            IDLE: begin                nextState = (memRead) ? READ : (memWrite) ? : WRITE : IDLE;
             end
             READ: begin
-                nextState = (cacheHit) ? IDLE : (cacheEvict) ? EVICT_RD : LOAD_RD;
-                memoryOut = memoryOutCache;
+                cacheAddr = aluResult;
+                cacheEnable = 1'b1;
+                cacheRead = 1'b1;
+                memoryOut = cacheDataOut;
+                nextState = (cacheHitOut) ? IDLE : (cacheEvictOut) ? EVICT_RD : LOAD_RD;
             end
             EVICT_RD: begin
-                nextState = (evictDone) ? LOAD_RD : EVICT_RD;
-                cacheMiss = cacheMissInternal;
-                cacheEvict = cacheEvictInternal;
-                //TODO: Is this right?
+                cacheAddr = aluResult;
+                cacheEvict = 1'b1;
                 mcDataOut = cacheBlkOut;
                 stallDMAMem = 1'b1;
+                nextState = (evictDone) ? LOAD_RD : EVICT_RD;
             end
             LOAD_RD: begin
-                nextState = (mcDataValid) ? WAIT_RD : LOAD_RD;
-                cacheMiss = cacheMissInternal;
+                cacheAddr = aluResult;
+                cacheMiss = 1'b1;
                 stallDMAMem = 1'b1;
+                cacheLoad = 1'b1;
+                cacheBlkIn = mcDataIn;
+                nextState = (mcDataValid) ? WAIT_RD : LOAD_RD;
             end
             WAIT_RD: begin
-                nextState = READ;
-                cacheMiss = cacheMissInternal;
                 stallDMAMem = 1'b1;
+                nextState = READ;
             end
             WRITE: begin
-                nextState = (cacheHit) ? IDLE : (cacheEvict) ? EVICT_WR : LOAD_WR;
+                cacheAddr = aluResult;
+                cacheEnable = 1'b1;
+                cacheWrite = 1'b1;
+                cacheDataIn = read2Data;
+                nextState = (cacheHitOut) ? IDLE : (cacheEvictOut) ? EVICT_WR : LOAD_WR;
             end
             EVICT_WR: begin
-                nextState = (evictDone) ? LOAD_WR : EVICT_WR;
-                cacheMiss = cacheMissInternal;
-                cacheEvict = cacheEvictInternal;
-                //TODO: is this right?
+                cacheAddr = aluResult;
+                cacheEvict = 1'b1;
                 mcDataOut = cacheBlkOut;
                 stallDMAMem = 1'b1;
+                nextState = (evictDone) ? LOAD_WR : EVICT_WR;
             end
             LOAD_WR: begin
-                nextState = (mcDataValid) ? WAIT_WR : LOAD_WR;
-                cacheMiss = cacheMissInternal;
+                cacheAddr = aluResult;
+                cacheMiss = 1'b1;
                 stallDMAMem = 1'b1;
+                cacheLoad = 1'b1;
+                cacheBlkIn = mcDataIn;
+                nextState = (mcDataValid) ? WAIT_WR : LOAD_WR;
             end
             WAIT_WR: begin
+                stallDMAMem = 1'b1;
                 nextState = WRITE;
-                cacheMiss = cacheMissInternal;
-                stallDMAMem = 1'b1
+            end
+            default: begin
+                nextState = IDLE;
+                stallDMAMem = 1'b1;
             end
         endcase
     end

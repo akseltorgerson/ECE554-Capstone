@@ -32,10 +32,7 @@ module fetch_stage(
     output cacheMiss;
 
     wire [31:0] currPC;
-
     wire stallPC;
-
-    wire cacheAddr;
 
     // cache signals
     logic cacheHit;
@@ -43,19 +40,22 @@ module fetch_stage(
     //These signals are not important (but can be used later if need be)
     wire cout, P, G;
 
-    // state variables, TODO: BE CAREFULL Might need to define last stage so all are defined for bits
-    typedef enum logic [1:0] {IDLE = 2'b0, REQUEST = 2'b01, WAIT = 2'b10} state;
+    //stall while DMA for fetch
+    //wire stallPCCache;
+
+    // NOTE: Might need to add in another state after request to wait a clk cycle that unconditionally goes to IDLE
+    typedef enum reg {IDLE = 1'b0, REQUEST = 1'b1} state;
     state currState;
     state nextState;
 
     //Control logic for if the PC needs to be stalled
-    assign stallPC = stallDMAMem | blockInstruction | cacheMiss;
+    assign stallPC = stallDMAMem | blockInstruction | cacheMiss; /*| stallPCCache*/
 
     //The halt signal will be ~ inside PC so when it is 0, it writes on the next clk cycle
-    prgoram_counter iPC(.clk(clk), .rst(rst), .halt(halt), .nextAddr(nextPC), .currAddr(currPC), .stallPC(stallPC));
+    program_counter iPC(.clk(clk), .rst(rst), .halt(halt), .nextAddr(nextPC), .currAddr(currPC), .stallPC(stallPC));
     
     //Add four to the current PC (if there is no branch, this will be where the next instruction is)
-    cla_32bit iPCAdder(.A(currPC), .B(16'h4), .Cin(1'b0), .Sum(pcPlus4), .Cout(cout), .P(P), .G(G));
+    cla_32bit iPCAdder(.A(currPC), .B(32'h4), .Cin(1'b0), .Sum(pcPlus4), .Cout(cout), .P(P), .G(G));
 
     //The instruction memeory
     instr_cache iInstrCache(.clk(clk), 
@@ -67,33 +67,24 @@ module fetch_stage(
                             .hit(cacheHit), 
                             .miss(cacheMiss));
 
-    always_ff @(posedge rst) begin
-        currState <= IDLE;
-        nextState <= IDLE;
+
+    always_ff @(posedge clk, posedge rst) begin
+        if (rst) begin
+            currState <= IDLE;
+        end else begin
+            currState <= nextState;
+        end
     end
 
-    always_ff @(posedge clk) begin
-        currState <= nextState;
-    end
-
-    // TODO might want to put this in an iCacheController module
     always_comb begin
         // Must assign all signals
         nextState = IDLE;
-        //stallPC = 1'b0;
-        cacheAddr = 32'h00000000;
         case(currState)
             IDLE: begin
-                cacheAddr = currPC;
                 nextState = (cacheMiss) ? REQUEST : IDLE; 
             end
             REQUEST: begin
-                nextState = (mcDataValid) ? WAIT : REQUEST;
-                //stallPC = 1'b1;
-            end
-            WAIT: begin
-                nextState = IDLE;
-                //stallPC = 1'b1;
+                nextState = (mcDataValid) ? IDLE : REQUEST;
             end
         endcase
     end
