@@ -1,8 +1,8 @@
 module memory_stage(
     //Inputs
-    aluResult, read2Data, clk, rst, memWrite, memRead, halt, mcDataIn, mcDataValid, evictDone,
+    aluResult, read2Data, clk, rst, memWrite, memRead, halt, mcDataIn, mcDataValid, evictDone, fftCalculating
     //Outputs
-    memoryOut, cacheMiss, mcDataOut, cacheEvict, stallDMAMem
+    memoryOut, cacheMiss, mcDataOut, cacheEvict, stallDMAMem, memAccessEx, memReadEx
 );
 
     input clk, rst;
@@ -16,6 +16,9 @@ module memory_stage(
     //Lets the data cache know that the data from the mc is valid data
     input mcDataValid;
     
+    //Signals that the fft is calculating
+    input fftCalculating;
+
     //Data from the mc to be written to the cache
     input [511:0] mcDataIn;
 
@@ -36,6 +39,15 @@ module memory_stage(
     
     //Signal to stall because there is a DMA request in process
     output reg stallDMAMem;
+
+    // If write outside data region
+    output memAccessEx;
+
+    // If read outside data region
+    output memReadEx
+
+    //If access (write or read) fftData while the accelerator is working on that data
+    output fftNotCompleteEx
 
     // TODO add some sort of dataValid signal that tells the next unit the data out is valid
 
@@ -176,5 +188,19 @@ module memory_stage(
             end
         endcase
     end
+
+    //--------------------------------------Exception Handling---------------------------------------------------
+
+    //Right now it's just overall fftCalculating
+    //NOTE: want it to check if its calculating on the address of the specific signal
+    assign memAccessEx = (fftCalculating != 1'b1) && (^aluResult[31:28] != 1'b1) && memWrite ? 1'b1 : 1'b0;
+
+    //Right now it's just overall fftCalculating
+    //NOTE: want it to check if its calculating on the address of the specific signal
+    assign memReadEx = (fftCalculating != 1'b1) && (^aluResult[31:28] != 1'b1) && memRead ? 1'b1 : 1'b0;
+
+    //Right now it's just overall fftCalculating
+    //NOTE: want it to check if its calculating on the address of the specific signal
+    assign fftNotCompleteEx = (fftCalculating == 1'b1) && (^aluResult[29:28] == 1'b1) && (memRead | memWrite) ? 1'b1 : 1'b0;
 
 endmodule

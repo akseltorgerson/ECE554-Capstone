@@ -3,7 +3,7 @@ module execute_stage(
     instr, pcPlus1, read1Data, read2Data, isSignExtend, isIType1,
     isBranch, aluSrc, isJump, isJR, isSLBI, aluOp,
     //Outputs
-    nextPC, aluResult
+    nextPC, aluResult, invalidJMPEx
 );
     input [31:0] instr, pcPlus1, read1Data, read2Data;
     input [3:0] aluOp;
@@ -12,6 +12,7 @@ module execute_stage(
 
     output [31:0] nextPC;
     output [31:0] aluResult;
+    output invalidJMPEx;
 
     wire [31:0] aluResultInterior;
     wire [31:0] extendedIType1;
@@ -69,4 +70,6 @@ module execute_stage(
 
     //---------------------Exception Handling-----------------------------
     
+    //If one of the top 4 bits is set, we are in the data section instead of instruction
+    assign invalidJMPEx = ^nextPC[31:28];
 endmodule

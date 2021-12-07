@@ -190,6 +190,7 @@ module cpu(//Inputs                   //TODO: These 3 signals were changed in na
         .mcDataValid(mcInstrValid),
         .blockInstruction(stallFFT),
         .mcDataIn(mcInstrIn),
+        .exception(exception),
         //Outputs
         .instr(instruction),
         .pcPlus1(pcPlus1),
@@ -243,7 +244,8 @@ module cpu(//Inputs                   //TODO: These 3 signals were changed in na
         .aluOp(aluOp),
         //Outputs
         .nextPC(nextPC),
-        .aluResult(aluResult)
+        .aluResult(aluResult),
+        .invalidJMPEx(invalidJMPEx)
     );
 
     memory_stage iMemory(
@@ -262,7 +264,10 @@ module cpu(//Inputs                   //TODO: These 3 signals were changed in na
         .cacheMiss(cacheMissMemory),
         .mcDataOut(dCacheOut),
         .cacheEvict(dCacheEvict),
-        .stallDMAMem(stallDMAMem)
+        .stallDMAMem(stallDMAMem),
+        .memAccessEx(memAccessEx),
+        .memReadEx(memReadEx),
+        .fftNotCompleteEx(fftNotCompleteEx)
     );
 
     writeback_stage iWriteback(
@@ -278,9 +283,9 @@ module cpu(//Inputs                   //TODO: These 3 signals were changed in na
         .rst(rst),
         .realImagLoadEx(realImagLoadEx),
         .complexArithmeticEx(complexArithmeticEx),
-        .fftNotCompleteEx(fftNotCompleteEx),
-        .memAccessEx(memAccessEx),
-        .memWriteEx(memWriteEx),
+        .fftNotCompleteEx(fftNotCompleteEx), //Need this
+        .memAccessEx(memAccessEx), //Need this 
+        .memWriteEx(memWriteEx), //Need this
         .invalidJMPEx(invalidJMPEx),
         .invalidFilterEx(invalidFilterEx),
         //Outputs

@@ -1,11 +1,15 @@
 module fetch_stage(
     //Inputs
-    clk, rst, halt, nextPC, stallDMAMem, mcDataValid, blockInstruction, mcDataIn,
+    clk, rst, halt, nextPC, stallDMAMem, mcDataValid, blockInstruction, mcDataIn, exception
     //Outputs
     instr, pcPlus1, cacheMiss
 );
 
     input clk, rst, halt;
+
+    //If there is an exception, halt the processor
+    //NOTE: Will want to change this to run through the exception handler
+    input exception;
 
     //Control signal from memory stage that stalls the PC if there is an ongoing DMA request
     input stallDMAMem;
@@ -53,7 +57,7 @@ module fetch_stage(
     state nextState;
 
     //Control logic for if the PC needs to be stalled
-    assign stallPC = stallDMAMem | blockInstruction | cacheMiss; /*| stallPCCache*/
+    assign stallPC = stallDMAMem | blockInstruction | cacheMiss | exception; /*| stallPCCache*/
 
     assign instrAddr = currPC;
 
