@@ -32,6 +32,9 @@ module fetch_stage(
     //Lets the mc know there was a miss in the instruction cache and to start a DMA request
     output cacheMiss;
 
+    // current address for the MC to use
+    output [31:0] instrAddr;
+
     wire [31:0] currPC;
     wire stallPC;
 
@@ -51,6 +54,8 @@ module fetch_stage(
 
     //Control logic for if the PC needs to be stalled
     assign stallPC = stallDMAMem | blockInstruction | cacheMiss; /*| stallPCCache*/
+
+    assign instrAddr = currPC;
 
     //The halt signal will be ~ inside PC so when it is 0, it writes on the next clk cycle
     program_counter iPC(.clk(clk), .rst(rst), .halt(halt), .nextAddr(nextPC), .currAddr(currPC), .stallPC(stallPC));
