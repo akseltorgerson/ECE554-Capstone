@@ -1,7 +1,7 @@
-module cpu(//Inputs
-            fftCalculating, clk, rst, mcDataValid, mcDataIn,
+module cpu(//Inputs                   //TODO: These 3 signals were changed in name so add them in right place
+            fftCalculating, clk, rst, mcDataValid, mcInstrValid, mcDataIn, mcInstrIn,
            //Outputs
-           startI, startF, loadF, sigNum, filter, dCacheOut, dCacheEvict
+           startI, startF, loadF, sigNum, filter, dCacheOut, dCacheEvict, aluReuslt
            //TODO: need to add in other accelerator and memory controller signals
            );
     
@@ -23,6 +23,9 @@ module cpu(//Inputs
 
     //For the machine controller to evict the data and WRITE to host mem
     output dCacheEvict;
+
+    //For the machine controller (used as an address)
+    output aluResult;
 
     //---------------------------------Wires First Used in Fetch Stage--------------------------------
     logic [31:0] instruction;
@@ -122,10 +125,6 @@ module cpu(//Inputs
 
     //----------------------------- Wires First Used in Execute -------------------------------------
 
-    //Goes into both memory and writeback, and it the result of the alu operation
-    //TODO: Possibly need to just make this an output of the CPU module as it's needed for the MC
-    logic [31:0] aluResult;
-
     //Control signal indicating that there was a cache miss in the memory stage
     //Will need to do a DMA request to retrieve the data when this occurs
     //TODO: This might have to be an output of the CPU?
@@ -153,9 +152,9 @@ module cpu(//Inputs
         .halt(halt),
         .nextPC(nextPC),
         .stallDMAMem(stallDMAMem),
-        .mcDataValid(mcDataValid),
+        .mcDataValid(mcInstrValid),
         .blockInstruction(stallFFT),
-        .mcDataIn(mcDataIn),
+        .mcDataIn(mcInstrIn),
         //Outputs
         .instr(instruction),
         .pcPlus4(pcPlus4),
@@ -225,8 +224,6 @@ module cpu(//Inputs
         //Outputs
         .memoryOut(memoryOut),
         .cacheMiss(cacheMissMemory),
-        //TODO: don't think this is really needed just make aluResult an output of the cpumodule
-        .aluResultMC(),
         .mcDataOut(dCacheOut),
         .cacheEvict(dCacheEvict),
         .stallDMAMem(stallDMAMem)
@@ -243,14 +240,14 @@ module cpu(//Inputs
     cause_register iCR(
         .clk(clk),
         .rst(rst),
-        .realImagLoadEx(),
-        .complexArithmeticEx(),
-        .fftNotCompleteEx(),
+        .realImagLoadEx(), //done
+        .complexArithmeticEx(), //done
+        .fftNotCompleteEx(), //This and the ones below need to talk to aksel about
         .memAccessEx(),
         .memWriteEx(),
         .invalidJMPEx(),
-        .invalidFilterEx(),
-        .invalidWaveEx(),
+        .invalidFilterEx(), //done
+        .invalidWaveEx(), //probably not needed
         //Outputs
         .causeDataOut(),
         .exception(),
