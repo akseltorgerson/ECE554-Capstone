@@ -240,7 +240,7 @@ namespace priscas
 			w = (w.AsUInt32() | ((rd & ((1 << 4) - 1) ) << 15 ));
 			w = (w.AsUInt32() | ((rt & ((1 << 4) - 1) ) << 19 ));
 			w = (w.AsUInt32() | ((rs & ((1 << 4) - 1) ) << 23 ));
-			if (op != priscas:ADD && op != priscas::SUB) {
+			if (op != priscas::ADD && op != priscas::SUB) {
 				w = w.AsUInt32() & ((uint32_t)0xFBBBFFFF);
 			}
 			w = (w.AsUInt32() | ((op & ((1 << 5) - 1) ) << 27 ));
@@ -252,7 +252,7 @@ namespace priscas
 			w = (w.AsUInt32() | ((rt & ((1 << 4) - 1) ) << 19 ));
 			w = (w.AsUInt32() | ((rs & ((1 << 4) - 1) ) << 23 ));
 
-			if (op != priscas:ADDI && op != priscas::SUBI) {
+			if (op != priscas::ADDI && op != priscas::SUBI) {
 				w = w.AsUInt32() & ((uint32_t)0xFBBFFFFF);
 			}
 			w = (w.AsUInt32() | ((op & ((1 << 5) - 1) ) << 27 ));
@@ -404,10 +404,10 @@ namespace priscas
 					imm = priscas::get_imm(args[1].c_str());
 				}
 			}
-			else if (current_op == pricas::STARTF || current_op == priscas::STARTI || current_op == priscas::LOADF)
+			else if (current_op == priscas::STARTF || current_op == priscas::STARTI || current_op == priscas::LOADF)
 			{
 				// Get signal num as uint_32
-				signum = priscas::get_imm(args[1].c_str())
+				signum = priscas::get_imm(args[1].c_str());
 			}
 			else
 			{
@@ -463,10 +463,10 @@ namespace priscas
 						rs = priscas::get_reg_num(args[2].c_str());
 				}
 			}
-			else if (current_op == priscas:STARTF)
+			else if (current_op == priscas::STARTF)
 			{
 				// Get the filter as an integer. Either 1 or 0
-				filter = pricas::get_imm(args[2].c_str())
+				filter = priscas::get_imm(args[2].c_str())
 			}
 		}
 
@@ -496,7 +496,7 @@ namespace priscas
 		}
 
 		// Pass the values of rs, rt, rd to the processor's encoding function
-		BW_32 inst = generic_mips32_encode(rs, rt, rd, f_code, imm, current_op, filter, signum);
+		BW_32 inst = generic_mips32_encode(rs, rt, rd, imm, current_op, filter, signum);
 
 		return std::shared_ptr<BW>(new BW_32(inst));
 	}
