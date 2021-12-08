@@ -44,7 +44,7 @@ module cpu_tb();
         rst = 1'b0;
 	    fftCalculating = 1'b0;
 	    mcDataValid = 1'b0;
-	    mcDataIn = 1'b0;
+	    mcDataIn = 512'b0;
         mcInstrIn = 512'b0;
         mcInstrValid = 1'b0;
         evictDone = 1'b0;
@@ -61,7 +61,7 @@ module cpu_tb();
         // SLBI R6 zero filled so R6 = h'10000000
         // ST Mem[R6 + 0 (h'10000000)] <- R5 ('h1002)
         // HALT
-        mcInstrIn = {{11{32'h00000000}}, 32'h8, 32'h93000000, 32'h43280002, 32'hA3001000, 32'h10000200};
+        mcInstrIn = {{11{32'h00000000}}, 32'h83280000, 32'h93000000, 32'h43280002, 32'hA3001000, 32'h10000200};
         //wait random number of cycles
         repeat($urandom_range(1,20)) begin
             @(posedge clk);
@@ -103,6 +103,28 @@ module cpu_tb();
 
         @(posedge clk);
         @(negedge clk);
+        if(iCPU.instruction != 32'h83280000) begin
+            errors++;
+            $display("Store Test Failed");
+        end
+        //wait 10 clk cycles to simulate that we are waiting for mcDataValid
+        repeat(10)begin
+            @(posedge clk);
+            @(negedge clk);
+        end
+        //will just write all zeros to the data array
+        mcDataValid = 1'b1;
+
+        @(posedge clk);
+        @(negedge clk);
+        mcDataValid = 1'b0;
+        
+        //wait two clk cycles for the state machine
+        @(posedge clk);
+        @(negedge clk);
+        @(posedge clk);
+        @(negedge clk);
+
 
         if(iCPU.instruction != 32'h00000000) begin
             errors++;
