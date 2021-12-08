@@ -60,8 +60,11 @@ module cpu_tb();
         // ADDI R5 ('h1002) <- R6('h1000) + ('h02)
         // SLBI R6 zero filled so R6 = h'10000000
         // ST Mem[R6 + 0 (h'10000000)] <- R5 ('h1002)
+        //1000 0011 0010 1000
+        // LD R4 <- MEM [R6 + 0 h'10000000] R4(h'1002)
+        //1000 1011 0010 00000000000000000000000
         // HALT
-        mcInstrIn = {{11{32'h00000000}}, 32'h83280000, 32'h93000000, 32'h43280002, 32'hA3001000, 32'h10000200};
+        mcInstrIn = {{10{32'h00000000}}, 32'h8B200000, 32'h83280000, 32'h93000000, 32'h43280002, 32'hA3001000, 32'h10000200};
         //wait random number of cycles
         repeat($urandom_range(1,20)) begin
             @(posedge clk);
@@ -119,12 +122,25 @@ module cpu_tb();
         @(negedge clk);
         mcDataValid = 1'b0;
         
-        //wait two clk cycles for the state machine
+        //wait two clk cycles for the me state machine to finish (should be a hit and then the next instruction)
         @(posedge clk);
         @(negedge clk);
         @(posedge clk);
         @(negedge clk);
+        if(iCPU.instruction != 32'h8B200000) begin
+            errors++;
+            $display("Load Test Failed");
+        end
 
+        @(posedge clk);
+        @(negedge clk);
+        if(iCPU.writebackData != 32'h1002) begin
+            errors++;
+            $display("Writeback data in Load is not right");
+        end
+        @(posedge clk);
+        @(negedge clk);
+        //make sure to test two loads in a row so that it doesn't keep stalling and actually goes to next instr
 
         if(iCPU.instruction != 32'h00000000) begin
             errors++;
