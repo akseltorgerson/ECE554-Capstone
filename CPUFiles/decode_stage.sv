@@ -96,5 +96,5 @@ module decode_stage(
     assign invalidFilterEx = (instr[31:27] == 5'b00010) && (instr[8] == 1'b1) && (filterLoaded == 1'b0) ? 1'b1 : 1'b0;
 
     //RealImaginaryLoadException First part here is for ADDI SUBI next part for SUB ADD
-    assign realImagLoadEx = ((instr[31:29] == 3'b010) && (instr[26 != instr[22]])) || ((instr[31:29] == 3'b110) && (instr[26] == instr[22]) && (instr[26] != instr[18])) ? 1'b1 : 1'b0;
+    assign realImagLoadEx = ((instr[31:29] == 3'b010) && (instr[26] != instr[22])) || ((instr[31:29] == 3'b110) && (instr[26] == instr[22]) && (instr[26] != instr[18])) ? 1'b1 : 1'b0;
 endmodule
