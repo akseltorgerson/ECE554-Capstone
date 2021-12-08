@@ -18,6 +18,7 @@ module mem_ctrl
 	parameter ADDR_BITCOUNT = 64
 	
 )
+// TODO make sure not to touch the host_ signals
 (
 	input wire clk,
 	input wire rst_n,

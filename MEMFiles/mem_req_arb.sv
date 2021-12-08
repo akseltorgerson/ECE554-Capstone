@@ -19,16 +19,25 @@ module mem_ctrl_top(
     output [511:0] dataBlock2Cache;     // mcDataIn
 
     // FT Accelerator Buffer Interface
-    input ftDataValid;                  //
+    input ftDataRead;                   //
     input [511:0] ftBlock2Mem;          //
     input [17:0] sigNum;                //
-    output sigBlkValid;                 //
+    output ftDataRead;                  //
     output [511:0] ftBlk2Buffer;        //
 
-    // Host Memory Interface
-    // TODO is this even right?
-        
-
 );
+
+    // Instr req, Data req, Accel Req
+    reg bit priorityReg [3];
+
+
+    // Instr 
+    assign reqReg[0] = instrCacheBlkReq;
+    // Data
+    assign reqReg[1] = dataCacheBlkReq;
+    // Accel
+    assign reqReg[2] = ftDataWrite;
+
+
 
 endmodule
