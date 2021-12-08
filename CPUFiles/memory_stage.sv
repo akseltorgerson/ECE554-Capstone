@@ -129,6 +129,8 @@ module memory_stage(
                 cacheRead = 1'b1;
                 memoryOut = cacheDataOut;
                 cacheMiss = cacheMissOut;
+                //NOTE: DO we want this high? (Shouldn't matter for now till mem controller)
+                cacheEvict = cacheEvictOut;
                 //NOTE: Need to stall here if there is a miss?
                 stallDMAMem = cacheMissOut;
                 nextState = (cacheHitOut) ? IDLE : (cacheEvictOut) ? EVICT_RD : LOAD_RD;
@@ -138,6 +140,8 @@ module memory_stage(
                 cacheEnable = 1'b1;
                 cacheEvict = 1'b1;
                 stallDMAMem = 1'b1;
+                //NOTE: Do we want to keep this high? (Shouldn't matter until mem controller)
+                cacheMiss = cacheMissOut;
                 mcDataOut = cacheBlkOut;
                 nextState = (evictDone) ? LOAD_RD : EVICT_RD;
             end
@@ -146,6 +150,8 @@ module memory_stage(
                 cacheEnable = 1'b1;
                 cacheLoad = 1'b1;
                 stallDMAMem = 1'b1;
+                //NOTE: Keep cacheMiss high until valid (for mem controller)
+                cacheMiss = 1'b1;
                 cacheBlkIn = mcDataIn;
                 nextState = (mcDataValid) ? WAIT_RD : LOAD_RD;
             end
@@ -159,6 +165,8 @@ module memory_stage(
                 cacheEnable = 1'b1;
                 cacheWrite = 1'b1;
                 cacheDataIn = read2Data;
+                //Note: for mem controller
+                cacheMiss = cacheMissOut;
                 //NOTE: Need to stall here if there is a miss?
                 stallDMAMem = cacheMissOut;
                 nextState = (cacheHitOut) ? IDLE : (cacheEvictOut) ? EVICT_WR : LOAD_WR;
@@ -168,12 +176,17 @@ module memory_stage(
                 cacheEvict = 1'b1;
                 mcDataOut = cacheBlkOut;
                 stallDMAMem = 1'b1;
+                cacheEnable = 1'b1;
+                //Note: Keep high for mem controller
+                cacheMiss = cacheMissOut;
                 nextState = (evictDone) ? LOAD_WR : EVICT_WR;
             end
             LOAD_WR: begin
                 cacheAddr = aluResult;
+                //Note: Maybe just make this cacheMissOut
                 cacheMiss = 1'b1;
                 stallDMAMem = 1'b1;
+                cacheEnable = 1'b1;
                 cacheLoad = 1'b1;
                 cacheBlkIn = mcDataIn;
                 nextState = (mcDataValid) ? WAIT_WR : LOAD_WR;
