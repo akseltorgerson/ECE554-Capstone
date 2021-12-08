@@ -38,14 +38,14 @@ int main()
 		integralPart = 0;
 	    }
 
-	    string hexValue = "0x0000_";
+	    string hexValue = "0000";
 	
 	    if (negative) {
-		hexValue = "0x1111_";
+		hexValue = "ffff";
 	    }
 
 	    if (integralPart == 1) {
-		hexValue = "0x0001_";
+		hexValue = "0001";
 	    }
 		
 	    //cout << wholeValue << '\n';
@@ -75,22 +75,22 @@ int main()
 		} else {
 		   switch(whole) {
 			case(10):
-				stream << "A";
+				stream << "a";
 				break;
 			case(11):
-				stream << "B";
+				stream << "b";
 				break;
 			case(12):
-				stream << "C";
+				stream << "c";
 				break;
 			case(13):
-				stream << "D";
+				stream << "d";
 				break;
 			case(14):
-				stream << "E";
+				stream << "e";
 				break;
 			case(15):
-				stream << "F";
+				stream << "f";
 				break;
 		   }
 		}
