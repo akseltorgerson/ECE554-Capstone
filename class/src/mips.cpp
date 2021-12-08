@@ -428,7 +428,7 @@ namespace priscas
 					std::string wc = args[2];
 					std::string imm_s = std::string();
 					std::string reg = std::string();
-
+					if (wc[0] != '(') throw mt_unmatched_parenthesis();
 					for(size_t i = 0; i < wc.length(); i++)
 					{
 						if(wc[i] == '(') { left_parenth = true; continue; }
@@ -438,19 +438,11 @@ namespace priscas
 						{
 							reg.push_back(wc[i]);
 						}
-
-						else
-						{
-							imm_s.push_back(wc[i]);
-						}
 					}
 
 					if(!right_parenth || !left_parenth) throw mt_unmatched_parenthesis();
 					if((rs = priscas::friendly_to_numerical(reg.c_str())) <= priscas::INVALID) rs = priscas::get_reg_num(reg.c_str());
-					imm = priscas::get_imm(imm_s.c_str());
-								
 				}
-
 				else
 				{
 					// later, MUST check for branches
