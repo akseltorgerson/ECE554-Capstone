@@ -12,7 +12,7 @@ module cause_register(
 
     output [31:0] causeDataOut;
     output exception;
-    output reg err;
+    output err;
     
 
     logic [31:0] dataIn;
@@ -29,7 +29,6 @@ module cause_register(
     always_comb begin
         dataIn = 32'h00000000;
         write = 1'b0;
-	    err = 1'b0;
         case({realImagLoadEx, complexArithmeticEx, fftNotCompleteEx, memAccessEx, memWriteEx, invalidJMPEx, invalidFilterEx})
             //-------------realImagLoad Exception---------------
             //Details: If try to load real into imag reg or vice versa
@@ -75,13 +74,13 @@ module cause_register(
                 write = 1'b1;
             end
             default: begin
-		// Issue if get here
-                err = 1'b1;
+                //mean's no exception
             end
         endcase
     end
 
     // If any of the bits are set, then there is an exception
     assign exception = ^causeDataOut;
-
+    //NOTE: Not dealing with err output because we are just halting right now on exception
+    assign err = 1'b0;
 endmodule

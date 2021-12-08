@@ -1,8 +1,8 @@
 module fetch_stage(
     //Inputs
-    clk, rst, halt, nextPC, stallDMAMem, mcDataValid, blockInstruction, mcDataIn, exception
+    clk, rst, halt, nextPC, stallDMAMem, mcDataValid, blockInstruction, mcDataIn, exception,
     //Outputs
-    instr, pcPlus1, cacheMiss
+    instr, pcPlus1, cacheMiss, instrAddr
 );
 
     input clk, rst, halt;

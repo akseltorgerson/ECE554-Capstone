@@ -59,7 +59,7 @@ module cpu_tb();
         //Issued instructions:
         // STARTF signum(1), filter (0)
         // HALT
-        mcInstrIn = {15{32'h00000000}, 32'h10000020};
+        mcInstrIn = {{15{32'h00000000}}, 32'h10000200};
         //wait random number of cycles
         repeat($urandom_range(1,20)) begin
             @(posedge clk);
@@ -72,12 +72,22 @@ module cpu_tb();
         if(sigNum != 18'b1) begin
             errors++;
         end
-        $stop();
+        repeat ($urandom_range(1,20)) begin
+            @(posedge clk);
+            @(negedge clk);
+        end
+
+        if(iCPU.instruction != 32'h00000000) begin
+            errors++;
+        end
+
         if(errors == 0) begin
             $display("YAHOO! All Tests Passed!");
         end else begin
             $display("ARG! Yar code be blasted!");
         end
+
+        $stop();
     end
 
     always #5 clk = ~clk;

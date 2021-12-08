@@ -77,6 +77,8 @@ module cpu(//Inputs                   //TODO: These 3 signals were changed in na
     //The data held in the second register to be read in an instruction
     logic [31:0] read2Data;
 
+    logic [31:0] instrAddr;
+
         //---------------Control Signals of Decode------------
 
     //Goes into execute to determine what the Binput of the aluIs (either read2Data or IType Data)
@@ -194,7 +196,8 @@ module cpu(//Inputs                   //TODO: These 3 signals were changed in na
         //Outputs
         .instr(instruction),
         .pcPlus1(pcPlus1),
-        .cacheMiss(cacheMissFetch)
+        .cacheMiss(cacheMissFetch),
+        .instrAddr(instrAddr)
     );
 
     decode_stage iDecode(
@@ -223,7 +226,7 @@ module cpu(//Inputs                   //TODO: These 3 signals were changed in na
         .startI(startI),
         .startF(startF),
         .loadF(loadF),
-        .blockInstruction(blockInstruction),
+        .blockInstruction(stallFFT),
         .realImagLoadEx(realImagLoadEx),
         .complexArithmeticEx(complexArithmeticEx),
         .invalidFilterEx(invalidFilterEx)
@@ -259,6 +262,7 @@ module cpu(//Inputs                   //TODO: These 3 signals were changed in na
         .mcDataIn(mcDataIn),
         .mcDataValid(mcDataValid),
 	    .evictDone(evictDone),
+        .fftCalculating(fftCalculating),
         //Outputs
         .memoryOut(memoryOut),
         .cacheMiss(cacheMissMemory),
@@ -266,7 +270,7 @@ module cpu(//Inputs                   //TODO: These 3 signals were changed in na
         .cacheEvict(dCacheEvict),
         .stallDMAMem(stallDMAMem),
         .memAccessEx(memAccessEx),
-        .memReadEx(memReadEx),
+        .memWriteEx(memWriteEx),
         .fftNotCompleteEx(fftNotCompleteEx)
     );
 
@@ -283,9 +287,9 @@ module cpu(//Inputs                   //TODO: These 3 signals were changed in na
         .rst(rst),
         .realImagLoadEx(realImagLoadEx),
         .complexArithmeticEx(complexArithmeticEx),
-        .fftNotCompleteEx(fftNotCompleteEx), //Need this
-        .memAccessEx(memAccessEx), //Need this 
-        .memWriteEx(memWriteEx), //Need this
+        .fftNotCompleteEx(fftNotCompleteEx), 
+        .memAccessEx(memAccessEx),  
+        .memWriteEx(memWriteEx), 
         .invalidJMPEx(invalidJMPEx),
         .invalidFilterEx(invalidFilterEx),
         //Outputs
