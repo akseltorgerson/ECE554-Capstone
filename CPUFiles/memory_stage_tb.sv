@@ -24,7 +24,7 @@ module memory_stage_tb();
     logic [511:0] mcDataOut;
     logic stallDMAMem;
     logic memAccessEx;
-    logic memReadEx;
+    logic memWriteEx;
     logic fftNotCompleteEx;
 
     // other signals
@@ -94,8 +94,6 @@ module memory_stage_tb();
                     end
                     // Data requested from the MC is now valid
                     mcDataValid = 1'b1;
-                    // TODO blkStartIndex will need to be changed for when accessing blocks larger
-                    // than the cache size, for now this should work
                     blkStartIndex = i[11:4] * 16;
                     mcDataIn = {testMemory[blkStartIndex+15],
                                 testMemory[blkStartIndex+14],
@@ -115,7 +113,7 @@ module memory_stage_tb();
                                 testMemory[blkStartIndex]};
 
                     // subtract from our loop index so we can read the block we just attempted to
-                    //i -= 1;
+                    i -= 1;
                     @(posedge clk);
                     mcDataValid = 1'b0;
                     // Read PHASE
@@ -222,8 +220,6 @@ module memory_stage_tb();
                     end
                     // Data requested from the MC is now valid
                     mcDataValid = 1'b1;
-                    // TODO blkStartIndex will need to be changed for when accessing blocks larger
-                    // than the cache size, for now this should work
                     blkStartIndex = i[12:4] * 16;
                     mcDataIn = {testMemory[blkStartIndex+15],
                                 testMemory[blkStartIndex+14],

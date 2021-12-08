@@ -15,12 +15,13 @@ module fetch_stage_tb();
     logic mcDataValid;
     logic [511:0] mcDataIn;
     logic [31:0] nextPC;
+    logic exception;
     
     // output signals
     logic [31:0] instr;
-    logic [31:0] pcPlus4;
+    logic [31:0] pcPlus1;
     logic cacheMiss;
-   
+    logic [31:0] instrAddr;   
 
     // other signals
     integer errors;
@@ -59,6 +60,7 @@ module fetch_stage_tb();
         blkStartIndex = 0;
         jump = 1'b0;
         jumpAddr = 32'b0;
+        exception = 1'b0;
 
         errors = 0;
         numMisses = 0;
@@ -172,6 +174,6 @@ module fetch_stage_tb();
     end
 
     // PC stuff
-    assign nextPC = (jump) ? jumpAddr : pcPlus4 % 2048;
+    assign nextPC = (jump) ? jumpAddr : pcPlus1 % 2048;
 
 endmodule

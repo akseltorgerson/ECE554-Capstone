@@ -30,7 +30,6 @@ module fetch_stage(
     output [31:0] instr;
 
     // The current PC plus 1 (to get the next instruction if there is no branch or jump)
-    // TODO should be pcPlus1;
     output [31:0] pcPlus1;
 
     //Lets the mc know there was a miss in the instruction cache and to start a DMA request
@@ -48,16 +47,13 @@ module fetch_stage(
     //These signals are not important (but can be used later if need be)
     wire cout, P, G;
 
-    //stall while DMA for fetch
-    //wire stallPCCache;
-
     // NOTE: Might need to add in another state after request to wait a clk cycle that unconditionally goes to IDLE
     typedef enum reg {IDLE = 1'b0, REQUEST = 1'b1} state;
     state currState;
     state nextState;
 
     //Control logic for if the PC needs to be stalled
-    assign stallPC = stallDMAMem | blockInstruction | cacheMiss | exception; /*| stallPCCache*/
+    assign stallPC = stallDMAMem | blockInstruction | cacheMiss | exception;
 
     assign instrAddr = currPC;
 
