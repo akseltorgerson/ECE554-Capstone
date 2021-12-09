@@ -32,7 +32,7 @@ module  address_generator
 
     assign stagePlus1 = stageCount + 5'b00001;
     assign shiftNumber = {4'b0000, stagePlus1};
-    assign numerator = (cycleCount << shiftNumber);
+    assign numerator = ({10'b0000000000, cycleCount} << shiftNumber);
     assign twiddle_int = {numerator >> 10}[8:0];
     
     // Bit Reversal
