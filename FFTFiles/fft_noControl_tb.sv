@@ -31,7 +31,7 @@ module fft_noControl_tb();
 
     address_generator iAgen(.stageCount(stageCount), .cycleCount(cycleCount), .indexA(indexA), .indexB(indexB), .twiddleIndex(twiddleIndex));
 
-    fft_ram iRam(.clk(clk), .rst(clk), .load(load), .externalLoad(externalLoad), .indexA(externalLoad ? externalIndexA : indexA), .indexB(indexB), 
+    fft_ram iRam(.clk(clk), .rst(rst), .load(load), .externalLoad(externalLoad), .indexA(externalLoad ? externalIndexA : indexA), .indexB(indexB), 
                  .A_real_i(externalLoad ? external_real_A : butterfly_real_A_out), .A_imag_i(externalLoad ? external_imag_A : butterfly_imag_A_out), 
                  .B_real_i(butterfly_real_B_out), .B_imag_i(butterfly_imag_B_out), .A_real_o(butterfly_real_A_in), .A_imag_o(butterfly_imag_A_in), 
                  .B_real_o(butterfly_real_B_in), .B_imag_o(butterfly_imag_B_in));
