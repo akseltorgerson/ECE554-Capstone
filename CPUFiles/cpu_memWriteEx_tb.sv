@@ -12,6 +12,9 @@ module cpu_memWriteEx_tb();
     logic [31:0] mcAddr;
 
     logic exception;
+    
+    logic cacheMissFetch;
+    logic cacheMissMemory;
 
     logic halt;
 
@@ -43,7 +46,9 @@ module cpu_memWriteEx_tb();
              .dCacheEvict(dCacheEvict),
 	         .aluResult(mcAddr),
              .exception(exception),
-             .halt(halt));
+             .halt(halt),
+             .cacheMissFetch(cacheMissFetch),
+             .cacheMissMemory(cacheMissMemory));
 
     initial begin
         clk = 1'b0;

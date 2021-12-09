@@ -1,7 +1,8 @@
-module cpu(//Inputs                   //TODO: These 3 signals were changed in name so add them in right place
+module cpu(//Inputs                   
             fftCalculating, clk, rst, mcDataValid, mcInstrValid, mcDataIn, mcInstrIn, evictDone,
            //Outputs
-           startI, startF, loadF, sigNum, filter, dCacheOut, dCacheEvict, aluResult, exception, halt
+           startI, startF, loadF, sigNum, filter, dCacheOut, dCacheEvict, aluResult, exception, halt,
+           cacheMissFetch, cacheMissMemory
            //TODO: need to add in other accelerator and memory controller signals
            );
     
@@ -23,7 +24,6 @@ module cpu(//Inputs                   //TODO: These 3 signals were changed in na
     input evictDone;
 
     //Output control signals for the accelerator
-    //TODO: Determine the filter signal
     output startI, startF, loadF, filter;
     output [17:0] sigNum; //Signal number for the accelerator, 18 bits
 
@@ -41,6 +41,14 @@ module cpu(//Inputs                   //TODO: These 3 signals were changed in na
 
     //If there is a halt, then dump the memory and will stop executing instructions
     output halt;
+
+    //Control signal indicating that there was a cache miss in the fetch stage
+    //Will need to do a DMA request to retrieve the data when this occurs
+    output cacheMissFetch;
+
+    //Control signal indicating that there was a cache miss in the memory stage
+    //Will need to do a DMA request to retrieve the data when this occurs
+    output cacheMissMemory;
 
     //---------------------------------Wires First Used in Fetch Stage--------------------------------
     logic [31:0] instruction;
@@ -62,11 +70,7 @@ module cpu(//Inputs                   //TODO: These 3 signals were changed in na
 
     //The current PC plus 4 (to get the next instruction if no branch)
     logic [31:0] pcPlus1;
-
-    //Control signal indicating that there was a cache miss in the fetch stage
-    //Will need to do a DMA request to retrieve the data when this occurs
-    //TODO: This might have to be an output of the CPU?
-    logic cacheMissFetch;
+    
     //-----------------------------------------------------------------------------------------------
 
 
@@ -139,11 +143,7 @@ module cpu(//Inputs                   //TODO: These 3 signals were changed in na
 
 
     //----------------------------- Wires First Used in Execute -------------------------------------
-
-    //Control signal indicating that there was a cache miss in the memory stage
-    //Will need to do a DMA request to retrieve the data when this occurs
-    //TODO: This might have to be an output of the CPU?
-    logic cacheMissMemory;
+    
 
     //-----------------------------------------------------------------------------------------------
 
@@ -158,7 +158,7 @@ module cpu(//Inputs                   //TODO: These 3 signals were changed in na
         //None all declared before
     //-----------------------------------------------------------------------------------------------
 
-    //---------------------------- Wires in Cause Register (TODO: will change these) ----------------
+    //---------------------------- Wires in Cause Register ----------------
 
     logic fftNotCompleteEx;
 

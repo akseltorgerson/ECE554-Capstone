@@ -13,6 +13,9 @@ module cpu_realImagEx_tb();
 
     logic exception;
 
+    logic cacheMissFetch;
+    logic cacheMissMemory;
+    
     logic halt;
 
     int errors = 0;
@@ -43,7 +46,9 @@ module cpu_realImagEx_tb();
              .dCacheEvict(dCacheEvict),
 	         .aluResult(mcAddr),
              .exception(exception),
-             .halt(halt));
+             .halt(halt),
+             .cacheMissFetch(cacheMissFetch),
+             .cacheMissMemory(cacheMissMemory));
 
     initial begin
         clk = 1'b0;
