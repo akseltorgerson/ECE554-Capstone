@@ -8,6 +8,9 @@ module mem_arb(
     input clk;
     input rst;
 
+    // todo might want a signal that ORS halt, write back, etc
+    input halt;
+
     // Instr Cache Interface
     input instrCacheBlkReq;             // cacheMiss    
     input [31:0] instrCacheAddr;        // instrAddr
@@ -47,10 +50,15 @@ module mem_arb(
     input [WORD_SIZE-1:0] common_data_bus_in;
     input tx_done;
     input rd_valid;
+
     // TODO might need CV value
+    // Condition variable
+    // Assign cv_value to 1 for a halt, or a write back
     output logic[63:0] cv_value;
 
 );
+
+    assign cv_value[0] = halt;
 
     // TODO Questions
     // what is cv_value
@@ -94,6 +102,7 @@ module mem_arb(
     /************************************************************************   
     *                      SIG COUNTER AND ADDR LOOKUP                      *
     ************************************************************************/
+    // TODO Zero extend the sigNum values, and OR
     assign sigBaseAddr = signumTable[sigNum][0] + 32'h1000_0000;
     assign sigEndAddr = signumTable[sigNum][1] + 32'h1000_0000;
     // TODO still need some way for the accelerator to know if there is another
@@ -103,15 +112,15 @@ module mem_arb(
     always_ff @(posedge accelWrBlkDone, posedge accelRdBlkDone, posedge rst) begin
         if (rst) begin
             sigOffset <= 8'b0;
-            accelTransferDone <= '0;
+            accelTransferDone <= 1'b0;
         end else begin
-            sigOffset <= sigOffset + 1;
-            accelTrasnferDone <= '0;
+            sigOffset <= sigOffset + 1'b1;
+            accelTrasnferDone <= 1'b0;
         end
         if (&sigOffset) begin
             transferDone = 1'b1;
             // rest it back to 0
-            sigOffset <= sigOffset + 1;
+            sigOffset <= sigOffset + 1'b1;
         end
     end
 
@@ -123,17 +132,17 @@ module mem_arb(
 
     always_comb begin
         if (enable) begin
-            if (priorityReg[2] == 1) begin
+            if (priorityReg[2] == 1'b1) begin
                 // request accelerator data
                 accelStart = 1'b1;
                 dataStart = 1'b0;
                 instrStart = 1'b0;
-            end else if (priorityReg[1] == 1) begin
+            end else if (priorityReg[1] == 1'b1) begin
                 // request a data block
                 dataStart = 1'b1;
                 accelStart = 1'b0;
                 instrStart = 1'b0;
-            end else if (priorityReg[0] == 1) begin
+            end else if (priorityReg[0] == 1'b1) begin
                 // request an instruction block
                 instrStart = 1'b1;
                 accelStart = 1'b0;
@@ -153,7 +162,7 @@ module mem_arb(
     always_comb begin
         // Default values
         nextState = IDLE;
-        io_addr = 1'b0;
+        io_addr = '0;
         op = IDLE;
         instrBlk2Cache = '0;
         instrBlk2CacheValid = '0;
@@ -252,7 +261,7 @@ module mem_arb(
                 nextState = accelTransferDone ? IDLE : ACCEL_WR;
             end
             default: begin
-                // neve eva should be here
+                
             end
         end
 
