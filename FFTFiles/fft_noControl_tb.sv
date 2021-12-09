@@ -13,8 +13,8 @@ module fft_noControl_tb();
                         twiddle_real, twiddle_imag, external_real_A, external_imag_A;
 
     logic [4:0] stageCount;
-    logic [9:0] indexA, indexB, externalIndexA;
-    logic [8:0] cycleCount, twiddleIndex;
+    logic [9:0] indexA, indexB, externalIndexA, cycleCount;
+    logic [8:0] twiddleIndex;
 
     // rom
     reg [31:0] twiddle_mem [0:1023];
@@ -29,7 +29,7 @@ module fft_noControl_tb();
                           .twiddle_real(twiddle_real), .twiddle_imag(twiddle_imag), .real_A_out(butterfly_real_A_out), .imag_A_out(butterfly_imag_A_out), 
                           .real_B_out(butterfly_real_B_out), .imag_B_out(butterfly_imag_B_out));
 
-    address_generator iAgen(.stageCount(stageCount), .cycleCount(cycleCount), .indexA(indexA), .indexB(indexB), .twiddleIndex(twiddleIndex));
+    address_generator iAgen(.stageCount(stageCount), .cycleCount(cycleCount[8:0]), .indexA(indexA), .indexB(indexB), .twiddleIndex(twiddleIndex));
 
     fft_ram iRam(.clk(clk), .rst(rst), .load(load), .externalLoad(externalLoad), .indexA(externalLoad ? externalIndexA : indexA), .indexB(indexB), 
                  .A_real_i(externalLoad ? external_real_A : butterfly_real_A_out), .A_imag_i(externalLoad ? external_imag_A : butterfly_imag_A_out), 
@@ -90,7 +90,7 @@ module fft_noControl_tb();
 
         // go through stage 1 and check outputs of the butterfly unit
         
-        for (cycleCount = 0; cycleCount < 511; cycleCount++) begin
+        for (cycleCount = 0; cycleCount < 512; cycleCount++) begin
 
             twiddle_real = twiddle_mem[2*twiddleIndex];
             twiddle_imag = twiddle_mem[2*twiddleIndex + 1];
@@ -106,12 +106,12 @@ module fft_noControl_tb();
         load = 0;
 
         // go through memory and make sure outputs have changed
-        for (cycleCount = 0; cycleCount < 511; cycleCount++) begin
+        for (cycleCount = 0; cycleCount < 512; cycleCount++) begin
 
             @(posedge clk);
             @(negedge clk);
 
-            if (butterfly_real_A_in === fake_mem[2*cycleCount] || butterfly_imag_A_in === fake_mem[2*cycleCount + 1]) begin
+            if (butterfly_real_A_in === fake_mem[2*cycleCount]) begin
                 $display("RAM OUT REAL: %h, RAM OUT IMAG: %h", butterfly_real_A_in, butterfly_imag_A_in);
                 $display("UNEXPECTED REAL: %h, UNEXPECTED IMAG: %h", fake_mem[2*cycleCount], fake_mem[2*cycleCount + 1]);
                 $stop();
