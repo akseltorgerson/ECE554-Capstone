@@ -21,7 +21,7 @@ module fft_ram(
                                .rst(rst), 
                                .d(indexA === i ? A_real_i :
                                   indexB === i ? B_real_i :
-                                  32'h00000000), 
+                                  q_real[2*i]), 
                                .q(q_real[2*i]),
                                .en(externalLoad ? indexA === i : 
                                    load && (indexA === i || indexB === i)));
@@ -29,7 +29,7 @@ module fft_ram(
                                .rst(rst), 
                                .d(indexA === i ? A_imag_i :
                                   indexB === i ? B_imag_i :
-                                  32'h00000000), 
+                                  q_real[2*i + 1]), 
                                .q(q_imag[2*i + 1]), 
                                .en(externalLoad ? indexA === i : 
                                    load && (indexA === i || indexB === i)));
