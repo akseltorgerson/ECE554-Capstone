@@ -1,4 +1,4 @@
-module mem_req_arb(
+module mem_arb(
 
     localparam WORD_SIZE = 32;
 	localparam CL_SIZE_WIDTH = 512;
@@ -227,6 +227,7 @@ module mem_req_arb(
             /************************************************************************
             *                               ACCEL STATES                            *
             ************************************************************************/
+            // FILLING BUFFER FROM HOST
             ACCEL_RD: begin
                 io_addr = sigBaseAddr + (sigOffset << 9);
                 op = READ;
@@ -238,6 +239,7 @@ module mem_req_arb(
                 accelRdBlkDone = rd_valid;
                 nextState = rd_valid ? (accelTransferDone ? IDLE : ACCEL_RD) : ACCEL_RD_DONE;
             end
+            // EMPTYING BUFFER TO HOST
             ACCEL_WR: begin
                 io_addr = sigBaseAddr + (sigOffset << 9);
                 op = WRITE;
