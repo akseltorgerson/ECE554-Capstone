@@ -71,6 +71,9 @@ module fft_noControl_tb();
 
             @(posedge clk);
 
+            $display("RAM OUT REAL: %h, RAM OUT IMAG: %h", butterfly_real_A_in, butterfly_imag_A_in);
+            $display("EXPECTED RAM OUT REAL: %h, EXPECTED RAM OUT IMAG: %h", fake_mem[2*i], fake_mem[2*i + 1]);
+
             if (butterfly_real_A_in !== fake_mem[2*i] || butterfly_imag_A_in !== fake_mem[2*i + 1]) begin
                 $display("RAM OUT REAL: %h, RAM OUT IMAG: %h", butterfly_real_A_in, butterfly_imag_A_in);
                 $display("EXPECTED RAM OUT REAL: %h, EXPECTED RAM OUT IMAG: %h", fake_mem[2*i], fake_mem[2*i + 1]);
