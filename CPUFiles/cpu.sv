@@ -174,7 +174,8 @@ module cpu(//Inputs                   //TODO: These 3 signals were changed in na
 
     //------------------------------ Wires first used in EPC------------------------------------------
     
-    logic [31:0] epcIn;
+    //This is just the current instr Addr if there is an exception
+    //logic [31:0] epcIn;
 
     logic [31:0] epcOut;
 
@@ -304,7 +305,7 @@ module cpu(//Inputs                   //TODO: These 3 signals were changed in na
     epc_register iEPC(
         .clk(clk),
         .rst(rst),
-        .epcIn(epcIn),
+        .epcIn(instrAddr),
         .write(exception),
         //Outputs
         .epcOut(epcOut)
