@@ -10,8 +10,8 @@ int main()
 {
     ifstream myfile; 
     ofstream outputFile; 
-    myfile.open("twiddleFactorsList.txt");
-    outputFile.open("twiddleHex.txt");
+    myfile.open("testSignalDec.txt");
+    outputFile.open("testSignalHex.txt");
 
    if(myfile.is_open() && outputFile.is_open()) {
 	std::string tp;
@@ -22,30 +22,35 @@ int main()
 	    string wholeValue;
 
 	    count++;
-
-            if (tp.at(0) == '-') { 
-		negative = true;
-            } else {
-		negative = false;
-	    }
-
 	    wholeValue = tp;
 
-	    if (wholeValue.at(0) == '1') {
-		integralPart = 1;
-		wholeValue.replace(0,1,"0");
-	    } else {
+            if (wholeValue.at(0) == '-') { 
+		negative = true;
 		integralPart = 0;
-	    }
 
+		if (wholeValue.at(1) == '1') {
+		    integralPart = 1;
+		}
+            } else {
+		negative = false;
+		integralPart = 0;
+		if (wholeValue.at(0) == '1') {
+		    integralPart = 1;
+		}
+	    }
+ 
 	    string hexValue = "0000";
 	
-	    if (negative) {
-		hexValue = "ffff";
-	    }
-
 	    if (integralPart == 1) {
 		hexValue = "0001";
+
+		if (negative) {
+		    hexValue = "fffe";
+	        }
+	    } else {
+		if (negative) {
+		    hexValue = "ffff";
+		}
 	    }
 		
 	    //cout << wholeValue << '\n';
@@ -55,7 +60,7 @@ int main()
 	    int whole;
 
 	    value = std::stod (wholeValue);
-	    std::modf(value, &whole_d);
+	    value = std::modf(value, &whole_d);
 	    whole = static_cast<int>(whole_d);
 	    
 	    // want constantly multiply by 16, take the integer part, and use that as the hex value
