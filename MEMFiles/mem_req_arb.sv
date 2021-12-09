@@ -2,6 +2,7 @@ module mem_req_arb(
 
     localparam WORD_SIZE = 32;
 	localparam CL_SIZE_WIDTH = 512;
+    // TODO can I just change this?
 	localparam ADDR_BITCOUNT = 64;
 
     input clk;
@@ -40,17 +41,22 @@ module mem_req_arb(
 	} opcode;
 
     // Mem Controller interface
-    output op;
+    output opcode op;
     output [WORD_SIZE-1:0] common_data_bus_out;
     output [31:0] io_addr;
     input [WORD_SIZE-1:0] common_data_bus_in;
-    // is tx_done high when there is a successful write to host memory?
     input tx_done;
     input rd_valid;
     // TODO might need CV value
     output logic[63:0] cv_value;
 
 );
+
+    // TODO Questions
+    // what is cv_value
+    // also it seems that the mem controller outputs a 32 bit value, how can i change it so it outputs the entire 512 bit block?
+    // CPU address in the address translation table seem to be 64 bits, can we just change that to 32 bits since we have 32 bit addresses?
+    // Am I kicking off a request in the correct way?
 
     // state enum
     typedef enum reg[3:0] {
@@ -90,6 +96,8 @@ module mem_req_arb(
     ************************************************************************/
     assign sigBaseAddr = signumTable[sigNum][0] + 32'h1000_0000;
     assign sigEndAddr = signumTable[sigNum][1] + 32'h1000_0000;
+    // TODO still need some way for the accelerator to know if there is another
+    // chunk of data
 
     // TODO may need to be one more bit
     always_ff @(posedge accelWrBlkDone, posedge accelRdBlkDone, posedge rst) begin
@@ -189,7 +197,7 @@ module mem_req_arb(
                 nextState = tx_done ? INSTR_RD_DONE : INSTR_RD;
             end
             INSTR_RD_DONE: begin    
-                instrBck2Cache = common_data_bus_in;
+                instrBlk2Cache = common_data_bus_in;
                 instrBlk2CacheValid = rd_valid;
                 nextState = rd_valid ? IDLE : INSTR_RD_DONE;
             end
@@ -234,7 +242,7 @@ module mem_req_arb(
                 io_addr = sigBaseAddr + (sigOffset << 9);
                 op = WRITE;
                 common_data_bus_out = accelBlk2Mem;
-                accelWrBlockDone = 1'b0;
+                accelWrBlkDone = 1'b0;
                 nextState = tx_done ? ACCEL_WR_DONE : ACCEL_WR;
             end
             ACCEL_WR_DONE: begin
