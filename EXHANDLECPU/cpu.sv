@@ -139,6 +139,9 @@ module cpu(//Inputs
     //before a loadF instruction has been done
     logic invalidFilterEx;
 
+    //return from exception handler
+    logic pcIsEPC;
+
     //-----------------------------------------------------------------------------------------------
 
 
@@ -174,7 +177,7 @@ module cpu(//Inputs
 
     //------------------------------ Wires first used in EPC------------------------------------------
     
-    //This is just the current instr Addr if there is an exception
+    //This will be the pc plus1
     //logic [31:0] epcIn;
 
     logic [31:0] epcOut;
@@ -232,7 +235,8 @@ module cpu(//Inputs
         .blockInstruction(stallFFT),
         .realImagLoadEx(realImagLoadEx),
         .complexArithmeticEx(complexArithmeticEx),
-        .invalidFilterEx(invalidFilterEx)
+        .invalidFilterEx(invalidFilterEx),
+        .pcIsEPC(pcIsEPC)
     );
 
     execute_stage iExecute(
@@ -305,12 +309,11 @@ module cpu(//Inputs
     epc_register iEPC(
         .clk(clk),
         .rst(rst),
-        .epcIn(instrAddr),
+        .epcIn(pcPlus1),
         .write(exception),
         //Outputs
         .epcOut(epcOut)
     );
-    
-
+     
 
 endmodule

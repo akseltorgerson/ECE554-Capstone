@@ -3,7 +3,8 @@ module decode_stage(
     clk, rst, instr, pcPlus1, writebackData, fftCalculating,
     //Outputs
     read1Data, read2Data, aluSrc, isSignExtend, isIType1, isBranch, halt, nop, memWrite, memRead,
-    memToReg, isJR, isSLBI, isJump, aluOp, startI, startF, loadF, blockInstruction, realImagLoadEx, complexArithmeticEx, invalidFilterEx
+    memToReg, isJR, isSLBI, isJump, aluOp, startI, startF, loadF, blockInstruction, realImagLoadEx, complexArithmeticEx, invalidFilterEx,
+    pcIsEPC
 );
 
     input clk, rst;
@@ -22,6 +23,9 @@ module decode_stage(
 
     //Exception signals
     output complexArithmeticEx, realImagLoadEx, invalidFilterEx;
+
+    //Control to determine to return from exception handler
+    output pcIsEPC;
 
     wire [3:0] writeRegSel;
     wire [31:0] writeData;
@@ -56,7 +60,8 @@ module decode_stage(
                               .startI(startI),
                               .startF(startF),
                               .loadF(loadF),
-                              .blockInstruction(blockInstruction)
+                              .blockInstruction(blockInstruction),
+                              .pcIsEPC(pcIsEPC)
                              );
     
     //Inputs: clk, rst, read1RegSel, read2RegSel, writeRegSel, writeData, write

@@ -3,7 +3,7 @@ module control_unit(
     //Inputs
     opcode, fftCalculating,
     //Outputs
-    blockInstruction, isJAL, regDst, rsWrite, regWrite, aluSrc, isSignExtend, isIType1, isBranch, nop, halt, memWrite, memRead, memToReg, isJR, isSLBI, aluOp, isJump, startI, startF, loadF
+    blockInstruction, isJAL, regDst, rsWrite, regWrite, aluSrc, isSignExtend, isIType1, isBranch, nop, halt, memWrite, memRead, memToReg, isJR, isSLBI, aluOp, isJump, startI, startF, loadF, pcIsEPC
 );
 
     //Determines the isntructions
@@ -40,6 +40,7 @@ module control_unit(
     output reg startF;
     output reg loadF;
     output reg blockInstruction;
+    output reg pcIsEPC;
 
     always @(*) begin
         isJAL = 1'b0;
@@ -67,6 +68,7 @@ module control_unit(
         startF = 1'b0;
         loadF = 1'b0;
         blockInstruction = 1'b0;
+        pcIsEPC = 1'b0;
         case(opcode)
             //Halt
             5'b00000: begin
@@ -281,7 +283,7 @@ module control_unit(
 //////////////////// Load Exception PC////////////////////////////////////////////
             //RFE (return from exception)
             5'b10101: begin
-                
+                pcIsEPC = 1'b1;
             end
 			default: begin
 				
