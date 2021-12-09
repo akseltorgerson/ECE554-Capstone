@@ -278,14 +278,6 @@ module control_unit(
 				regWrite = 1'b1;
 				//pcSrc = 1'b1;
 			end
-/////////////////////// Extra Credit Instructions//////////////////////////////////
-// TODO: Maybe want these from 552 for exceptions, not sure if do it this way    //
-            5'b00010: begin
-				//Set the SIIC illegal instruction exception
-			end
-			5'b00011: begin
-				//RTI returns from an exception by loading the PC for the value in the EPC register
-			end
 			default: begin
 				
 			end
