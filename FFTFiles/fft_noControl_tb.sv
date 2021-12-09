@@ -70,6 +70,7 @@ module fft_noControl_tb();
             external_real_A = fake_mem[2*i];
 
             @(posedge clk);
+            @(posedge clk);
 
             if (butterfly_real_A_in !== fake_mem[2*i] || butterfly_imag_A_in !== fake_mem[2*i + 1]) begin
                 $display("RAM OUT REAL: %h, RAM OUT IMAG: %h", butterfly_real_A_in, butterfly_imag_A_in);
