@@ -9,18 +9,18 @@ module mem_req_arb(
 
     // Instr Cache Interface
     input instrCacheBlkReq;             // cacheMiss    
-    input [31:0] instrCacheAddr;               // instrAddr
-    output [511:0] instrBlk2Cache;    // blkIn
+    input [31:0] instrCacheAddr;        // instrAddr
+    output [511:0] instrBlk2Cache;      // blkIn
     output instrBlk2CacheValid;         // mcDataValid
 
     // Data Cache Interface
     input dataCacheBlkReq;              // cacheMiss
     input [31:0] dataAddr;              // aluResult
     input dataCacheEvictReq;            // cacheEvict
-    input [511:0] dataBlk2Mem;        // mcDataOut
+    input [511:0] dataBlk2Mem;          // mcDataOut
     output dataEvictAck;                // evictDone
     output dataBlk2CacheValid;          // mcDataValid
-    output [511:0] dataBlk2Cache;     // mcDataIn
+    output [511:0] dataBlk2Cache;       // mcDataIn
 
     // FT Accelerator Buffer Interface
     input accelDataRd;                  // lets MC know we want to read a sig chunk from host
@@ -28,12 +28,13 @@ module mem_req_arb(
     input [511:0] accelBlk2Mem;         // the block we want to write to mem
     input [17:0] sigNum;                // the signal number that corresponds to the signal data
     output accelWrBlkDone;              // lets the a-buf know that a blk as been written to host, ready for next block
-    output accelRdBlkDone;               // lets the a-buf know that a blk has been sent to a-buf is done, ready for next block
+    output accelRdBlkDone;              // lets the a-buf know that a blk has been sent to a-buf is done, ready for next block
     output [511:0] accelBlk2Buffer;     // block of data going to the buffer
 
     // Definitions
 	typedef enum bit
 	{
+        IDLE = 2'b00;
 		READ = 2'b01,
 		WRITE = 2'b11 
 	} opcode;
@@ -43,6 +44,7 @@ module mem_req_arb(
     output [WORD_SIZE-1:0] common_data_bus_out;
     output [31:0] io_addr;
     input [WORD_SIZE-1:0] common_data_bus_in;
+    // is tx_done high when there is a successful write to host memory?
     input tx_done;
     input rd_valid;
     // TODO might need CV value
@@ -70,18 +72,26 @@ module mem_req_arb(
 
     // Signum Table
     // {18 bits end offset, 18 bits start offset}
-    reg [35:0] signumTable [8192];
-    logic sigBaseAddr;
+    reg [35:0] signumTable [8192][2];
+    logic [31:0] sigBaseAddr;
+    logic [31:0] sigEndAddr;
     logic [7:0] sigOffset;
     reg accelTransferDone;
+    logic [17:0] sigLength;
 
     // Instr req, Data req, Accel Reqg
     reg [2:0] priorityReg;
     logic enable;
     logic instrStart, dataStart, accelStart;
 
+
+    /************************************************************************   
+    *                      SIG COUNTER AND ADDR LOOKUP                      *
+    ************************************************************************/
+    assign sigBaseAddr = signumTable[sigNum][0] + 32'h1000_0000;
+    assign sigEndAddr = signumTable[sigNum][1] + 32'h1000_0000;
+
     // TODO may need to be one more bit
-    // counter for signals
     always_ff @(posedge accelWrBlkDone, posedge accelRdBlkDone, posedge rst) begin
         if (rst) begin
             sigOffset <= 8'b0;
@@ -97,31 +107,55 @@ module mem_req_arb(
         end
     end
 
-    // instr, data, accel
+    /************************************************************************
+    *                           PRIORITY ENCODER                            *
+    ************************************************************************/
     assign priorityReg = {instrCacheBlkReq, (dataCacheBlkReq | dataCacheEvictReq), (accelDataRd | accelDataWr)};
     assign enable = |priorityReg;
 
-    // Priority Enc
     always_comb begin
         if (enable) begin
             if (priorityReg[2] == 1) begin
                 // request accelerator data
                 accelStart = 1'b1;
+                dataStart = 1'b0;
+                instrStart = 1'b0;
             end else if (priorityReg[1] == 1) begin
                 // request a data block
                 dataStart = 1'b1;
+                accelStart = 1'b0;
+                instrStart = 1'b0;
             end else if (priorityReg[0] == 1) begin
                 // request an instruction block
                 instrStart = 1'b1;
+                accelStart = 1'b0;
+                instrStart = 1'b0;
             end else begin
                 // do nothing
+                accelStart = 1'b0;
+                dataStart = 1'b0;
+                instrStart = 1'b0;
             end
         end
     end
 
-    // State machine
+    /************************************************************************
+    *                            STATE MACHINE                              *
+    ************************************************************************/
     always_comb begin
         // Default values
+        nextState = IDLE;
+        io_addr = 1'b0;
+        op = IDLE;
+        instrBlk2Cache = '0;
+        instrBlk2CacheValid = '0;
+        dataBlk2Cache = '0;
+        dataBlk2CacheValid = '0;
+        common_data_bus_out = '0;
+        dataEvictAck = '0;
+        accelBlk2Buffer = '0;
+        accelRdBlkDone = '0;
+        accelWrBlkDone = '0;
 
         case(state) begin
             INIT: begin
@@ -144,50 +178,60 @@ module mem_req_arb(
                 end else if (instrStart) begin
                     nextState = INSTR_RD;
                 end
+                nextState = IDLE;
             end
+            /************************************************************************
+            *                            INSTR STATES                                *
+            ************************************************************************/
             INSTR_RD: begin
                 io_addr = instrAddr;
                 op = READ;
-                nextState = rd_valid ? INSTR_RD_DONE : INSTR_RD;
+                nextState = tx_done ? INSTR_RD_DONE : INSTR_RD;
             end
             INSTR_RD_DONE: begin    
-                instrBlock2Cache = common_data_bus_in;
-                instrBlk2CacheValid = 1'b1;
-                nextState = IDLE;
+                instrBck2Cache = common_data_bus_in;
+                instrBlk2CacheValid = rd_valid;
+                nextState = rd_valid ? IDLE : INSTR_RD_DONE;
             end
+            /************************************************************************
+            *                            DATA STATES                                *
+            ************************************************************************/
             DATA_RD: begin
                 io_addr = dataCacheAddr;
                 op = READ;
-                nextState = rd_valid ? DATA_RD_DONE : INSTR_RD;
+                nextState = tx_done ? DATA_RD_DONE : INSTR_RD;
             end
             DATA_RD_DONE: begin 
-                dataBlock2Cache = common_data_bus_in;
-                dataBlock2CacheValid = 1'b1;
-                nextState = IDLE;
+                dataBlk2Cache = common_data_bus_in;
+                dataBlk2CacheValid = rd_valid;
+                nextState = rd_valid ? IDLE : DATA_RD_DONE;
             end
             DATA_WR: begin
                 io_addr = dataCacheAddr;
                 op = WRITE;
-                common_data_bus_out = dataBlock2Mem;
+                common_data_bus_out = dataBlk2Mem;
                 nextState = tx_done ? DATA_WR_DONE : DATA_WR; 
             end
             DATA_WR_DONE: begin
                 dataEvictAck = 1'b1;
                 nextState = IDLE:
             end
+            /************************************************************************
+            *                               ACCEL STATES                            *
+            ************************************************************************/
             ACCEL_RD: begin
-                io_addr = sigBaseAddr + sigOffset;
+                io_addr = sigBaseAddr + (sigOffset << 9);
                 op = READ;
                 accelBlk2Buffer = common_data_bus_in;
                 accelRdBlkDone = 1'b0;
-                nextState = rd_valid ? ACCEL_RD_DONE : ACCEL_RD;
+                nextState = tx_done ? ACCEL_RD_DONE : ACCEL_RD;
             end
             ACCEL_RD_DONE: begin
-                accelRdBlkDone = 1'b1;
-                nextState = accelTransferDone ? IDLE : ACCEL_RD;
+                accelRdBlkDone = rd_valid;
+                nextState = rd_valid ? (accelTransferDone ? IDLE : ACCEL_RD) : ACCEL_RD_DONE;
             end
             ACCEL_WR: begin
-                io_addr = sigBaseAddr + sigOffset;
+                io_addr = sigBaseAddr + (sigOffset << 9);
                 op = WRITE;
                 common_data_bus_out = accelBlk2Mem;
                 accelWrBlockDone = 1'b0;
@@ -198,6 +242,7 @@ module mem_req_arb(
                 nextState = accelTransferDone ? IDLE : ACCEL_WR;
             end
             default: begin
+                // neve eva should be here
             end
         end
 
