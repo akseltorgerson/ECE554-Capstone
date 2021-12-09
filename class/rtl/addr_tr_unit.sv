@@ -12,7 +12,7 @@ module addr_tr_unit
 	parameter VIRT_ADDR_BITCOUNT = 32
 )
 (
-	input logic [VIRT_ADDR_BITCOUNT-1:0] virtual_addr,
+	input logic [VIRT_ADDR_BITCOUNT-1:0] short_virtual_addr,
 
 	input logic [ADDR_BITCOUNT-1:0] base_address_s0,
 	input logic [ADDR_BITCOUNT-1:0] base_address_s1,
@@ -22,7 +22,10 @@ module addr_tr_unit
 	output logic [ADDR_BITCOUNT-1:0] corrected_address
 );
 
+	wire [ADDR_BITCOUNT-1:0] virtual_addr;
+	
 	// zero extend the virtual addr
+	assign virtual_addr = {32'b0, short_virtual_addr};
 
 	// keep this
 	assign corrected_address =
