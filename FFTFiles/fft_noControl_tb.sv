@@ -16,7 +16,7 @@ module fft_noControl_tb();
     logic [9:0] indexA, indexB, externalIndexA;
     logic [8:0] cycleCount, twiddleIndex;
 
-    // twiddle rom
+    // rom
     reg [31:0] twiddle_mem [0:1023];
     reg [31:0] fake_mem [0:2047];
 
