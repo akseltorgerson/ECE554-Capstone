@@ -61,7 +61,7 @@ module cpu_tb();
         @(negedge clk);
         rst = 1'b0;
         //Issued instructions:
-        mcInstrIn = {{10{32'h00000000}}, // HALT
+        mcInstrIn = {{7{32'h00000000}}, // HALT
                       32'h10000900, // STARTF signum (4), filter(1)
                       32'h10000500, // STARTF signum (2), filter (1)
                       32'hF8000600, // LOADF signum (3)

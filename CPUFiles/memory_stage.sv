@@ -1,6 +1,6 @@
 module memory_stage(
     //Inputs
-    aluResult, read2Data, clk, rst, memWrite, memRead, halt, mcDataIn, mcDataValid, evictDone, fftCalculating,
+    aluResult, read2Data, clk, rst, memWrite, memRead, halt, exception, mcDataIn, mcDataValid, evictDone, fftCalculating,
     //Outputs
     memoryOut, cacheMiss, mcDataOut, cacheEvict, stallDMAMem, memAccessEx, memWriteEx, fftNotCompleteEx
 );
@@ -12,6 +12,8 @@ module memory_stage(
     input [31:0] read2Data;
 
     input memWrite, memRead, halt;
+
+    input exception;
 
     //Lets the data cache know that the data from the mc is valid data
     input mcDataValid;

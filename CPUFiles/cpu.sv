@@ -265,6 +265,7 @@ module cpu(//Inputs                   //TODO: These 3 signals were changed in na
         .mcDataValid(mcDataValid),
 	    .evictDone(evictDone),
         .fftCalculating(fftCalculating),
+        .exception(exception),
         //Outputs
         .memoryOut(memoryOut),
         .cacheMiss(cacheMissMemory),
