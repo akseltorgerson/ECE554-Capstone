@@ -8,7 +8,7 @@ module fft_noControl_tb();
     logic clk, rst, load, externalLoad, scan;
 
     // butterfly signals
-    logic signed [31:0] butterfly_real_A_out, butterfly_real_B_out, butterfly_imag_A_out, butterfly_imag_B_out, 
+    logic [31:0] butterfly_real_A_out, butterfly_real_B_out, butterfly_imag_A_out, butterfly_imag_B_out, 
                         butterfly_real_A_in, butterfly_real_B_in, butterfly_imag_A_in, butterfly_imag_B_in,
                         twiddle_real, twiddle_imag, external_real_A, external_imag_A;
 
