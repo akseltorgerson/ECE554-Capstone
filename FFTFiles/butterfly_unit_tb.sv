@@ -1,9 +1,9 @@
 module butterfly_unit_tb();
 	
 	//////// intermediates //////////
-	logic signed [31:0] real_A, imag_A, real_B, imag_B, twiddle_real, twiddle_imag, real_A_out, 
+	logic [31:0] real_A, imag_A, real_B, imag_B, twiddle_real, twiddle_imag, real_A_out, 
 						imag_A_out, real_B_out, imag_B_out, real_A_out_ex, imag_A_out_ex, real_B_out_ex, imag_B_out_ex;
-	logic signed [63:0] real_A_out_ex_product_left, real_A_out_ex_product_right, imag_A_out_ex_product_left, imag_A_out_ex_product_right, 
+	logic [63:0] real_A_out_ex_product_left, real_A_out_ex_product_right, imag_A_out_ex_product_left, imag_A_out_ex_product_right, 
 						real_B_out_ex_product_left, real_B_out_ex_product_right, imag_B_out_ex_product_left, imag_B_out_ex_product_right;
 	logic clk;
 	

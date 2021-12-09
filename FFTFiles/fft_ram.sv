@@ -1,8 +1,8 @@
 module fft_ram(
     input clk, rst, load, externalLoad,
     input [9:0] indexA, indexB,
-    input  signed [31:0] A_real_i, A_imag_i, B_real_i, B_imag_i,
-    output reg signed [31:0] A_real_o, A_imag_o, B_real_o, B_imag_o
+    input [31:0] A_real_i, A_imag_i, B_real_i, B_imag_i,
+    output reg [31:0] A_real_o, A_imag_o, B_real_o, B_imag_o
 );
 
     genvar i;

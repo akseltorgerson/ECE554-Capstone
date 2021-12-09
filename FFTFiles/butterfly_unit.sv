@@ -1,15 +1,15 @@
 module butterfly_unit
 	(
-	input signed [31:0] real_A, imag_A, real_B, imag_B, twiddle_real, twiddle_imag,
-	output signed [31:0] real_A_out, imag_A_out, real_B_out, imag_B_out
+	input [31:0] real_A, imag_A, real_B, imag_B, twiddle_real, twiddle_imag,
+	output [31:0] real_A_out, imag_A_out, real_B_out, imag_B_out
 	);
 	
 	/////////////////////////
 	////// Intermediates ////
 	/////////////////////////
 	
-	wire signed [31:0] mult_B_real, mult_B_imag, mult_B_real_left, mult_B_real_right, mult_B_imag_left, mult_B_imag_right;
-	wire signed [63:0] mult_B_real_left_product, mult_B_real_right_product, mult_B_imag_left_product, mult_B_imag_right_product;
+	wire [31:0] mult_B_real, mult_B_imag, mult_B_real_left, mult_B_real_right, mult_B_imag_left, mult_B_imag_right;
+	wire [63:0] mult_B_real_left_product, mult_B_real_right_product, mult_B_imag_left_product, mult_B_imag_right_product;
 	
 	/*********
 	* modules
