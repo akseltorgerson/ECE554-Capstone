@@ -56,6 +56,7 @@ module fft_noControl_tb();
         rst = 1;
 
         @(posedge clk);
+        @(negedge clk);
 
         rst = 0;
 
@@ -65,13 +66,13 @@ module fft_noControl_tb();
         externalLoad = 1;
 
         for (i = 0; i < 1024; i++) begin
-            @(negedge clk);
-            
+
             externalIndexA = i;
             external_imag_A = fake_mem[2*i + 1];
             external_real_A = fake_mem[2*i];
 
             @(posedge clk);
+            @(negedge clk);
 
             if (butterfly_real_A_in !== fake_mem[2*i] || butterfly_imag_A_in !== fake_mem[2*i + 1]) begin
                 $display("RAM OUT REAL: %h, RAM OUT IMAG: %h", butterfly_real_A_in, butterfly_imag_A_in);
@@ -90,12 +91,12 @@ module fft_noControl_tb();
         // go through stage 1 and check outputs of the butterfly unit
         
         for (cycleCount = 0; cycleCount < 511; cycleCount++) begin
-            @(negedge clk);
 
             twiddle_real = twiddle_mem[2*twiddleIndex];
             twiddle_imag = twiddle_mem[2*twiddleIndex + 1];
 
             @(posedge clk);
+            @(negedge clk);
 
             $display("BUTTERFLY, Real A: %h, Imag A: %h", butterfly_real_A_out, butterfly_imag_A_out);
             $display("BUTTERFLY, Real B: %h, Imag B: %h", butterfly_real_B_out, butterfly_imag_B_out);
