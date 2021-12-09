@@ -1,42 +1,43 @@
 module proc(
     //Inputs
-
+    mcDataValid, mcInstrValid, mcDataIn, mcInstrIn, evictDone
     //Outputs
+    dCacheOut, dCacheEvict, mcDataAddr, cacheMissFetch, cacheMissMemory
 );
 
 
     //-------------------------- Memory Controller signals----------------------
     //Lets the dCache know that the data from the MC is valid and ready to write
-    logic mcDataValid;
+    input mcDataValid;
 
     //Lets the iCache know that the data from the MC is valid and ready to write
-    logic mcInstrValid;
+    input mcInstrValid;
 
     //Data from the memory controller to be used on a DMA request (for memory stage i.e dCache)
-    logic [511:0] mcDataIn;
+    input [511:0] mcDataIn;
 
     //Data from the memory controller to be used on a DMA request (for fetch stage i.e iCache)
-    logic [511:0] mcInstrIn;
-
-    //For the memory controller when there is an evict in the data Cache
-    logic [511:0] dCacheOut;
-
-    //For the machine controller to evict the data and WRITE to host mem
-    logic dCacheEvict;
-
-    //Address used for the MC on a DMA request
-    logic [31:0] mcDataAddr;
+    input [511:0] mcInstrIn;
 
     //From memory controller, lets memory know succefully stored into host memory
-    logic evictDone;
+    input evictDone;
+
+    //For the memory controller when there is an evict in the data Cache
+    output [511:0] dCacheOut;
+
+    //For the machine controller to evict the data and WRITE to host mem
+    output dCacheEvict;
+
+    //Address used for the MC on a DMA request
+    output [31:0] mcDataAddr;
 
     //Control signal indicating that there was a cache miss in the fetch stage
     //Will need to do a DMA request to retrieve the data when this occurs
-    logic cacheMissFetch;
+    output cacheMissFetch;
 
     //Control signal indicating that there was a cache miss in the memory stage
     //Will need to do a DMA request to retrieve the data when this occurs
-    logic cacheMissMemory;
+    output cacheMissMemory;
 
 
     //----------------------------Accelerator Signals---------------------------
