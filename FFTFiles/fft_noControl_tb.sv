@@ -122,7 +122,7 @@ module fft_noControl_tb();
 
         // dump output
 
-        fd = $fopen("./fftOutput.txt","w")
+        fd = $fopen("./fftOutput.txt","w");
 
         for (j = 0; j < 1024; j++) begin
 
@@ -133,7 +133,7 @@ module fft_noControl_tb();
 
             $fdisplay(fd, "%h", butterfly_real_A_in);
             $fdisplay(fd, "%h", butterfly_imag_A_in);
-            
+
         end
 
         $fclose();
