@@ -98,6 +98,14 @@ module fft_noControl_tb();
 
         end
 
+        // go through memory and make sure outputs have changed
+        for (j = 0; j < 1024; j++) begin
+            if (butterfly_real_A_in === fake_mem[2*i] || butterfly_imag_A_in === fake_mem[2*i + 1]) begin
+                $display("RAM OUT REAL: %h, RAM OUT IMAG: %h", butterfly_real_A_in, butterfly_imag_A_in);
+                $stop();
+            end
+        end
+
         $display("YAHOOOO! Tests Passed!");
         $stop();
     end
