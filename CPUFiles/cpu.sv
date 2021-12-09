@@ -1,7 +1,7 @@
 module cpu(//Inputs                   //TODO: These 3 signals were changed in name so add them in right place
             fftCalculating, clk, rst, mcDataValid, mcInstrValid, mcDataIn, mcInstrIn, evictDone,
            //Outputs
-           startI, startF, loadF, sigNum, filter, dCacheOut, dCacheEvict, aluResult
+           startI, startF, loadF, sigNum, filter, dCacheOut, dCacheEvict, aluResult, exception, halt
            //TODO: need to add in other accelerator and memory controller signals
            );
     
@@ -36,12 +36,16 @@ module cpu(//Inputs                   //TODO: These 3 signals were changed in na
     //Address used for the MC on a DMA request
     output [31:0] aluResult;
 
+    //If an exception is raised, then this will output to dump the memory
+    output exception;
+
+    //If there is a halt, then dump the memory and will stop executing instructions
+    output halt;
+
     //---------------------------------Wires First Used in Fetch Stage--------------------------------
     logic [31:0] instruction;
 
     //Stops the processor from executing instructions
-    //TODO: Want this to dump the memory state somehow
-    logic halt;
 
     //The address of the next instruction the PC will be getting
     logic [31:0] nextPC;
@@ -163,8 +167,6 @@ module cpu(//Inputs                   //TODO: These 3 signals were changed in na
     logic invalidJMPEx;
     
     logic [31:0] causeDataOut;
-
-    logic exception;
 
     logic err;
 

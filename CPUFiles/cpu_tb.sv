@@ -11,6 +11,10 @@ module cpu_tb();
     logic [511:0] dCacheOut;
     logic [31:0] mcAddr;
 
+    logic exception;
+
+    logic halt;
+
     int errors = 0;
     int i = 0;
 
@@ -37,7 +41,9 @@ module cpu_tb();
              .filter(filter),
              .dCacheOut(dCacheOut),
              .dCacheEvict(dCacheEvict),
-	         .aluResult(mcAddr));
+	         .aluResult(mcAddr),
+             .exception(exception),
+             .halt(halt));
 
     initial begin
         clk = 1'b0;
@@ -55,16 +61,17 @@ module cpu_tb();
         @(negedge clk);
         rst = 1'b0;
         //Issued instructions:
-        // STARTF signum(1), filter (0)
-        // LBI R6 <- 'h00001000;
-        // ADDI R5 ('h1002) <- R6('h1000) + ('h02)
-        // SLBI R6 zero filled so R6 = h'10000000
-        // ST Mem[R6 + 0 (h'10000000)] <- R5 ('h1002)
-        //1000 0011 0010 1000
-        // LD R4 <- MEM [R6 + 0 h'10000000] R4(h'1002)
-        //1000 1011 0010 00000000000000000000000
-        // HALT
-        mcInstrIn = {{10{32'h00000000}}, 32'h8B200000, 32'h83280000, 32'h93000000, 32'h43280002, 32'hA3001000, 32'h10000200};
+        mcInstrIn = {{10{32'h00000000}}, // HALT
+                      32'h10000900, // STARTF signum (4), filter(1)
+                      32'h10000500, // STARTF signum (2), filter (1)
+                      32'hF8000600, // LOADF signum (3)
+                      32'h8B200000, // LD R4 <- MEM [R6 + 0 h'10000000] R4(h'1002)
+                      32'h83280000, // ST Mem[R6 + 0 (h'10000000)] <- R5 ('h1002)
+                      32'h93000000, // SLBI R6 zero filled so R6 = h'10000000
+                      32'h43280002, // ADDI R5 ('h1002) <- R6('h1000) + ('h02)
+                      32'hA3001000, // LBI R6 <- 'h00001000;
+                      32'h10000200}; // STARTF signum(1), filter (0)
+
         //wait random number of cycles
         repeat($urandom_range(1,20)) begin
             @(posedge clk);
@@ -76,7 +83,7 @@ module cpu_tb();
         @(posedge clk);
         @(negedge clk);
         mcInstrValid = 1'b0;
-        if(sigNum != 18'b1) begin
+        if(sigNum != 18'b1 || iCPU.startF != 1'b1) begin
             errors++;
             $display("Failed STARTF Test");
         end
@@ -122,7 +129,7 @@ module cpu_tb();
         @(negedge clk);
         mcDataValid = 1'b0;
         
-        //wait two clk cycles for the me state machine to finish (should be a hit and then the next instruction)
+        //wait two clk cycles for the mem state machine to finish (should be a hit and then the next instruction)
         @(posedge clk);
         @(negedge clk);
         @(posedge clk);
@@ -138,14 +145,63 @@ module cpu_tb();
             errors++;
             $display("Writeback data in Load is not right");
         end
+
         @(posedge clk);
         @(negedge clk);
-        //make sure to test two loads in a row so that it doesn't keep stalling and actually goes to next instr
+        
+        if(iCPU.instruction != 32'hF8000600 || loadF != 1'b1 || sigNum != 18'h3)begin
+            errors++;
+            $display("Failed LoadF test");
+        end
+
+        @(posedge clk);
+        @(negedge clk);
+        //filter loaded signal should now stay high for the rest of the CPU
+        if(iCPU.iDecode.filterLoaded != 1'b1)begin
+            errors++;
+            $display("Filter loaded did not get properly set by LOADF");
+        end
+
+        if(iCPU.instruction != 32'h10000500 || sigNum != 18'h2 || filter != 1'b1) begin
+            errors++;
+            $display("Failed 2nd StartF Test");
+        end
+
+        @(posedge clk);
+        //set fftCalculating to 1 to simulate the accelerator working on previous startF
+        fftCalculating = 1'b1;
+        @(negedge clk);
+        if(iCPU.instruction != 32'h10000900 || startF != 1'b0 || filter != 1'b1 || sigNum != 18'h4) begin
+            errors++;
+            $display("Failed second startF in a row");
+        end
+
+        //Wait a 6 cycles to simulate the accelerator working
+        repeat(6) begin
+            @(posedge clk);
+            @(negedge clk);
+        end
+        //Should still be on startF while previous one is calculating still 
+        if(iCPU.instruction != 32'h10000900 || startF != 1'b0 || filter != 1'b1 || sigNum != 18'h4) begin
+            errors++;
+            $display("Didn't stall PC on startF while accelerator calculating on previous signal");
+        end
+
+        //Simulate that the accelerator finished working
+        fftCalculating = 1'b0;
+        @(posedge clk);
+        if(startF != 1'b1 || iCPU.instruction != 32'h10000900) begin
+            errors++;
+            $display("startF not asserted when fftCalculating was cleared");
+        end
+        @(posedge clk);
+        @(negedge clk);
 
         if(iCPU.instruction != 32'h00000000) begin
             errors++;
             $display("Failed Halt Test");
         end
+
 
         if(errors == 0) begin
             $display("YAHOO! All Tests Passed!");
