@@ -5,7 +5,7 @@ module fft_noControl_tb();
     ////////////////////////
 
     // global signals
-    logic clk, rst, load, externalLoad;
+    logic clk, rst, load, externalLoad, scan;
 
     // butterfly signals
     logic signed [31:0] butterfly_real_A_out, butterfly_real_B_out, butterfly_imag_A_out, butterfly_imag_B_out, 
@@ -20,7 +20,7 @@ module fft_noControl_tb();
     reg [31:0] twiddle_mem [0:1023];
     reg [31:0] fake_mem [0:2047];
 
-    int i, j;
+    int i, j, fd;
 
     ////////////////////////
     ////// modules /////////
@@ -31,7 +31,7 @@ module fft_noControl_tb();
 
     address_generator iAgen(.stageCount(stageCount), .cycleCount(cycleCount[8:0]), .indexA(indexA), .indexB(indexB), .twiddleIndex(twiddleIndex));
 
-    fft_ram iRam(.clk(clk), .rst(rst), .load(load), .externalLoad(externalLoad), .indexA(externalLoad ? externalIndexA : indexA), .indexB(indexB), 
+    fft_ram iRam(.clk(clk), .rst(rst), .load(load), .externalLoad(externalLoad), .indexA(externalLoad || scan ? externalIndexA : indexA), .indexB(indexB), 
                  .A_real_i(externalLoad ? external_real_A : butterfly_real_A_out), .A_imag_i(externalLoad ? external_imag_A : butterfly_imag_A_out), 
                  .B_real_i(butterfly_real_B_out), .B_imag_i(butterfly_imag_B_out), .A_real_o(butterfly_real_A_in), .A_imag_o(butterfly_imag_A_in), 
                  .B_real_o(butterfly_real_B_in), .B_imag_o(butterfly_imag_B_in));
@@ -42,6 +42,7 @@ module fft_noControl_tb();
         clk = 0;
         rst = 0;
         load = 0;
+        scan = 0;
         externalLoad = 0;
         external_real_A = 32'h00000000;
         external_imag_A = 32'h00000000;
@@ -103,20 +104,39 @@ module fft_noControl_tb();
 
         end
 
-        load = 0;
+        // go through all stages
 
-        // go through memory and make sure outputs have changed
-        for (cycleCount = 0; cycleCount < 512; cycleCount++) begin
+        for (stageCount = 1; stageCount < 10; stageCount++) begin
+            for (cycleCount = 0; cycleCount < 512; cycleCount++) begin
+
+                twiddle_real = twiddle_mem[2*twiddleIndex];
+                twiddle_imag = twiddle_mem[2*twiddleIndex + 1];
+
+                @(posedge clk);
+                @(negedge clk);
+            end
+        end
+
+        load = 0;
+        scan = 1;
+
+        // dump output
+
+        fd = $fopen("./fftOutput.txt","w")
+
+        for (j = 0; j < 1024; j++) begin
+
+            externalIndexA = j;
 
             @(posedge clk);
             @(negedge clk);
 
-            if (butterfly_real_A_in === fake_mem[2*cycleCount]) begin
-                $display("RAM OUT REAL: %h, RAM OUT IMAG: %h", butterfly_real_A_in, butterfly_imag_A_in);
-                $display("UNEXPECTED REAL: %h, UNEXPECTED IMAG: %h", fake_mem[2*cycleCount], fake_mem[2*cycleCount + 1]);
-                $stop();
-            end
+            $fdisplay(fd, "%h", butterfly_real_A_in);
+            $fdisplay(fd, "%h", butterfly_imag_A_in);
+            
         end
+
+        $fclose();
 
         $display("YAHOOOO! Tests Passed!");
         $stop();
