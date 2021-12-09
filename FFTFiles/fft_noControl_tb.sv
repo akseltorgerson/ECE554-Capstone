@@ -107,6 +107,10 @@ module fft_noControl_tb();
 
         // go through memory and make sure outputs have changed
         for (cycleCount = 0; cycleCount < 511; cycleCount++) begin
+
+            @(posedge clk);
+            @(negedge clk);
+
             if (butterfly_real_A_in === fake_mem[2*cycleCount] || butterfly_imag_A_in === fake_mem[2*cycleCount + 1]) begin
                 $display("RAM OUT REAL: %h, RAM OUT IMAG: %h", butterfly_real_A_in, butterfly_imag_A_in);
                 $stop();
