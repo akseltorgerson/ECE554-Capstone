@@ -45,7 +45,7 @@ module execute_stage(
             );
 
     //Sign extend or zero extend the last 19 bits of IFormType1
-    assign extendedIType1 = isSignExtend ? {{13{instr[18]}}, instr[18:0]} : {13'b0, instr[19:0]};
+    assign extendedIType1 = isSignExtend ? {{13{instr[18]}}, instr[18:0]} : {13'b0, instr[18:0]};
 
     //Need this becuase SLBI is zero extended whereas the rest of IFormType2 instructions are signextended
     assign extendedIType2 = isSLBI ? {16'b0, instr[15:0]} : {{9{instr[22]}}, instr[22:0]};

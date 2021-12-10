@@ -81,16 +81,6 @@ module cpu_tb();
                       32'h43280002, // ADDI R5 ('h1002) <- R6('h1000) + ('h02)
                       32'hA3001000, // LBI R6 <- 'h00001000;
                       32'h10000200}; // STARTF signum(1), filter (0)
-        //  17 addi
-        // xori
-        //  18 andni
-        //  21 andn
-        //  24 sle
-        //  28 jalr
-        //  29 beqz
-        //  30 bnez
-        //  31 bltz
-        //  32 bgez
 
         //wait random number of cycles
         repeat($urandom_range(1,20)) begin
@@ -246,9 +236,11 @@ module cpu_tb();
         // Current register state (in hex): R6 = 10000000 R5= 1002 R4 = 1002
         //new block coming in
         //After instructions execture reg state:
-            //R6 = 10000000, R5 = 1002, R4 = 1002, R11= 5, R12 = A, R10 = FFFFFFFB, R1= 1002, R15 = 50007, R2 = 10001002
+            //R6 = 10000000, R5 = 1002, R4 = 1002, R11= 5, R12 = A, R10 = FFFFFFFB, R1= 0, R15 = 50007, R2 = 10001002, R3 = 4326
         mcInstrValid = 1'b1;
-        mcInstrIn = {{3{32'h00000000}}, //Halt instructions
+        mcInstrIn = {32'hda288000, //AND R1 <- R4 & ~R5 so R1 should get 0 
+                    32'h599bfffd, //ANDNI R3 <- R3 & 3FFFD so R3 gets 0002
+                    32'h50985324, //XORI R3 <- R1 ^ 5324 should give R3 4326
                     32'h89080000, //LD R1 <- MEM[R2] so R1 should get 1002
                     32'h89080001, //LD the R1 <- MEM[R2 + 1] so R1 should get 0
                     32'h99200A40, //STU MEM[10001A32] <- R4 (1002) R2 <- 10001A32
@@ -381,9 +373,133 @@ module cpu_tb();
             errors++;
             $display("Failed Second Load after STU Test");
         end
+
+        @(posedge clk);
+        @(negedge clk);
+        //Test XORI signals
+        if(iCPU.instruction != 32'h50985324 || iCPU.iDecode.regWrite != 1'b1 || iCPU.isIType1 != 1'b1 || iCPU.iDecode.writeRegSel != 4'b0011 || iCPU.writebackData != 32'h4326)begin
+            errors++;
+            $display("Failed XORI Test");
+        end
+        
+        @(posedge clk);
+        @(negedge clk);
+        //Test ANDNI
+        if(iCPU.instruction != 32'h599bfffd || iCPU.iDecode.regWrite != 1'b1 || iCPU.isIType1 != 1'b1 || iCPU.iDecode.writeRegSel != 4'b0011 || iCPU.writebackData != 32'h0002)begin
+            errors++;
+            $display("Failed ANDNI Test");
+        end
+
+        @(posedge clk);
+        @(negedge clk);
+        //Test ANDN
+        if(iCPU.instruction != 32'hda288000 || iCPU.iDecode.regWrite != 1'b1 || iCPU.iDecode.regDst != 1'b1 || iCPU.aluSrc != 1'b1 || iCPU.iDecode.writeRegSel != 4'b0001 || iCPU.writebackData != 32'h0)begin
+            errors++;
+            $display("Failed ANDN Test");
+        end
+        //Current Register state: R6 = 10000000, R5 = 1002, R4 = 1002, R11= 5, R12 = A, R10 = FFFFFFFB, R1= 0, R15 = 50007, R2 = 10001002, R3 = 4326
+        //Next instruction block
+        mcInstrIn = {{13{32'h0}}, //HALT, shouldn't get here because of branch
+                  32'h6a80138D,   //BNEZ R1 (R5 is 1) so branch to currAddr + 138D addrInstr = 0050012 (pcplus1 + offset) so nextPC = 513A0
+                  32'h62801390, //BEQZ R1 (R5 is 1) so no branch happens (addrInstr = 00050011)
+                  32'hf22a8000  //SLE R5 should get 1 since at this point R5 = 1002, R4 = 1002      
+            };
+        // Register state after instr block: R6 = 10000000, R5 = 1, R4 = 1002, R11= 5, R12 = A, R10 = FFFFFFFB, R1= 0, R15 = 50007, R2 = 10001002, R3 = 4326
+        @(posedge clk);
+        @(negedge clk);
+        //Should have a cache miss (since 16 instruction have run so next blk needs to come in) resulting in the operation being run being a nop
+        if(iCPU.instruction != 32'h08000000 || iCPU.cacheMissFetch != 1'b1) begin
+            errors++;
+            $display("Failed cache miss after running 16 instructions");
+        end
+        @(posedge clk);
+        @(negedge clk);
+        mcInstrValid = 1'b1;
+        @(posedge clk);
+        @(negedge clk);
+        mcInstrValid = 1'b0;
+        //Should have new instructions now (test SLE)
+        if(iCPU.instruction != 32'hf22a8000 || iCPU.iDecode.regDst != 1'b1 || iCPU.aluSrc != 1'b1 || iCPU.iDecode.regWrite != 1'b1 || iCPU.iDecode.writeRegSel != 4'b0101 || iCPU.writebackData != 32'h1) begin
+            errors++;
+            $display("Failed SLE Test");
+        end
+
+        @(posedge clk);
+        @(negedge clk);
+        //Test BEQZ
+        if(iCPU.instruction != 32'h62801390 || iCPU.iDecode.isBranch != 1'b1) begin
+            errors++;
+            $display("Failed BEQZ Test");
+        end
+
+        @(posedge clk);
+        @(negedge clk);
+        //Test BNEZ (should reach here since BEQZ not true)
+        if(iCPU.instruction != 32'h6a80138D || iCPU.iDecode.isBranch != 1'b1) begin
+            errors++;
+            $display("Failed BNEZ Test");
+        end
         //Last instruction
         @(posedge clk);
         @(negedge clk);
+        //Should have cache miss from the branch not being in instruction
+        if(iCPU.instruction != 32'h08000000) begin
+            errors++;
+            $display("Failed BNEZ next address");
+        end
+        //  28 jalr
+        // Current reg state: R6 = 10000000, R5 = 1, R4 = 1002, R11= 5, R12 = A, R10 = FFFFFFFB, R1= 0, R15 = 50007, R2 = 10001002, R3 = 4326
+        mcInstrIn = {{10{32'h0}}, //HALT, final instrcution
+                  32'h79800001, //should get skipped by the JALR
+                  32'h38800001,  //JALR R1 + 1 (so skip 1 instrcution), R15 <- 513a5 (next instr addr) skips 1 
+                  32'h465800c0, //addi R11 <- R12 + CA so R11 gets CA (gets here from bgez) instr addr = 513a3
+                  32'h00000000, //HALT, gets skipped because of BGEZ
+                  32'h79800001, //BGEZ R3, 1 (R3 greater than zero so should branch, skips 1 instruction)
+                  32'h710001f4 //BLTZ R2 (R2 greater than zero so shouldn't branch)    
+            };
+        // Reg state after instruction blk executed: R6 = 10000000, R5 = 1, R4 = 1002, R11= CA, R12 = A, R10 = FFFFFFFB, R1= 0, R15 = 50007, R2 = 10001002, R3 = 4326
+        mcInstrValid = 1'b1;
+        @(posedge clk);
+        @(negedge clk);
+        mcInstrValid = 1'b0;
+        //Should have new instruction now (test BLTZ)
+        if(iCPU.instruction != 32'h710001f4 || iCPU.iDecode.isBranch != 1'b1) begin
+            errors++;
+            $display("Failed BLTZ Test");
+        end
+
+        @(posedge clk);
+        @(negedge clk);
+        //Test BGEZ (should get here cuz no brawnch from BLTZ)
+        if(iCPU.instruction != 32'h79800001 || iCPU.iDecode.isBranch != 1'b1) begin
+            errors++;
+            $display("Failed BGEZ Test");
+        end
+
+        @(posedge clk);
+        @(negedge clk);
+        //Test ADDI (also that branch from BGEZ got to this instruction)
+        if(iCPU.instruction != 32'h465800c0 || iCPU.iDecode.regWrite != 1'b1 || iCPU.isIType1 != 1'b1 || iCPU.isSignExtend != 1'b1 || iCPU.iDecode.writeRegSel != 4'b1011 || iCPU.writebackData != 32'hCA) begin
+            errors++;
+            $display("Failed ADDI Test");
+        end
+
+        @(posedge clk);
+        @(negedge clk);
+        //Test JALR
+        if(iCPU.instruction != 32'h38800001 || iCPU.iDecode.regWrite != 1'b1 || iCPU.iDecode.isJR != 1'b1 || iCPU.iDecode.isJAL != 1'b1 || iCPU.iDecode.writeRegSel != 4'b1111 || iCPU.writebackData != 32'h513a5) begin
+            errors++;
+            $display("Failed JALR Test");
+        end
+        //Will have cache miss because of address
+        mcInstrIn = {{15{32'h0}}, //HALT, final instrcution
+                  32'h79800001 //should get skipped by the JALR    
+            };
+        mcInstrValid = 1'b1;
+        @(posedge clk);
+        @(negedge clk);
+        mcInstrValid = 1'b0;
+        //LAST HALT, JALR should jump to here
         if(iCPU.instruction != 32'h00000000 || halt != 1'b1) begin
             errors++;
             $display("Failed Halt Test");
