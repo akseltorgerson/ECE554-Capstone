@@ -7,8 +7,8 @@ module fft_ram(
 
     genvar i;
 
-    wire signed [31:0] q_imag [0:2047];
-    wire signed [31:0] q_real [0:2047];
+    wire [31:0] q_imag [0:2047];
+    wire [31:0] q_real [0:2047];
 
    assign A_real_o = q_real[2 * indexA];
    assign A_imag_o = q_imag[2 * indexA + 1];

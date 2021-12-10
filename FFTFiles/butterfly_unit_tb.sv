@@ -15,7 +15,7 @@ module butterfly_unit_tb();
 	/////// Functions & Tasks /////////
 	
 	task compare_outputs;
-		input signed [31:0] realAOut, realAout_ex, realBOut, realBOut_ex, 
+		input [31:0] realAOut, realAout_ex, realBOut, realBOut_ex, 
 							imagAOut, imagAOut_ex, imagBOut, imagBOut_ex;
 		
 		begin
