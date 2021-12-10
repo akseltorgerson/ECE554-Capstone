@@ -54,7 +54,7 @@ module control(
                 else if (startI)
                     next_state = LOADI; 
             end
-            // Await for RAM to be loaded
+            // Await for RAM to be loaded from MC
             LOADI: begin
                 loadExternal = 1;
                 if (loadExternalDone) begin
