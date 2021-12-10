@@ -4,7 +4,7 @@ module a_buf_in (
     input clk, rst, wrEn, dequeue;
     input [511:0] dataIn;
     input mcDataValid;
-    output reg dataReady;
+    output reg dataReady;   // when buffer is full
     output reg [63:0] dataOut;
 
 );
@@ -65,14 +65,18 @@ module a_buf_in (
             end else begin
                 dataReady <= 1'b0;
             end
-            index <= index + 8;
+            index <= index + 4'b1000;
         end
     end
 
     // Buffer empty process
     always_ff @(posedge clk) begin
         if (dequeue) begin
-            outIndex <= outIndex + 1;
+            outIndex <= outIndex + 1'b1;
+        end
+        if (outIndex == 10'b1111111111) begin
+            
+        end
         end
     end
 

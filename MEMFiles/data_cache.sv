@@ -186,13 +186,4 @@ module data_cache (
     assign evict = (miss & dirty & valid);
     assign blkOut = (evict) ? blkOutPacked : 512'b0;
 
-    // Flop outputs
-    //always @(posedge clk) begin
-    //    dataOut <= dataOutInt;
-    //    hit <= hitInt;
-    //    miss <= missInt;
-    //    evict <= evictInt;
-    //    blkOut <= blkOutInt;
-    //end
-
 endmodule

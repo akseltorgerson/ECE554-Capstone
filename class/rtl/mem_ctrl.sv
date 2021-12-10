@@ -13,7 +13,9 @@
  */
 module mem_ctrl
 #(
-	parameter WORD_SIZE = 32,
+	// WORD SIZE TO OUR CACHE LINE SIZE
+	// TODO make cache line size of 512 here
+	parameter WORD_SIZE = 512,
 	parameter CL_SIZE_WIDTH = 512,
 	parameter ADDR_BITCOUNT = 32
 	
