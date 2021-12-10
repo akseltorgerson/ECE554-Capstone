@@ -128,6 +128,17 @@ module fft_noControl_tb();
 
             externalIndexA = j;
 
+            externalIndexA = {externalIndexA[0],
+                              externalIndexA[1],
+                              externalIndexA[2],
+                              externalIndexA[3],
+                              externalIndexA[4],
+                              externalIndexA[5],
+                              externalIndexA[6],
+                              externalIndexA[7],
+                              externalIndexA[8],
+                              externalIndexA[9]};
+
             @(posedge clk);
             @(negedge clk);
 
