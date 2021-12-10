@@ -1,11 +1,11 @@
 module proc(
     //Inputs
-    mcDataValid, mcInstrValid, mcDataIn, mcInstrIn, evictDone
+    clk, rst,
     //Outputs
-    dCacheOut, dCacheEvict, mcDataAddr, cacheMissFetch, cacheMissMemory
+
 );
 
-
+    input clk, rst;
     //-------------------------- Memory Controller signals----------------------
     //Lets the dCache know that the data from the MC is valid and ready to write
     input mcDataValid;
@@ -39,6 +39,9 @@ module proc(
     //Will need to do a DMA request to retrieve the data when this occurs
     output cacheMissMemory;
 
+    //The current address the PC is on
+    logic [31:0] instrAddr;
+
 
     //----------------------------Accelerator Signals---------------------------
 
@@ -65,6 +68,8 @@ module proc(
 
     logic halt;
 
+    //---------------------- Mem Arbiter Signals---------------------------------
+
     cpu iCPU( //Inputs
         .clk(clk),
         .rst(rst),
@@ -86,7 +91,8 @@ module proc(
         .exception(exception),
         .halt(halt),
         .cacheMissFetch(cacheMissFetch),
-        .cacheMissMemory(cacheMissMemory)
+        .cacheMissMemory(cacheMissMemory),
+        .instrAddr(instrAddr)
     );
 
     accelerator iAccelerator(
@@ -103,6 +109,39 @@ module proc(
         */
     );
 
-    //mem controller in here too?
+    mem_arb iMemArbiter(
+        //Inputs
+        .clk(clk),
+        .rst(rst),
+        .halt(halt), //TODO: should this be an output of the processor (needed for the mem controller/afu?)
+        .instrCacheBlkReq(cacheMissFetch),
+        .instrCacheAddr(instrAddr),
+        .dataCacheBlkReq(cacheMissMemory),
+        .dataAddr(mcDataAddr),
+        .dataCacheEvictReq(dCacheEvict),
+        .dataBlk2Mem(dCacheOut),
+        .accelDataRd(), 
+        .accelDataWr(),
+        .accelBlk2Mem(),
+        .sigNum(sigNum),
+        //Mem Controller Interface inputs
+        .common_data_bus_in(),
+        .tx_done(),
+        .rd_valid(),
+        //Outputs
+        .instrBlk2Cache(mcInstrIn),
+        .instrBlk2CacheValid(mcInstrValid),
+        .dataEvictAck(evictDone),
+        .dataBlk2CacheValid(mcDataValid),
+        .dataBlk2Cache(mcDataIn),
+        .accelWrBlkDone(),
+        .accelRdBlkDone(),
+        .accelBlk2Buffer(),
+        //Mem Controller interface outputs
+        .op(),
+        .common_data_bus_out(),
+        .io_addr(),
+        .cv_value();
+    );
 
 endmodule

@@ -2,7 +2,7 @@ module cpu(//Inputs
             fftCalculating, clk, rst, mcDataValid, mcInstrValid, mcDataIn, mcInstrIn, evictDone,
            //Outputs
            startI, startF, loadF, sigNum, filter, dCacheOut, dCacheEvict, aluResult, exception, halt,
-           cacheMissFetch, cacheMissMemory
+           cacheMissFetch, cacheMissMemory, instrAddr
            //TODO: need to add in other accelerator and memory controller signals
            );
     
@@ -50,6 +50,8 @@ module cpu(//Inputs
     //Will need to do a DMA request to retrieve the data when this occurs
     output cacheMissMemory;
 
+    output [31:0] instrAddr;
+
     //---------------------------------Wires First Used in Fetch Stage--------------------------------
     logic [31:0] instruction;
 
@@ -84,8 +86,6 @@ module cpu(//Inputs
 
     //The data held in the second register to be read in an instruction
     logic [31:0] read2Data;
-
-    logic [31:0] instrAddr;
 
         //---------------Control Signals of Decode------------
 
