@@ -1,46 +1,103 @@
 module control(
     //Inputs
-    startF, startI, loadF, sigNum, doFilter, done, clk, rst
+    input startF, startI, loadF, loadExternalDone, doFilter, done, clk, rst,
+    input [17:0] sigNum, 
     //Outputs
-    fftCalculating, storeSigNum, writeFilter, isIFFT, fDone, 
+    output reg calculating, loadExternal, loadInternal, writeFilter, isIFFT, fDone, aDone, startFFT
 );
 
-    input clk, rst;
+    ////////////////////
+    /// intermediates //
+    ////////////////////
 
-    //Control signal from CPU to let accel know to do an FFT
-    input startF;
+    typedef enum { INITIAL, IDLE, LOADI, LOADF, STARTF, STARTI, CALCULATINGF, CALCULATINGI, DONE } state_t;
 
-    //Control signal from CPU to let it know to do an inverse FFT
-    input startI;
+    state_t state, next_state;
 
-    //Control signal from CPU to let it know to load a filter in
-    input loadF;
 
+    ///
+    // state dff
     //
-    input [17:0] sigNum;
+    always @(posedge clk, posedge rst) begin
+        if (rst) begin
+            state <= INITIAL;
+            next_state <=INITIAL;
+        end else begin
+            state <= next_state;
+        end
+    end
 
-    //Control signal to let the accelerator know that it should be filtered on a STARTF
-    input filter;
+    ////////////////
+    // State machine
+    ////////////////
+    always_comb
+        // defaults
+        next_state = state;
+        calculating = 0;
+        loadExternal = 0;
+        loadInternal = 0;
+        writeFilter = 0;
+        isIFFT = 0;
+        startFFT = 0;
+        fDone = 0;
+        aDone = 0;
 
+        case(state)
+            INITIAL: begin
+                next_state = IDLE;
+            end
+            IDLE: begin
+                if (startF)
+                    next_state = LOADF;
+                else if (startI)
+                    next_state = LOADI; 
+            end
+            // Await for RAM to be loaded
+            LOADI: begin
+                loadExternal = 1;
+                if (loadExternalDone) begin
+                    next_state = STARTI;
+                end
+            end
+            LOADF: begin
+                loadExternal = 1;
+                if(loadExternalDone) begin
+                    next_state = STARTF;
+                end
+            end
 
-    input done;
+            // start calculation
+            STARTF: begin
+                startFFT = 1;
+                next_state = CALCULATINGF;
+            end
+            STARTI: begin
+                startFFT = 1;
+                next_state = CALCULATINGI;
+            end
 
-    //Signal to show that the fft is currently calculating on the sigNum
-    output fftCalculating;
+            // calculations
+            CALCULATINGF: begin
+                calculating = 1;
+                loadInternal = 1;
+                if (done)
+                    next_state = DONE;
+            end
+            CALCULATINGI: begin
+                calculating = 1;
+                isIFFT = 1;
+                loadInternal = 1;
+                if (done)
+                    next_state = DONE;
+            end
 
-    //Singal to determine that the sigNum should be stored in it's register
-    output storeSigNum;
+            // DONE STATE
+            DONE: begin
+                aDone = 1;
+                next_state = IDLE;
+            end
 
-    output fDone;
-
-    output isIFFT;
-
-    always @(*) begin
-        case()
 
         endcase
     end
-
-
-
 endmodule
