@@ -27,6 +27,8 @@ module cpu_realImagEx_tb();
     //test RAM
     logic [31:0] testInstrMemory [2048];
 
+    logic [31:0] instrAddr;
+
 
     cpu iCPU(.fftCalculating(fftCalculating),
              .clk(clk),
@@ -48,7 +50,8 @@ module cpu_realImagEx_tb();
              .exception(exception),
              .halt(halt),
              .cacheMissFetch(cacheMissFetch),
-             .cacheMissMemory(cacheMissMemory));
+             .cacheMissMemory(cacheMissMemory),
+             .instrAddr(instrAddr));
 
     initial begin
         clk = 1'b0;
