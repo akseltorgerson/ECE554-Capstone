@@ -8,107 +8,86 @@ using namespace std;
 // Driver program to test above function
 int main()
 {
-    ifstream myfile; 
-    ofstream outputFile; 
-    myfile.open("testSignalDec.txt");
-    outputFile.open("testSignalHex.txt");
+	ifstream myfile;
+	ofstream outputFile;
+	myfile.open("twiddleFactorsList.txt");
+	outputFile.open("twiddleHex.txt");
 
-   if(myfile.is_open() && outputFile.is_open()) {
-	std::string tp;
-	int count = 0;
-        while(getline(myfile, tp)) {
-	    bool negative;
-	    int integralPart;
-	    string wholeValue;
+	if (myfile.is_open() && outputFile.is_open())
+	{
+		std::string tp;
+		int count = 0;
+		while (getline(myfile, tp))
+		{
+			bool negative = tp.at(0) == '-';
+			string hexValue = "";
+			double value = std::stod(tp);
+			double intDouble = 0.0;
+			int integerVal = 0;
 
-	    count++;
-	    wholeValue = tp;
+			value = value * 16 * 16 * 16 * 16;
 
-            if (wholeValue.at(0) == '-') { 
-		negative = true;
-		integralPart = 0;
+			std::modf(value, &intDouble);
+			integerVal = static_cast<int>(intDouble);
 
-		if (wholeValue.at(1) == '1') {
-		    integralPart = 1;
+			/**for(int i = 0; i < 8; i++) {
+		int intermediate = integerVal % 16;
+		integerVal = integerVal / 16;
+
+		if (negative && intermediate != 0) {
+		    intermediate += 16;
 		}
-            } else {
-		negative = false;
-		integralPart = 0;
-		if (wholeValue.at(0) == '1') {
-		    integralPart = 1;
-		}
-	    }
- 
-	    string hexValue = "0000";
-	
-	    if (integralPart == 1) {
-		hexValue = "0001";
-
-		if (negative) {
-		    hexValue = "fffe";
-	        }
-	    } else {
-		if (negative) {
-		    hexValue = "ffff";
-		}
-	    }
-		
-	    //cout << wholeValue << '\n';
-
-	    double value;
-	    double whole_d;
-	    int whole;
-
-	    value = std::stod (wholeValue);
-	    value = std::modf(value, &whole_d);
-	    whole = static_cast<int>(whole_d);
-	    
-	    // want constantly multiply by 16, take the integer part, and use that as the hex value
-	    for (int i = 0; i < 4; i++) {
-		value = value * 16.0;
-		value = std::modf(value, &whole_d);
-		whole = static_cast<int>(whole_d); 
 
 		std::stringstream stream;
 
-		if (negative && whole != 0) {
-		    whole = whole + 16;
-		}
-
-		if (whole < 10) {
-		   stream << whole;
+		if(intermediate < 10){
+		    stream << intermediate;
 		} else {
-		   switch(whole) {
-			case(10):
-				stream << "a";
-				break;
-			case(11):
-				stream << "b";
-				break;
-			case(12):
-				stream << "c";
-				break;
-			case(13):
-				stream << "d";
-				break;
-			case(14):
-				stream << "e";
-				break;
-			case(15):
-				stream << "f";
-				break;
-		   }
+		    switch(intermediate) {
+			    case 10: 
+				    stream << "a";
+				    break;
+			    case 11:
+				    stream << "b";
+				    break;
+			    case 12:
+				    stream << "c";
+				    break;
+			    case 13:
+				    stream << "d";
+				    break;
+			    case 14:
+				    stream << "e";
+				    break;
+			    case 15:
+				    stream << "f";
+				    break;
+		    }
 		}
+		
+		hexValue = stream.str() + hexValue;
+	    }*/
 
-		//cout << whole_d << '\n';	
+			//cout << hexValue << '\n';
 
-		hexValue.append(stream.str());
-	    }
-	    //cout << hexValue << '\n';
-	    outputFile << hexValue << '\n';
-        }
-    }
+		std:
+			stringstream stream;
+			stream << std::hex << integerVal;
 
-    myfile.close();
-    outputFile.close();
+			string output = stream.str();
+
+			if (output.length() != 8)
+			{
+				for (int k = output.length(); k < 8; k++)
+				{
+					output = "0" + output;
+				}
+			}
+
+			outputFile << output << '\n';
+		}
+	}
+
+	myfile.close();
+	outputFile.close();
 }
