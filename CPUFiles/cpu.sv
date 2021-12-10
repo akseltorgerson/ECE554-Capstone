@@ -210,6 +210,7 @@ module cpu(//Inputs
         .pcPlus1(pcPlus1),
         .writebackData(writebackData),
         .fftCalculating(fftCalculating),
+        .stallDMAMem(stallDMAMem),
         //Outputs
         .read1Data(read1Data),
         .read2Data(read2Data),
