@@ -5,7 +5,6 @@ module a_buf_in (
     input [511:0] dataIn;
     input mcDataValid;
     output reg dataReady;   // when buffer is full
-    output // when buffer is empty
     output reg [63:0] dataOut;
 
 );
