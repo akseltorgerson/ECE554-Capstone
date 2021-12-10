@@ -136,7 +136,7 @@ module fft_noControl_tb();
 
         end
 
-        $fclose();
+        $fclose(fd);
 
         $display("YAHOOOO! Tests Passed!");
         $stop();
