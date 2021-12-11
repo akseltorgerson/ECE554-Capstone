@@ -8,29 +8,27 @@ using namespace std;
 // Driver program to test above function
 int main()
 {
-	ifstream myfile;
-	ofstream outputFile;
-	myfile.open("twiddleFactorsList.txt");
-	outputFile.open("twiddleHex.txt");
+    ifstream myfile; 
+    ofstream outputFile; 
+    myfile.open("testSignalDec.txt");
+    outputFile.open("testSignalHex.txt");
 
-	if (myfile.is_open() && outputFile.is_open())
-	{
-		std::string tp;
-		int count = 0;
-		while (getline(myfile, tp))
-		{
-			bool negative = tp.at(0) == '-';
-			string hexValue = "";
-			double value = std::stod(tp);
-			double intDouble = 0.0;
-			int integerVal = 0;
+   if(myfile.is_open() && outputFile.is_open()) {
+	std::string tp;
+	int count = 0;
+        while(getline(myfile, tp)) {
+	    bool negative = tp.at(0) == '-';
+	    string hexValue = "";
+	    double value = std::stod(tp);
+	    double intDouble = 0.0;
+	    int integerVal = 0;
 
-			value = value * 16 * 16 * 16 * 16;
+	    value = value * 16 * 16 * 16 * 16;
 
-			std::modf(value, &intDouble);
-			integerVal = static_cast<int>(intDouble);
-
-			/**for(int i = 0; i < 8; i++) {
+	    std::modf(value, &intDouble);
+    	    integerVal = static_cast<int>(intDouble);
+	    
+	    /**for(int i = 0; i < 8; i++) {
 		int intermediate = integerVal % 16;
 		integerVal = integerVal / 16;
 
@@ -68,26 +66,25 @@ int main()
 		hexValue = stream.str() + hexValue;
 	    }*/
 
-			//cout << hexValue << '\n';
 
-		std:
-			stringstream stream;
-			stream << std::hex << integerVal;
 
-			string output = stream.str();
+	    //cout << hexValue << '\n';
 
-			if (output.length() != 8)
-			{
-				for (int k = output.length(); k < 8; k++)
-				{
-					output = "0" + output;
-				}
-			}
+	    std:stringstream stream;
+	    stream << std::hex << integerVal;
 
-			outputFile << output << '\n';
-		}
-	}
+	    string output = stream.str();
 
-	myfile.close();
-	outputFile.close();
+	    if (output.length() != 8) {
+		for (int k = output.length(); k < 8; k++) {
+		    output = "0" + output;
+		}	
+	    }
+
+	    outputFile << output << '\n';
+        }
+    }
+
+    myfile.close();
+    outputFile.close();
 }

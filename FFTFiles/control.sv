@@ -14,7 +14,6 @@ module control(
 
     state_t state, next_state;
 
-
     ///
     // state dff
     //
