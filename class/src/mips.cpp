@@ -236,8 +236,8 @@ namespace priscas
 		printf("rs: %x, rt: %x, rd: %x, imm: %x, op: %x, filter: %x, sig: %x\n", rs, rt, rd, imm_shamt_jaddr, op, filter, signum);
 		if(r_inst(op))
 		{
-			if ((op == priscas::XORI || op == pricas:ANDNI) && rs > 7 ) {
-				throw priscas::mt_parse_unexpected(rs.c_str(), "RS must be less than 7");
+			if ((op == priscas::XORI || op == priscas::ANDNI) && rs > 7 ) {
+				throw priscas::mt_parse_unexpected((char*)rs+ 48, "RS must be less than 7");
 			}
 			//first 15 bits are zero as don't cares
 			w = (w.AsUInt32() | ((rd & ((1 << 4) - 1) ) << 15 ));
