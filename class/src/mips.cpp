@@ -236,11 +236,8 @@ namespace priscas
 		printf("rs: %x, rt: %x, rd: %x, imm: %x, op: %x, filter: %x, sig: %x\n", rs, rt, rd, imm_shamt_jaddr, op, filter, signum);
 		if(r_inst(op))
 		{
-			if (op != priscas::ADD && op != priscas::SUB) {
-				w = (w.AsUInt32() | ((rd & ((1 << 3) - 1) ) << 15 ));
-				w = (w.AsUInt32() | ((rt & ((1 << 3) - 1) ) << 19 ));
-				w = (w.AsUInt32() | ((rs & ((1 << 3) - 1) ) << 23 ));
-				w = w.AsUInt32() & ((uint32_t)0xFBBBFFFF);
+			if ((op == priscas::XORI || op == pricas:ANDNI) && rs > 7 ) {
+				throw priscas::mt_parse_unexpected(rs, "RS must be less than 7");
 			}
 			//first 15 bits are zero as don't cares
 			w = (w.AsUInt32() | ((rd & ((1 << 4) - 1) ) << 15 ));
@@ -255,10 +252,6 @@ namespace priscas
 			w = (w.AsUInt32() | (imm_shamt_jaddr & ((1 << 19) - 1)));
 			w = (w.AsUInt32() | ((rt & ((1 << 4) - 1) ) << 19 ));
 			w = (w.AsUInt32() | ((rs & ((1 << 4) - 1) ) << 23 ));
-
-			if (op != priscas::ADDI && op != priscas::SUBI) {
-				w = w.AsUInt32() & ((uint32_t)0xFBBFFFFF);
-			}
 			w = (w.AsUInt32() | ((op & ((1 << 5) - 1) ) << 27 ));
 		}
 		if (i_inst2(op))
