@@ -3,7 +3,7 @@ module control(
     input startF, startI, loadF, loadExternalDone, doFilter, done, clk, rst,
     input [17:0] sigNum, 
     //Outputs
-    output reg calculating, loadExternal, loadInternal, writeFilter, isIFFT, fDone, aDone, startFFT, idle,
+    output reg calculating, loadExternal, loadInternal, writeFilter, isIFFT, fDone, aDone, startFFT,
     output reg [17:0] sigNumMC
 );
 
