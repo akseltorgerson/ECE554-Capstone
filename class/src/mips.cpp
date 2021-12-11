@@ -263,7 +263,7 @@ namespace priscas
 		}
 		if (i_inst2(op))
 		{
-			if ((op != priscas::LBI && op != priscas:SLBI) && (rs > 7) ) {
+			if ((op != priscas::LBI && op != priscas::SLBI) && (rs > 7) ) {
 				throw priscas::mt_bad_imm();
 			}
 			w = (w.AsUInt32() | (imm_shamt_jaddr & ((1 << 23) - 1)));
