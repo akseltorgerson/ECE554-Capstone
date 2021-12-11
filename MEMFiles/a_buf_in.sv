@@ -1,11 +1,12 @@
 module a_buf_in ( 
 
     // This buffer will store data from host memory to accelerator
-    input clk, rst, wrEn, dequeue;
-    input [511:0] dataIn;
-    input mcDataValid;
-    output reg dataReady;   // when buffer is full
-    output reg [63:0] dataOut;
+    input clk, rst; 
+    input wnEn;                 // control signal from MC that the data is valid to be written
+    input [511:0] dataIn;       // data going into the buffer
+    output reg emptyReady;      // signals to accel that the buffer can start being emptied
+    output reg [63:0] dataOut;  // data going to accelerator
+    output reg dataOutValid;    // signal to let the accelerator know the data on the bus is valid
 
 );
 
@@ -45,9 +46,9 @@ module a_buf_in (
     // reset sequence
     always_ff @(posedge rst) begin
         if (rst) begin
-            index <= 0;
-            outIndex <= 0;
-            dataRead <= 0;
+            index <= 1'b0;
+            outIndex <= 1'b0;
+            emptyReady <= 1'b0;
             for (i = 0; i < DEPTH; i++) begin
                 buffer[i] <= 64'b0;
             end
@@ -56,14 +57,14 @@ module a_buf_in (
 
     // Buffer fill proccess
     always_ff @(posedge clk) begin
-        if (wrEn && mcDataValid) begin
+        if (wrEn) begin
             for (j = 0; j < 8; j++) begin
                 buffer[index + j] <= {dataInUnpacked[index + j][1], dataInUnpacked[index + j][0]};
             end
-            if (index == 12'h3F8) begin
-                dataReady <= 1'b1;
+            if (index == 10'h3F8) begin
+                emptyReady <= 1'b1;
             end else begin
-                dataReady <= 1'b0;
+                emptyReady <= 1'b0;
             end
             index <= index + 4'b1000;
         end
@@ -71,12 +72,13 @@ module a_buf_in (
 
     // Buffer empty process
     always_ff @(posedge clk) begin
-        if (dequeue) begin
+        if (emptyReady) begin
             outIndex <= outIndex + 1'b1;
         end
-        if (outIndex == 10'b1111111111) begin
-            
-        end
+        if (&outIndex) begin
+            emptyReady <= 1'b0;
+        end else begin
+            emptyReady <= 1'b1;
         end
     end
 

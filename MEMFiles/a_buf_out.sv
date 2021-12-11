@@ -1,14 +1,71 @@
 module a_buf_out (
-    input clk, rst, wrEn, dequeue;
-    input reg [63:0] dataIn;
-    output bufferFull;
-    output reg [511:0] dataOut;
-    output reg dataOutValid;
+
+    // This buffer will store data from accelerator going to host memory
+    input clk, rst;
+    input wrEn;                     // control signal from the accelerator CU to let us know that the data is valid
+    input reg [63:0] dataIn;        // data point from the accelerator
+    output reg emptyReady;          // control signal to let the MC know we can start writing data
+    output reg [511:0] dataOut;     // data leaving the buffer going to host mem
+    output reg dataOutValid;        // signal to let the MC know the data on the bus is valid
 
 );
 
     localparam DEPTH = 1024;
     localparam WIDTH = 64;
+    localparam DATA_OUT_WIDTH = 512;
 
+    // Register to hold {imag, real} data members
+    // 8kB
+    reg [WIDTH-1:0] buffer [DEPTH];
+    logic [$clog2(DEPTH)-1:0] index;
+    logic [$clog2(DEPTH)-1:0] outIndex;
+
+    integer i, j, k;
+
+    // reset sequence
+    always_ff @(posedge clk) begin
+        if (rst) begin
+            index <= 1'b0;
+            outIndex <= 1'b0;
+            emptyReady <= 1'b0;
+            for (i = 0; i < DEPTH; i++) begin
+                buffer[i] <= 64'b0;
+            end
+        end
+    end
+
+
+    // Buffer fill process (from accelerator)
+    always_ff @(posedge clk) begin
+        if (wrEn) begin
+            buffer[index] <= dataIn;
+            index <= index + 1'b1;
+        end
+        if (&index) begin
+            emptyReady <= 1'b1;
+        end else begin
+            emptyReady <= 1'b0;
+    end
+
+    // Buffer empty process
+    always_ff @(posedge clk) begin
+        if (emptyReady) begin
+            outIndex <= outIndex + 4'b1000;
+        end
+        if (outIndex == 10'h3F8) begin
+            emptyReady <= 1'b0;
+        end else begin
+            emptyReady <= 1'b1;
+        end
+    end
+
+    assign dataOut = {buffer[outIndex],
+                            buffer[outIndex+1],
+                            buffer[outIndex+2],
+                            buffer[outIndex+3],
+                            buffer[outIndex+4],
+                            buffer[outIndex+5],
+                            buffer[outIndex+6],
+                            buffer[outIndex+7]};
 
 endmodule
