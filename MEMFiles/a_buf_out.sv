@@ -34,7 +34,6 @@ module a_buf_out (
         end
     end
 
-
     // Buffer fill process (from accelerator)
     always_ff @(posedge clk) begin
         if (wrEn) begin

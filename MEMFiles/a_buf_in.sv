@@ -43,7 +43,9 @@ module a_buf_in (
     assign dataInUnpacked[7][0] = {dataIn[479:448]};
     assign dataInUnpacked[7][1] = {dataIn[511:480]};
 
-    // reset sequence
+    /********************************************************
+    *                     Reset Sequence                    *
+    ********************************************************/
     always_ff @(posedge rst) begin
         if (rst) begin
             index <= 1'b0;
@@ -55,7 +57,9 @@ module a_buf_in (
         end
     end
 
-    // Buffer fill proccess
+    /********************************************************
+    *                     Fill Sequence                     *
+    ********************************************************/
     always_ff @(posedge clk) begin
         if (wrEn) begin
             for (j = 0; j < 8; j++) begin
@@ -70,7 +74,9 @@ module a_buf_in (
         end
     end
 
-    // Buffer empty process
+    /********************************************************
+    *                    Empty Sequence                     *
+    ********************************************************/
     always_ff @(posedge clk) begin
         if (emptyReady) begin
             outIndex <= outIndex + 1'b1;
