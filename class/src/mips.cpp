@@ -337,7 +337,7 @@ namespace priscas
 		else if ("j" == args[0]) {current_op = priscas::J;}
 		else if ("jal" == args[0]) {current_op = priscas::JAL;}
 		else if ("jalr" == args[0]) {current_op = priscas::JALR;}
-		else if ("bqez" == args[0]) {current_op = priscas::BEQZ;}
+		else if ("beqz" == args[0]) {current_op = priscas::BEQZ;}
 		else if ("bnez" == args[0]) {current_op = priscas::BNEZ;}
 		else if ("bltz" == args[0]) {current_op = priscas::BLTZ;}
 		else if ("bgez" == args[0]) {current_op = priscas::BGEZ;}
