@@ -3,14 +3,21 @@ module fft_accel(
     input [9:0] externalIndexA
     input [17:0] sigNum,
     input [31:0] external_real_A, external_imag_A,
-    output done, calculating, 
-    output [17:0] sigNumMC
+    output done, calculating,
+    output reg [17:0] sigNumMC,
     output [31:0] real_out, imag_out;
 );
 
-    logic [31:0] butterfly_real_A_out, butterfly_real_B_out, butterfly_imag_A_out, butterfly_imag_B_out, 
-                        butterfly_real_A_in, butterfly_real_B_in, butterfly_imag_A_in, butterfly_imag_B_in,
-                        twiddle_real, twiddle_imag, external_real_A, external_imag_A;
+    logic [31:0] butterfly_real_A_out, 
+                 butterfly_real_B_out, 
+                 butterfly_imag_A_out, 
+                 butterfly_imag_B_out, 
+                 butterfly_real_A_in, 
+                 butterfly_real_B_in, 
+                 butterfly_imag_A_in, 
+                 butterfly_imag_B_in,
+                 twiddle_real,
+                 twiddle_imag;
 
     logic [4:0] stageCount;
     logic [9:0] indexA, indexB;
@@ -32,8 +39,7 @@ module fft_accel(
                      .done(doneCalculating), 
                      .loadExternalDone(loadExternalDone), 
                      .doFilter(doFilter),
-                     .sigNum(sigNum), 
-                     .sigNumMC(sigNumMC), 
+                     .sigNum(sigNum),
                      .startF(startF), 
                      .startI(startI), 
                      .calculating(calculating), 
@@ -97,7 +103,14 @@ module fft_accel(
             stageCount <= stageCount + 1;
     end
 
-    //////
+    always_ff @(posedge clk, posedge rst) begin
+        if (rst)
+            sigNumMC <= 18'h00000;
+        else if (startF | startI)
+            sigNumMC <= sigNum;
+    end
+
+    ////// logic 
     assign real_out = butterfly_real_A_in;
     assign imag_out = butterfly_imag_A_in;
 

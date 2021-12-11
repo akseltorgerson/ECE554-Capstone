@@ -3,8 +3,7 @@ module control(
     input startF, startI, loadF, loadExternalDone, doFilter, done, clk, rst,
     input [17:0] sigNum, 
     //Outputs
-    output reg calculating, loadExternal, loadInternal, writeFilter, isIFFT, fDone, aDone, startFFT,
-    output reg [17:0] sigNumMC
+    output reg calculating, loadExternal, loadInternal, writeFilter, isIFFT, fDone, aDone
 );
 
     ////////////////////
@@ -38,10 +37,8 @@ module control(
         loadInternal = 0;
         writeFilter = 0;
         isIFFT = 0;
-        startFFT = 0;
         fDone = 0;
         aDone = 0;
-        sigNumMC = 18'h00000;
 
         case(state)
             IDLE: begin
@@ -61,27 +58,15 @@ module control(
                 loadExternal = 1;
                 calculating = 1'b1;
                 if (loadExternalDone) begin
-                    next_state = STARTI;
+                    next_state = CALCULATINGI;
                 end
             end
             LOADF: begin
                 loadExternal = 1;
                 calculating = 1'b1;
                 if(loadExternalDone) begin
-                    next_state = STARTF;
+                    next_state = CALCULATINGF;
                 end
-            end
-
-            // start calculation
-            STARTF: begin
-                startFFT = 1;
-                calculating = 1'b1;
-                next_state = CALCULATINGF;
-            end
-            STARTI: begin
-                startFFT = 1;
-                calculating = 1'b1;
-                next_state = CALCULATINGI;
             end
 
             // calculations
