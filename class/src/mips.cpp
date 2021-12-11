@@ -238,7 +238,7 @@ namespace priscas
 		{
 			if ((op == priscas::XOR || op == priscas::ANDN || op == priscas::SEQ || op == priscas::SLT || op == priscas::SLE) 
 			&& (rs > 7 ||  rt > 7 || rd > 7) ) {
-				throw "rs, rt, rd should be >7 "
+				throw "rs, rt, rd should be >7 ";
 			}
 			//first 15 bits are zero as don't cares
 			w = (w.AsUInt32() | ((rd & ((1 << 4) - 1) ) << 15 ));
