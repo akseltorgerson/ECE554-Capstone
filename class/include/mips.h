@@ -37,6 +37,7 @@
 #include <cstring>
 #include <cstddef>
 #include <memory>
+#include <stdio.h>
 #include "ISA.h"
 #include "mt_exception.h"
 #include "primitives.h"
@@ -85,11 +86,6 @@ namespace priscas
 		INVALID = -1
 	};
 
-	// instruction formats
-	enum format
-	{
-		R, I, J	
-	};
 
 	// MIPS Processor Opcodes
 	enum opcode
@@ -201,7 +197,7 @@ namespace priscas
 	/* Check if a special R-format
 	 * shift instruction
 	 */
-	bool shift_inst(funct f);
+	bool shift_inst(opcode operation);
 
 	/* Check if a Jump or
 	 * Branch Instruction
@@ -226,7 +222,7 @@ namespace priscas
 		public:
 			virtual std::string get_reg_name(int id);
 			virtual int get_reg_id(std::string& fr) { return friendly_to_numerical(fr.c_str()); }
-			virtual ISA_Attrib::endian get_endian() { return ISA_Attrib::CPU_BIG_ENDIAN; }
+			virtual ISA_Attrib::endian get_endian() { return ISA_Attrib::CPU_LITTLE_ENDIAN; }
 			virtual mBW assemble(const Arg_Vec& args, const BW& baseAddress, syms_table& jump_syms) const;
 		private:
 			static const unsigned REG_COUNT = 32;

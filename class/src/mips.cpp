@@ -233,34 +233,41 @@ namespace priscas
 	BW_32 generic_mips32_encode(int rs, int rt, int rd, int imm_shamt_jaddr, opcode op, int filter, uint32_t signum)
 	{
 		BW_32 w = 0;
-
+		// printf("rs: %x, rt: %x, rd: %x, imm: %x, op: %x, filter: %x, sig: %x\n", rs, rt, rd, imm_shamt_jaddr, op, filter, signum);
 		if(r_inst(op))
 		{
+			if ((op == priscas::XOR || op == priscas::ANDN || op == priscas::SEQ || op == priscas::SLT || op == priscas::SLE) 
+			&& (rs > 7 ||  rt > 7 || rd > 7) ) {
+				throw priscas::mt_invalid_reg();
+			}
 			//first 15 bits are zero as don't cares
 			w = (w.AsUInt32() | ((rd & ((1 << 4) - 1) ) << 15 ));
 			w = (w.AsUInt32() | ((rt & ((1 << 4) - 1) ) << 19 ));
 			w = (w.AsUInt32() | ((rs & ((1 << 4) - 1) ) << 23 ));
-			if (op != priscas:ADD && op != priscas::SUB) {
-				w = w.AsUInt32() & ((uint32_t)0xFBBBFFFF);
-			}
+
 			w = (w.AsUInt32() | ((op & ((1 << 5) - 1) ) << 27 ));
 		}
 
 		if(i_inst1(op))
 		{
+			if ((op == priscas::XORI || op == priscas::ANDNI) && (rs > 7 || rd > 7)){
+				throw priscas::mt_invalid_reg();
+			}
+			if ((op == priscas::ST || op == priscas::LD || op == priscas::STU) && (rs > 7)) {
+				throw priscas::mt_invalid_reg();
+			}
 			w = (w.AsUInt32() | (imm_shamt_jaddr & ((1 << 19) - 1)));
 			w = (w.AsUInt32() | ((rt & ((1 << 4) - 1) ) << 19 ));
 			w = (w.AsUInt32() | ((rs & ((1 << 4) - 1) ) << 23 ));
-
-			if (op != priscas:ADDI && op != priscas::SUBI) {
-				w = w.AsUInt32() & ((uint32_t)0xFBBFFFFF);
-			}
 			w = (w.AsUInt32() | ((op & ((1 << 5) - 1) ) << 27 ));
 		}
 		if (i_inst2(op))
 		{
+			if ((op != priscas::LBI && op != priscas::SLBI) && (rs > 7) ) {
+				throw priscas::mt_invalid_reg();
+			}
 			w = (w.AsUInt32() | (imm_shamt_jaddr & ((1 << 23) - 1)));
-			w = (w.AsUInt32() | ( ((rs & ((1 << 4) - 1)) << 23)) & ((uint32_t)0xFBFFFFFF) );
+			w = (w.AsUInt32() | ( ((rs & ((1 << 4) - 1)) << 23)) );
 			w = (w.AsUInt32() | ((op & ((1 << 5) - 1) ) << 27 ));
 		}
 
@@ -285,7 +292,6 @@ namespace priscas
 			w = (w.AsUInt32() | ((signum & ((1 << 18) - 1) ) << 9 ));
 			w = (w.AsUInt32() | ((op & ((1 << 5) - 1) ) << 27 ));
 		}
-
 		return w;
 	}
 
@@ -317,6 +323,7 @@ namespace priscas
 		if ("halt" == args[0]) {current_op = priscas::HALT;}
 		else if ("nop" == args[0]) {current_op = priscas::NOP;}
 		else if ("startf" == args[0]) {current_op = priscas::STARTF;}
+		else if ("starti" == args[0]) {current_op = priscas::STARTI;}
 		else if ("loadf" == args[0]) {current_op = priscas::LOADF;}
 		else if ("addi" == args[0]) {current_op = priscas::ADDI;}
 		else if ("subi" == args[0]) {current_op = priscas::SUBI;}
@@ -330,7 +337,7 @@ namespace priscas
 		else if ("j" == args[0]) {current_op = priscas::J;}
 		else if ("jal" == args[0]) {current_op = priscas::JAL;}
 		else if ("jalr" == args[0]) {current_op = priscas::JALR;}
-		else if ("bqez" == args[0]) {current_op = priscas::BEQZ;}
+		else if ("beqz" == args[0]) {current_op = priscas::BEQZ;}
 		else if ("bnez" == args[0]) {current_op = priscas::BNEZ;}
 		else if ("bltz" == args[0]) {current_op = priscas::BLTZ;}
 		else if ("bgez" == args[0]) {current_op = priscas::BGEZ;}
@@ -347,7 +354,6 @@ namespace priscas
 		{
 			throw mt_bad_mnemonic();
 		}
-
 		// Check for insufficient arguments
 		if(args.size() >= 1)
 		{
@@ -358,7 +364,7 @@ namespace priscas
 					(j_inst(current_op) && args.size() != 2) ||
 					(current_op == priscas::HALT && args.size() != 1) ||
 					(current_op == priscas::NOP && args.size() != 1) ||
-					(current_op == priscas:STARTF && args.size() != 3) ||
+					(current_op == priscas::STARTF && args.size() != 3) ||
 					((current_op == priscas::STARTI ||  current_op == priscas::LOADF) && args.size () != 2)		
 				)
 			{
@@ -368,11 +374,7 @@ namespace priscas
 			// Now first argument parsing
 			if(r_inst(current_op))
 			{
-					// if(f_code == priscas::JR)
-					// {
-					// 	if((rs = priscas::friendly_to_numerical(args[1].c_str())) <= priscas::INVALID)
-					// 	rs = priscas::get_reg_num(args[1].c_str());
-					// }
+
 					if((rd = priscas::friendly_to_numerical(args[1].c_str())) <= priscas::INVALID)
 						rd = priscas::get_reg_num(args[1].c_str());
 
@@ -404,10 +406,10 @@ namespace priscas
 					imm = priscas::get_imm(args[1].c_str());
 				}
 			}
-			else if (current_op == pricas::STARTF || current_op == priscas::STARTI || current_op == priscas::LOADF)
+			else if (current_op == priscas::STARTF || current_op == priscas::STARTI || current_op == priscas::LOADF)
 			{
 				// Get signal num as uint_32
-				signum = priscas::get_imm(args[1].c_str())
+				signum = priscas::get_imm(args[1].c_str());
 			}
 			else
 			{
@@ -425,7 +427,7 @@ namespace priscas
 					rs = priscas::get_reg_num(args[2].c_str());
 			}
 						
-			else if(i_inst1(current_op) || i_inst2(current_op))
+			else if(i_inst1(current_op))
 			{
 				if(mem_inst(current_op))
 				{
@@ -433,7 +435,7 @@ namespace priscas
 					std::string wc = args[2];
 					std::string imm_s = std::string();
 					std::string reg = std::string();
-
+					if (wc[0] != '(') throw mt_unmatched_parenthesis();
 					for(size_t i = 0; i < wc.length(); i++)
 					{
 						if(wc[i] == '(') { left_parenth = true; continue; }
@@ -443,19 +445,11 @@ namespace priscas
 						{
 							reg.push_back(wc[i]);
 						}
-
-						else
-						{
-							imm_s.push_back(wc[i]);
-						}
 					}
 
 					if(!right_parenth || !left_parenth) throw mt_unmatched_parenthesis();
 					if((rs = priscas::friendly_to_numerical(reg.c_str())) <= priscas::INVALID) rs = priscas::get_reg_num(reg.c_str());
-					imm = priscas::get_imm(imm_s.c_str());
-								
 				}
-
 				else
 				{
 					// later, MUST check for branches
@@ -463,10 +457,13 @@ namespace priscas
 						rs = priscas::get_reg_num(args[2].c_str());
 				}
 			}
-			else if (current_op == priscas:STARTF)
+			else if (i_inst2(current_op)) {
+				imm = priscas::get_imm(args[2].c_str());
+			}
+			else if (current_op == priscas::STARTF)
 			{
 				// Get the filter as an integer. Either 1 or 0
-				filter = pricas::get_imm(args[2].c_str())
+				filter = priscas::get_imm(args[2].c_str());
 			}
 		}
 
@@ -493,11 +490,11 @@ namespace priscas
 					imm = priscas::get_imm(args[3].c_str());
 				}
 			}
+			
 		}
 
 		// Pass the values of rs, rt, rd to the processor's encoding function
-		BW_32 inst = generic_mips32_encode(rs, rt, rd, f_code, imm, current_op, filter, signum);
-
+		BW_32 inst = generic_mips32_encode(rs, rt, rd, imm, current_op, filter, signum);
 		return std::shared_ptr<BW>(new BW_32(inst));
 	}
 
