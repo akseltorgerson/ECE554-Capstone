@@ -45,10 +45,16 @@ module control(
 
         case(state)
             IDLE: begin
-                if (startF)
+                if (startF)begin
                     next_state = LOADF;
-                else if (startI)
-                    next_state = LOADI; 
+                end
+                else if (startI) begin
+                    next_state = LOADI;
+                end
+                else begin
+                    next_state = IDLE;
+                end
+
             end
             // Await for RAM to be loaded from MC
             LOADI: begin
