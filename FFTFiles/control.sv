@@ -1,6 +1,6 @@
 module control(
     //Inputs
-    input startF, startI, loadF, loadExternalDone, doFilter, done, clk, rst, outLoadDone
+    input startF, startI, loadF, loadExternalDone, doFilter, done, clk, rst, outLoadDone,
     input [17:0] sigNum, 
     //Outputs
     output reg calculating, loadExternal, loadInternal, writeFilter, isIFFT, fDone, aDone, loadOutBuffer
@@ -28,7 +28,7 @@ module control(
     ////////////////
     // State machine
     ////////////////
-    always_comb
+    always_comb begin
         // defaults
         next_state = IDLE;
         calculating = 1'b0;
