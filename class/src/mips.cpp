@@ -260,7 +260,7 @@ namespace priscas
 		if (i_inst2(op))
 		{
 			w = (w.AsUInt32() | (imm_shamt_jaddr & ((1 << 23) - 1)));
-			w = (w.AsUInt32() | ( ((rs & ((1 << 4) - 1)) << 23)) & ((uint32_t)0xFBFFFFFF) );
+			w = (w.AsUInt32() | ( ((rs & ((1 << 4) - 1)) << 23)) );
 			w = (w.AsUInt32() | ((op & ((1 << 5) - 1) ) << 27 ));
 		}
 
