@@ -1,5 +1,5 @@
 module fft_accel(
-    input clk, rst, startF, startI, loadF,
+    input clk, rst, startF, startI, loadF, filter,
     input [17:0] sigNum,
     output done, calculating
 );
