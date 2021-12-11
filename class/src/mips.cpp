@@ -233,7 +233,7 @@ namespace priscas
 	BW_32 generic_mips32_encode(int rs, int rt, int rd, int imm_shamt_jaddr, opcode op, int filter, uint32_t signum)
 	{
 		BW_32 w = 0;
-		printf("rs: %x, rt: %x, rd: %x, imm: %x, op: %x, filter: %x, sig: %x\n", rs, rt, rd, imm_shamt_jaddr, op, filter, signum);
+		// printf("rs: %x, rt: %x, rd: %x, imm: %x, op: %x, filter: %x, sig: %x\n", rs, rt, rd, imm_shamt_jaddr, op, filter, signum);
 		if(r_inst(op))
 		{
 			if ((op == priscas::XOR || op == priscas::ANDN || op == priscas::SEQ || op == priscas::SLT || op == priscas::SLE) 
