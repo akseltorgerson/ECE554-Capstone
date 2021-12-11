@@ -100,6 +100,7 @@ module cpu_tb();
 
         @(posedge clk);
         @(negedge clk);
+        fftCalculating = 1'b1;
         if(iCPU.instruction != 32'hA3001000 || iCPU.writebackData != 32'h1000)begin
             errors++;
             $display("Failed LBI Test");
@@ -115,7 +116,7 @@ module cpu_tb();
 
         @(posedge clk);
         @(negedge clk);
-
+        fftCalculating = 1'b0;
         if(iCPU.instruction != 32'h93000000 || iCPU.writebackData != 32'h10000000)begin
             errors++;
             $display("Failed SLBI Test");

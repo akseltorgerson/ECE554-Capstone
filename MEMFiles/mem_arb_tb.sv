@@ -154,9 +154,9 @@ module mem_arb_tb();
         // test out multiple requests at one time
         @(negedge clk);
         instrCacheBlkReq = 1'b1;
-        instrAddr = 32'h8;
+        instrAddr = 32'h16;
         dataCacheBlkReq = 1'b1;
-        dataAddr = 32'h10;
+        dataAddr = 32'h1f;
 
         // wait some clock cycles for request
         repeat(2) begin
@@ -173,29 +173,29 @@ module mem_arb_tb();
         @(posedge clk);
         // Move into DATA_RD_DONE state
         @(negedge clk);
-        common_data_bus_in = {  testMemory[15+dataAddr],
-                                testMemory[14+dataAddr],
-                                testMemory[13+dataAddr],
-                                testMemory[12+dataAddr],
-                                testMemory[11+dataAddr],
-                                testMemory[10+dataAddr],
-                                testMemory[9+dataAddr],
-                                testMemory[8+dataAddr],
-                                testMemory[7+dataAddr],
-                                testMemory[6+dataAddr],
-                                testMemory[5+dataAddr],
-                                testMemory[4+dataAddr],
-                                testMemory[3+dataAddr],
-                                testMemory[2+dataAddr],
-                                testMemory[1+dataAddr],
-                                testMemory[0+dataAddr]};
+        common_data_bus_in = {  testMemory[15+(dataAddr&32'hfffffff0)],
+                                testMemory[14+(dataAddr&32'hfffffff0)],
+                                testMemory[13+(dataAddr&32'hfffffff0)],
+                                testMemory[12+(dataAddr&32'hfffffff0)],
+                                testMemory[11+(dataAddr&32'hfffffff0)],
+                                testMemory[10+(dataAddr&32'hfffffff0)],
+                                testMemory[9+(dataAddr&32'hfffffff0)],
+                                testMemory[8+(dataAddr&32'hfffffff0)],
+                                testMemory[7+(dataAddr&32'hfffffff0)],
+                                testMemory[6+(dataAddr&32'hfffffff0)],
+                                testMemory[5+(dataAddr&32'hfffffff0)],
+                                testMemory[4+(dataAddr&32'hfffffff0)],
+                                testMemory[3+(dataAddr&32'hfffffff0)],
+                                testMemory[2+(dataAddr&32'hfffffff0)],
+                                testMemory[1+(dataAddr&32'hfffffff0)],
+                                testMemory[0+(dataAddr&32'hfffffff0)]};
 
         rd_valid = 1'b1;
 
         @(posedge clk);
 
         if (dataBlk2Cache != common_data_bus_in) begin
-            $display("ERROR: Data Blk Expected, %32h, Got, %32h", common_data_bus_in, instrBlk2Cache);
+            $display("ERROR: Data Blk Expected, %32h, Got, %32h", common_data_bus_in, dataBlk2Cache);
             errors += 1;
         end
 
@@ -226,22 +226,22 @@ module mem_arb_tb();
         @(posedge clk);
         // Move into INSTR_RD_DONE state
         @(negedge clk);
-        common_data_bus_in = {  testMemory[15+instrAddr],
-                                testMemory[14+instrAddr],
-                                testMemory[13+instrAddr],
-                                testMemory[12+instrAddr],
-                                testMemory[11+instrAddr],
-                                testMemory[10+instrAddr],
-                                testMemory[9+instrAddr],
-                                testMemory[8+instrAddr],
-                                testMemory[7+instrAddr],
-                                testMemory[6+instrAddr],
-                                testMemory[5+instrAddr],
-                                testMemory[4+instrAddr],
-                                testMemory[3+instrAddr],
-                                testMemory[2+instrAddr],
-                                testMemory[1+instrAddr],
-                                testMemory[0+instrAddr]};
+        common_data_bus_in = {  testMemory[15+(instrAddr&32'hfffffff0)],
+                                testMemory[14+(instrAddr&32'hfffffff0)],
+                                testMemory[13+(instrAddr&32'hfffffff0)],
+                                testMemory[12+(instrAddr&32'hfffffff0)],
+                                testMemory[11+(instrAddr&32'hfffffff0)],
+                                testMemory[10+(instrAddr&32'hfffffff0)],
+                                testMemory[9+(instrAddr&32'hfffffff0)],
+                                testMemory[8+(instrAddr&32'hfffffff0)],
+                                testMemory[7+(instrAddr&32'hfffffff0)],
+                                testMemory[6+(instrAddr&32'hfffffff0)],
+                                testMemory[5+(instrAddr&32'hfffffff0)],
+                                testMemory[4+(instrAddr&32'hfffffff0)],
+                                testMemory[3+(instrAddr&32'hfffffff0)],
+                                testMemory[2+(instrAddr&32'hfffffff0)],
+                                testMemory[1+(instrAddr&32'hfffffff0)],
+                                testMemory[0+(instrAddr&32'hfffffff0)]};
 
         rd_valid = 1'b1;
 

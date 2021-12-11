@@ -52,7 +52,9 @@ module proc(
     //The current address the PC is on
     logic [31:0] instrAddr;
 
+    logic exception;
 
+    logic halt;
     //----------------------------Accelerator Signals---------------------------
 
     //Lets CPU know that the accelerator is currently calculating
@@ -73,10 +75,9 @@ module proc(
     //The signal number that the accelerator will operate on
     logic [17:0] sigNum;
 
-    //TODO: These two below might be outputs of the processor?
-    logic exception;
-
-    logic halt;
+    
+    //The accelerator is done with it's signal
+    logic done;
 
     //---------------------- Mem Arbiter Signals---------------------------------
     
@@ -112,10 +113,14 @@ module proc(
         .startI(startI),
         .loadF(loadF),
         .filter(filter),
-        .sigNum(), //TODO: Don't think this is actually needed in accel, just for memArb (But mem arb might have to store this signal when it stores the accel output data?) 
+        .read(readAccel),
+        .sigNum(sigNum),  
         //Outputs
-        .done(), //TODO: don't think this is actually needed if fftCalculating is right?
-        .calculating(fftCalculating)
+        .done(done), //TODO: don't think this is actually needed if fftCalculating is right?
+        .calculating(fftCalculating),
+        .sigNumMC(sigNumMC),
+        .real_out(),
+        .imag_out()
     );
 
     mem_arb iMemArbiter(
@@ -132,7 +137,7 @@ module proc(
         .accelDataRd(), 
         .accelDataWr(),
         .accelBlk2Mem(),
-        .sigNum(sigNum),
+        .sigNum(sigNumMC),
         //Mem Controller Interface inputs
         .common_data_bus_in(common_data_bus_in),
         .tx_done(tx_done),

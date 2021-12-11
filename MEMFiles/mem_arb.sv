@@ -8,27 +8,28 @@ module mem_arb(
 
     // Instr Cache Interface
     input instrCacheBlkReq,             // cacheMiss    
-    input [31:0] instrAddr,        // instrAddr
-    output reg [511:0] instrBlk2Cache,      // blkIn
-    output reg instrBlk2CacheValid,         // mcDataValid
+    input [31:0] instrAddr,             // instrAddr
+    output reg [511:0] instrBlk2Cache,  // blkIn
+    output reg instrBlk2CacheValid,     // mcDataValid
 
     // Data Cache Interface
     input dataCacheBlkReq,              // cacheMiss
     input [31:0] dataAddr,              // aluResult
     input dataCacheEvictReq,            // cacheEvict
     input [511:0] dataBlk2Mem,          // mcDataOut
-    output reg dataEvictAck,                // evictDone
-    output reg dataBlk2CacheValid,          // mcDataValid
-    output reg [511:0] dataBlk2Cache,       // mcDataIn
+    output reg dataEvictAck,            // evictDone
+    output reg dataBlk2CacheValid,      // mcDataValid
+    output reg [511:0] dataBlk2Cache,   // mcDataIn
 
     // FT Accelerator Buffer Interface
     input accelDataRd,                  // lets MC know we want to read a sig chunk from host
     input accelDataWr,                  // lets the MC know we want to write a sig chunk to host, data is ready
     input [511:0] accelBlk2Mem,         // the block we want to write to mem
     input [17:0] sigNum,                // the signal number that corresponds to the signal data
-    output reg accelWrBlkDone,              // lets the a-buf know that a blk as been written to host, ready for next block
-    output reg accelRdBlkDone,              // lets the a-buf know that a blk has been sent to a-buf is done, ready for next block
-    output reg [511:0] accelBlk2Buffer,     // block of data going to the buffer
+    output reg accelWrBlkDone,          // lets the a-buf know that a blk as been written to host, ready for next block
+    output reg accelRdBlkDone,          // lets the a-buf know that a blk has been sent to a-buf is done, ready for next block
+    output reg [511:0] accelBlk2Buffer, // block of data going to the buffer
+    output reg transformComplete;
 
     // Mem Controller interface
     output logic [1:0] op,
@@ -38,11 +39,7 @@ module mem_arb(
     input tx_done,
     input rd_valid,
 
-    // TODO might need CV value
-    // Condition variable
-    // Assign cv_value to 1 for a halt, or a write back
     output logic[63:0] cv_value
-
 );
 
     localparam WORD_SIZE = 32;
@@ -59,8 +56,8 @@ module mem_arb(
     opcode op_out;
 
     assign op = opcode'(op_out);
+    // TODO may want to OR this with another signal
     assign cv_value[0] = halt;
-
 
     // state enum
     typedef enum reg[3:0] {
@@ -80,14 +77,30 @@ module mem_arb(
 
     state_t currState, nextState;
 
+    // transform enum
+    typedef enum reg[1:0] {
+        IDLE = 2'b00,
+        IN_PROCESS = 2'b01,
+        CHUNK_DONE = 2'b10,
+        TRANSFORM_COMPLETE = 2'b11
+    } sig_state_t;
+
+    sig_state_t currSigState, nextSigState;
+
     // Signum Table
-    // {18 bits end offset, 18 bits start offset}
+    // {18 bits end blkNum, 18 bits start blkNum}
     reg [35:0] signumTable [8192][2];
     logic [31:0] sigBaseAddr;
     logic [31:0] sigEndAddr;
     logic [7:0] sigOffset;
     reg accelTransferDone;
-    logic [17:0] sigLength;
+    logic [17:0] sigBaseBlkAddr;
+    logic [17:0] sigEndBlkAddr;
+    logic [31:0] sigPtr;
+
+    // Address alignment
+    logic dataAddrAligned;
+    logic instrAddrAligned;
 
     // Instr req, Data req, Accel Reqg
     reg priorityReg [2:0];
@@ -98,11 +111,12 @@ module mem_arb(
     /************************************************************************   
     *                      SIG COUNTER AND ADDR LOOKUP                      *
     ************************************************************************/
-    assign sigBaseAddr = {14'b0, signumTable[sigNum][0]} | 32'h1000_0000;
-    assign sigEndAddr = {14'b0, signumTable[sigNum][1]} | 32'h1000_0000;
-    
-    // TODO still need some way for the accelerator to know if there is another
-    // chunk of data
+    assign dataAddrAligned = dataAddr & 32'hfffffff0;
+    assign instrAddrAligned = instrAddr & 32'hfffffff0;
+
+    // TODO I think this is right now
+    assign sigBaseAddr = {3'b0, signumTable[sigNum][0], 11'b0} + 32'h1000_0000;
+    assign sigEndAddr = {3'b0, signumTable[sigNum][1], 11'b0} + 32'h1000_0000;
 
     // TODO may need to be one more bit
     always_ff @(posedge accelWrBlkDone, posedge accelRdBlkDone, posedge rst) begin
@@ -131,7 +145,7 @@ module mem_arb(
     assign instrStart = (enable & priorityReg[0]) ? 1'b1 : 1'b0;
 
     /************************************************************************
-    *                            STATE MACHINE                              *
+    *                        REQEST STATE MACHINE                           *
     ************************************************************************/
     always_comb begin
         // Default values
@@ -161,10 +175,10 @@ module mem_arb(
                         nextState = ACCEL_WR;
                     end
                 end else if (dataStart) begin
-                    if (dataCacheBlkReq) begin
-                        nextState = DATA_RD;
-                    end else begin
+                    if (dataCacheEvictReq) begin
                         nextState = DATA_WR;
+                    end else begin
+                        nextState = DATA_RD;
                     end
                 end else if (instrStart) begin
                     nextState = INSTR_RD;
@@ -176,7 +190,7 @@ module mem_arb(
             *                            INSTR STATES                                *
             ************************************************************************/
             INSTR_RD: begin
-                io_addr = instrAddr;
+                io_addr = instrAddrAligned;
                 op_out = READ;
                 nextState = tx_done ? INSTR_RD_DONE : INSTR_RD;
             end
@@ -189,7 +203,7 @@ module mem_arb(
             *                            DATA STATES                                *
             ************************************************************************/
             DATA_RD: begin
-                io_addr = dataAddr;
+                io_addr = dataAddrAligned;
                 op_out = READ;
                 nextState = tx_done ? DATA_RD_DONE : DATA_RD;
             end
@@ -199,7 +213,7 @@ module mem_arb(
                 nextState = rd_valid ? IDLE : DATA_RD_DONE;
             end
             DATA_WR: begin
-                io_addr = dataAddr;
+                io_addr = dataAddrAligned;
                 op_out = WRITE;
                 common_data_bus_out = dataBlk2Mem;
                 nextState = tx_done ? DATA_WR_DONE : DATA_WR; 
@@ -245,6 +259,28 @@ module mem_arb(
     always_ff @(posedge clk, posedge rst) begin
         if (rst) begin
             currState <= INIT;
+        end else begin
+            currState <= nextState;
+        end
+    end
+
+    /************************************************************************
+    *                      TRANSFORM STATE MACHINE                          *
+    ************************************************************************/
+    always_comb begin
+        // zero stuff
+
+        case(currSigState)
+
+
+        endcase
+
+
+    end
+
+    always_ff @(posedge clk, posedge rst) begin
+        if (rst) begin
+            currState <= IDLE;
         end else begin
             currState <= nextState;
         end
