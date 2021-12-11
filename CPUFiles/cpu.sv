@@ -50,6 +50,7 @@ module cpu(//Inputs
     //Will need to do a DMA request to retrieve the data when this occurs
     output cacheMissMemory;
 
+    //The current instruction's address
     output [31:0] instrAddr;
 
     //---------------------------------Wires First Used in Fetch Stage--------------------------------
@@ -189,37 +190,37 @@ module cpu(//Inputs
     fetch_stage iFetch(
         .clk(clk),
         .rst(rst),
-        .halt(halt),
-        .nextPC(nextPC),
-        .stallDMAMem(stallDMAMem),
-        .mcDataValid(mcInstrValid),
-        .blockInstruction(stallFFT),
-        .mcDataIn(mcInstrIn),
-        .exception(exception),
+        .halt(halt), //stops the processor
+        .nextPC(nextPC), //the nextPC that the instruction should be fetched from 
+        .stallDMAMem(stallDMAMem), //stall signal from memory while memory is performing a DMA request
+        .mcDataValid(mcInstrValid), //Lets the iCache know that the data from the MC is valid and ready to write
+        .blockInstruction(stallFFT), //Lets the PC know to stall if get a startF or startI while the accelerator is calculating
+        .mcDataIn(mcInstrIn), //Data from the memory controller to be used on a DMA request (for fetch stage i.e iCache)
+        .exception(exception), //Exception raised, stops the processor
         //Outputs
-        .instr(instruction),
-        .pcPlus1(pcPlus1),
-        .cacheMiss(cacheMissFetch),
-        .instrAddr(instrAddr)
+        .instr(instruction), //The instruction to decode
+        .pcPlus1(pcPlus1), //The current pcplus1 which will be used as nextPC if no Branch or Jump
+        .cacheMiss(cacheMissFetch), //Control signal indicating that there was a cache miss in the fetch stage
+        .instrAddr(instrAddr) //The address of the current instruction the cpu is working on
     );
 
     decode_stage iDecode(
         .clk(clk),
         .rst(rst),
-        .instr(instruction),
-        .pcPlus1(pcPlus1),
-        .writebackData(writebackData),
-        .fftCalculating(fftCalculating),
-        .stallDMAMem(stallDMAMem),
+        .instr(instruction), //The current instruction to decode
+        .pcPlus1(pcPlus1), //The current pc plus 1
+        .writebackData(writebackData), //Data from writeback to write to the register file
+        .fftCalculating(fftCalculating), //From the accelerator, if the accelerator is calculating on a signal
+        .stallDMAMem(stallDMAMem), //Lets decode know not to write to the register file on a stall
         //Outputs
-        .read1Data(read1Data),
-        .read2Data(read2Data),
-        .aluSrc(aluSrc),
-        .isSignExtend(isSignExtend),
-        .isIType1(isIType1),
-        .isBranch(isBranch),
-        .halt(halt),
-        .nop(nop),
+        .read1Data(read1Data), //The data held in the first register to be read in an instruction
+        .read2Data(read2Data), //The data held in the second register to be read in an instruction
+        .aluSrc(aluSrc), //Goes into execute to determine what the Binput of the aluIs (either read2Data or IType Data)
+        .isSignExtend(isSignExtend), //Goes into execute to determine how to extend last 19 bits of IFormType1
+        .isIType1(isIType1), //Goes into execute to determine which immediate to use for ITypes
+        .isBranch(isBranch), //Goes into execute to determine the offset for adding to the PC
+        .halt(halt), //If there is a halt, then dump the memory and will stop executing instructions
+        .nop(nop), //Signal to show that there is a nop 
         .memWrite(memWrite),
         .memRead(memRead),
         .memToReg(memToReg),
@@ -290,26 +291,26 @@ module cpu(//Inputs
     cause_register iCR(
         .clk(clk),
         .rst(rst),
-        .realImagLoadEx(realImagLoadEx),
-        .complexArithmeticEx(complexArithmeticEx),
-        .fftNotCompleteEx(fftNotCompleteEx), 
-        .memAccessEx(memAccessEx),  
-        .memWriteEx(memWriteEx), 
-        .invalidJMPEx(invalidJMPEx),
-        .invalidFilterEx(invalidFilterEx),
+        .realImagLoadEx(realImagLoadEx), //Exception for if real loaded into imag reg or vice versa
+        .complexArithmeticEx(complexArithmeticEx), //Exception for if real and imaginary data are being added/subtracted
+        .fftNotCompleteEx(fftNotCompleteEx), //If access fft output memory addresses while data is calculating in accelerator
+        .memAccessEx(memAccessEx),  //If read an illegal memory address
+        .memWriteEx(memWriteEx), //If write to an illegal memory address
+        .invalidJMPEx(invalidJMPEx), //If jump to an invalid address
+        .invalidFilterEx(invalidFilterEx), //If there is a startF with filtering before a loadF has been done
         //Outputs
-        .causeDataOut(causeDataOut),
-        .exception(exception),
-        .err(err)
+        .causeDataOut(causeDataOut), //Shows which exception was raised
+        .exception(exception), //whether there was an exception raised
+        .err(err) //Error signal for bad state
     );
 
     epc_register iEPC(
         .clk(clk),
         .rst(rst),
-        .epcIn(instrAddr),
-        .write(exception),
+        .epcIn(instrAddr), //The address of the current instruction that raised the exception
+        .write(exception), // Write the epcIn when an exception is raised
         //Outputs
-        .epcOut(epcOut)
+        .epcOut(epcOut) //The data of the epc (address of exception)
     );
     
 
