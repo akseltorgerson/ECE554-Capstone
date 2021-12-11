@@ -236,7 +236,7 @@ namespace priscas
 		printf("rs: %x, rt: %x, rd: %x, imm: %x, op: %x, filter: %x, sig: %x\n", rs, rt, rd, imm_shamt_jaddr, op, filter, signum);
 		if(r_inst(op))
 		{
-			if ((op == priscas::XOR || op == priscas::ANDN || op == priscas::SEQ || op == priscas::SLT || op == pricas::SLE) 
+			if ((op == priscas::XOR || op == priscas::ANDN || op == priscas::SEQ || op == priscas::SLT || op == priscas::SLE) 
 			&& (rs > 7 ||  rt > 7 || rd > 7) ) {
 				throw priscas::mt_bad_imm();
 			}
