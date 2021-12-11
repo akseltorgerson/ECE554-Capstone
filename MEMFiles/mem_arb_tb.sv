@@ -39,6 +39,7 @@ module mem_arb_tb();
     logic accelWrBlkDone;
     logic accelRdBlkDone;
     logic [511:0] accelBlk2Buffer;
+    logic transformComplete;
 
     logic [511:0] common_data_bus_out;
     logic [31:0] io_addr;

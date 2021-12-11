@@ -29,7 +29,7 @@ module mem_arb(
     output reg accelWrBlkDone,          // lets the a-buf know that a blk as been written to host, ready for next block
     output reg accelRdBlkDone,          // lets the a-buf know that a blk has been sent to a-buf is done, ready for next block
     output reg [511:0] accelBlk2Buffer, // block of data going to the buffer
-    output reg transformComplete;
+    output reg transformComplete,
 
     // Mem Controller interface
     output logic [1:0] op,
@@ -165,6 +165,7 @@ module mem_arb(
         case(currState)
             INIT: begin
                 // TODO Need to load the accel sigNums from host mem
+                // for now lets just assume its 
                 nextState = IDLE;
             end
             IDLE: begin
@@ -264,9 +265,11 @@ module mem_arb(
         end
     end
 
+    // TODO DO NOT THINK THIS IS RIGHT AT ALL
     /************************************************************************
     *                      TRANSFORM STATE MACHINE                          *
     ************************************************************************/
+    /*
     always_comb begin
         // zero stuff
         nextState = IDLE_TRANSFORM;
@@ -307,5 +310,6 @@ module mem_arb(
             currState <= nextState;
         end
     end
+    */
 
 endmodule

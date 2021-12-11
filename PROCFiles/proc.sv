@@ -84,6 +84,15 @@ module proc(
     //TODO: ?
     logic [511:0] mcAccelIn;
 
+    //TODO: ?
+    logic [511:0] mcAccelOut;
+
+    //TODO: ?
+    logic outFifoReady;
+
+    //TODO: ?
+    logic mcAccelDataOutValid;
+
     //The accelerator is done with it's signal
     logic done;
 
@@ -129,7 +138,9 @@ module proc(
         .done(done),
         .calculating(fftCalculating),
         .sigNumMC(sigNumMC),
-        .mcDataOut(),
+        .mcDataOut(mcAccelOut),
+        .outFifoReady(outFifoReady),
+        .mcDataOutValid(mcAccelDataOutValid)
     );
 
     mem_arb iMemArbiter(
@@ -143,9 +154,9 @@ module proc(
         .dataAddr(mcDataAddr),
         .dataCacheEvictReq(dCacheEvict),
         .dataBlk2Mem(dCacheOut),
-        .accelDataRd(), 
-        .accelDataWr(),
-        .accelBlk2Mem(),
+        .accelDataRd(startF | startI), //Fine with 1 8kb chunk
+        .accelDataWr(outFifoReady),
+        .accelBlk2Mem(mcAccelOut),
         .sigNum(sigNumMC),
         //Mem Controller Interface inputs
         .common_data_bus_in(common_data_bus_in),
@@ -160,6 +171,7 @@ module proc(
         .accelWrBlkDone(),
         .accelRdBlkDone(),
         .accelBlk2Buffer(),
+        .transformComplete(),
         //Mem Controller interface outputs
         .op(op),
         .common_data_bus_out(common_data_bus_out),

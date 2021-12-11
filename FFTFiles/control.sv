@@ -53,6 +53,7 @@ module control(
                 end
 
             end
+            
             // Await for RAM to be loaded from MC
             LOADI: begin
                 loadExternal = 1;

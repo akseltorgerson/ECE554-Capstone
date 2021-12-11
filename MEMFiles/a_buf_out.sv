@@ -1,12 +1,12 @@
 module a_buf_out (
 
     // This buffer will store data from accelerator going to host memory
-    input clk, rst;
-    input wrEn;                     // control signal from the accelerator CU to let us know that the data is valid
-    input reg [63:0] dataIn;        // data point from the accelerator
-    output reg emptyReady;          // control signal to let the MC know we can start writing data
-    output reg [511:0] dataOut;     // data leaving the buffer going to host mem
-    output reg dataOutValid;        // signal to let the MC know the data on the bus is valid
+    input clk, rst,
+    input wrEn,                     // control signal from the accelerator CU to let us know that the data is valid
+    input reg [63:0] dataIn,        // data point from the accelerator
+    output reg emptyReady,          // control signal to let the MC know we can start writing data
+    output reg [511:0] dataOut,     // data leaving the buffer going to host mem
+    output reg dataOutValid        // signal to let the MC know the data on the bus is valid
 );
 
     localparam DEPTH = 1024;
@@ -47,6 +47,7 @@ module a_buf_out (
             emptyReady <= 1'b1;
         end else begin
             emptyReady <= 1'b0;
+        end
     end
 
     /********************************************************

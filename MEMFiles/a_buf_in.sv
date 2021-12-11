@@ -1,12 +1,12 @@
 module a_buf_in ( 
 
     // This buffer will store data from host memory to accelerator
-    input clk, rst; 
-    input wrEn;                 // control signal from MC that the data is valid to be written
-    input [511:0] dataIn;       // data going into the buffer
-    output reg emptyReady;      // signals to accel that the buffer can start being emptied
-    output reg [63:0] dataOut;  // data going to accelerator
-    output reg dataOutValid;    // signal to let the accelerator know the data on the bus is valid
+    input clk, rst,
+    input wrEn,                 // control signal from MC that the data is valid to be written
+    input [511:0] dataIn,       // data going into the buffer
+    output reg emptyReady,      // signals to accel that the buffer can start being emptied
+    output reg [63:0] dataOut,  // data going to accelerator
+    output reg dataOutValid    // signal to let the accelerator know the data on the bus is valid
 
 );
 

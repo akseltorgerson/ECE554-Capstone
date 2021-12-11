@@ -1,16 +1,16 @@
 module a_buf_top(
 
-    input clk, rst;
-    input accelWrEn;
-    input mcWrEn;
-    input [511:0] mcDataIn;
-    input [63:0] accelDataIn;
-    output reg outEmptyReady;
-    output reg inEmptyReady;
-    output reg [63:0] accelDataOut;
-    output reg [511:0] mcDataOut;
-    output reg mcDataOutValid;
-    output reg accelDataOutValid;
+    input clk, rst,
+    input accelWrEn,
+    input mcWrEn,
+    input [511:0] mcDataIn,
+    input [63:0] accelDataIn,
+    output reg outEmptyReady,
+    output reg inEmptyReady,
+    output reg [63:0] accelDataOut,
+    output reg [511:0] mcDataOut,
+    output reg mcDataOutValid,
+    output reg accelDataOutValid
 
 );
 
