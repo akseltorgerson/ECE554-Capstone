@@ -1,7 +1,7 @@
 module twiddle_ROM(
     input clk,
     input [8:0] twiddleIndex,
-    output reg [31:0] twiddle_real, twiddle_imag;
+    output reg [31:0] twiddle_real, twiddle_imag
 );
 
     reg [31:0] twiddle_mem [0:1023];
