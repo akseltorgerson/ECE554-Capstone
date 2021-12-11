@@ -11,7 +11,7 @@ module control(
     /// intermediates //
     ////////////////////
 
-    typedef enum { INITIAL, IDLE, LOADI, LOADF, STARTF, STARTI, CALCULATINGF, CALCULATINGI, DONE } state_t;
+    typedef enum { IDLE, LOADI, LOADF, STARTF, STARTI, CALCULATINGF, CALCULATINGI, DONE } state_t;
 
     state_t state, next_state;
 
@@ -21,8 +21,7 @@ module control(
     //
     always @(posedge clk, posedge rst) begin
         if (rst) begin
-            state <= INITIAL;
-            next_state <=INITIAL;
+            state <= IDLE;
         end else begin
             state <= next_state;
         end
@@ -33,8 +32,8 @@ module control(
     ////////////////
     always_comb
         // defaults
-        next_state = state;
-        calculating = 0;
+        next_state = IDLE;
+        calculating = 1'b0;
         loadExternal = 0;
         loadInternal = 0;
         writeFilter = 0;
@@ -45,9 +44,6 @@ module control(
         sigNumMC = 18'h00000;
 
         case(state)
-            INITIAL: begin
-                next_state = IDLE;
-            end
             IDLE: begin
                 if (startF)
                     next_state = LOADF;
@@ -57,12 +53,14 @@ module control(
             // Await for RAM to be loaded from MC
             LOADI: begin
                 loadExternal = 1;
+                calculating = 1'b1;
                 if (loadExternalDone) begin
                     next_state = STARTI;
                 end
             end
             LOADF: begin
                 loadExternal = 1;
+                calculating = 1'b1;
                 if(loadExternalDone) begin
                     next_state = STARTF;
                 end
@@ -71,10 +69,12 @@ module control(
             // start calculation
             STARTF: begin
                 startFFT = 1;
+                calculating = 1'b1;
                 next_state = CALCULATINGF;
             end
             STARTI: begin
                 startFFT = 1;
+                calculating = 1'b1;
                 next_state = CALCULATINGI;
             end
 
