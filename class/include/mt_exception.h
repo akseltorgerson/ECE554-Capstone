@@ -82,7 +82,7 @@ namespace priscas
 		public:
 			mt_invalid_reg()
 			{
-				mt_exception::except_num = 15;
+				mt_exception::except_num = exception_nums::GENERAL;
 				mt_exception::message = "Rs, Rt, or Rd may need to be less than 8";
 			}
 	}
