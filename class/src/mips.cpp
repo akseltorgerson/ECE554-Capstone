@@ -347,7 +347,7 @@ namespace priscas
 		{
 			throw mt_bad_mnemonic();
 		}
-
+		printf("current op %x", current_op);
 		// Check for insufficient arguments
 		if(args.size() >= 1)
 		{
