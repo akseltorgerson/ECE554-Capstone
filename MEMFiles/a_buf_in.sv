@@ -2,7 +2,7 @@ module a_buf_in (
 
     // This buffer will store data from host memory to accelerator
     input clk, rst; 
-    input wnEn;                 // control signal from MC that the data is valid to be written
+    input wrEn;                 // control signal from MC that the data is valid to be written
     input [511:0] dataIn;       // data going into the buffer
     output reg emptyReady;      // signals to accel that the buffer can start being emptied
     output reg [63:0] dataOut;  // data going to accelerator
@@ -15,7 +15,7 @@ module a_buf_in (
    
     // Register to hold {imag, real} data members
     // 8kB
-    reg [WIDTH-1:0] buffer [DEPTH];
+    reg [WIDTH-1:0] buffer [DEPTH-1:0];
     logic [WIDTH-1:0] dataInUnpacked [7:0][1:0];
     logic [$clog2(DEPTH)-1:0] index;
     logic [$clog2(DEPTH)-1:0] outIndex;

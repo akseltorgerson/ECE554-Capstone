@@ -7,7 +7,6 @@ module a_buf_out (
     output reg emptyReady;          // control signal to let the MC know we can start writing data
     output reg [511:0] dataOut;     // data leaving the buffer going to host mem
     output reg dataOutValid;        // signal to let the MC know the data on the bus is valid
-
 );
 
     localparam DEPTH = 1024;
