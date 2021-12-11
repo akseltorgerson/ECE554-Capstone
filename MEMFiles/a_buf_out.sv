@@ -22,11 +22,13 @@ module a_buf_out (
 
     integer i, j, k;
 
-    // reset sequence
+    /********************************************************
+    *                     Reset Sequence                    *
+    ********************************************************/
     always_ff @(posedge clk) begin
         if (rst) begin
-            index <= 1'b0;
-            outIndex <= 1'b0;
+            index <= 10'b0;
+            outIndex <= 10'b0;
             emptyReady <= 1'b0;
             for (i = 0; i < DEPTH; i++) begin
                 buffer[i] <= 64'b0;
@@ -34,7 +36,9 @@ module a_buf_out (
         end
     end
 
-    // Buffer fill process (from accelerator)
+    /********************************************************
+    *                     Fill Sequence                     *
+    ********************************************************/
     always_ff @(posedge clk) begin
         if (wrEn) begin
             buffer[index] <= dataIn;
@@ -46,7 +50,9 @@ module a_buf_out (
             emptyReady <= 1'b0;
     end
 
-    // Buffer empty process
+    /********************************************************
+    *                    Empty Sequence                     *
+    ********************************************************/
     always_ff @(posedge clk) begin
         if (emptyReady) begin
             outIndex <= outIndex + 4'b1000;
@@ -58,13 +64,13 @@ module a_buf_out (
         end
     end
 
-    assign dataOut = {buffer[outIndex],
-                            buffer[outIndex+1],
-                            buffer[outIndex+2],
-                            buffer[outIndex+3],
-                            buffer[outIndex+4],
-                            buffer[outIndex+5],
+    assign dataOut = {buffer[outIndex+7],
                             buffer[outIndex+6],
-                            buffer[outIndex+7]};
+                            buffer[outIndex+5],
+                            buffer[outIndex+4],
+                            buffer[outIndex+3],
+                            buffer[outIndex+2],
+                            buffer[outIndex+1],
+                            buffer[outIndex]};
 
 endmodule

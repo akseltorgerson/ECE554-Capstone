@@ -2,8 +2,6 @@ module mem_arb(
 
     localparam WORD_SIZE = 32;
 	localparam CL_SIZE_WIDTH = 512;
-    // TODO can I just change this?
-	localparam ADDR_BITCOUNT = 64;
 
     input clk;
     input rst;
@@ -60,12 +58,6 @@ module mem_arb(
 
     assign cv_value[0] = halt;
 
-    // TODO Questions
-    // what is cv_value
-    // also it seems that the mem controller outputs a 32 bit value, how can i change it so it outputs the entire 512 bit block?
-    // CPU address in the address translation table seem to be 64 bits, can we just change that to 32 bits since we have 32 bit addresses?
-    // Am I kicking off a request in the correct way?
-
     // state enum
     typedef enum reg[3:0] {
         INIT = 4'b0000;
@@ -102,9 +94,9 @@ module mem_arb(
     /************************************************************************   
     *                      SIG COUNTER AND ADDR LOOKUP                      *
     ************************************************************************/
-    // TODO Zero extend the sigNum values, and OR
-    assign sigBaseAddr = signumTable[sigNum][0] + 32'h1000_0000;
-    assign sigEndAddr = signumTable[sigNum][1] + 32'h1000_0000;
+    assign sigBaseAddr = {14'b0, signumTable[sigNum][0]} | 32'h1000_0000;
+    assign sigEndAddr = {14'b0, signumTable[sigNum][1]} | 32'h1000_0000;
+    
     // TODO still need some way for the accelerator to know if there is another
     // chunk of data
 
@@ -119,7 +111,6 @@ module mem_arb(
         end
         if (&sigOffset) begin
             transferDone = 1'b1;
-            // rest it back to 0
             sigOffset <= sigOffset + 1'b1;
         end
     end

@@ -48,8 +48,8 @@ module a_buf_in (
     ********************************************************/
     always_ff @(posedge rst) begin
         if (rst) begin
-            index <= 1'b0;
-            outIndex <= 1'b0;
+            index <= 10'b0;
+            outIndex <= 10'b0;
             emptyReady <= 1'b0;
             for (i = 0; i < DEPTH; i++) begin
                 buffer[i] <= 64'b0;
