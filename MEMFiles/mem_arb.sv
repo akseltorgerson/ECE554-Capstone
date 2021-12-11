@@ -79,8 +79,8 @@ module mem_arb(
 
     // transform enum
     typedef enum reg[1:0] {
-        IDLE = 2'b00,
-        IN_PROCESS = 2'b01,
+        IDLE_TRANSFORM = 2'b00,
+        IN_PROGRESS = 2'b01,
         CHUNK_DONE = 2'b10,
         TRANSFORM_COMPLETE = 2'b11
     } sig_state_t;
@@ -227,7 +227,7 @@ module mem_arb(
             ************************************************************************/
             // FILLING BUFFER FROM HOST
             ACCEL_RD: begin
-                io_addr = sigBaseAddr + (sigOffset << 9);
+                io_addr = sigPtr + (sigOffset << 9);
                 op_out = READ;
                 accelBlk2Buffer = common_data_bus_in;
                 accelRdBlkDone = 1'b0;
@@ -239,7 +239,7 @@ module mem_arb(
             end
             // EMPTYING BUFFER TO HOST
             ACCEL_WR: begin
-                io_addr = sigBaseAddr + (sigOffset << 9);
+                io_addr = sigPtr + (sigOffset << 9);
                 op_out = WRITE;
                 common_data_bus_out = accelBlk2Mem;
                 accelWrBlkDone = 1'b0;
@@ -269,13 +269,35 @@ module mem_arb(
     ************************************************************************/
     always_comb begin
         // zero stuff
+        nextState = IDLE_TRANSFORM;
+        sigPtr = 32'b0;
+        transformComplete = 1'b1;
 
         case(currSigState)
+            IDLE_TRANSFORM: begin
+                sigPtr = sigBaseAddr;
+                transformComplete = 1'b1;
+                // Move to in progress once we get our first accelDataRd request.
+                nextState = accelDataRd ? IN_PROGRESS : IDLE_TRANSFORM;
+            end
+            IN_PROGRESS: begin
+                transformComplete = 1'b0;
+                // Move to chunk done state when we get a write request from the accelerator
+                sigPtr = (accelDataWr) ? sigPtr + 32'h00000800 : sigPtr;
+                nextState = accelDataWr ? CHUNK_DONE : IN_PROGRESS;
+            end
+            CHUNK_DONE: begin
+                transformComplete = 1'b0;
+                nextState = (sigPtr < sigEndAddr) ? TRANSFORM_COMPLETE : IN_PROGRESS;
+            end
+            TRANSFORM_COMPLETE: begin
+                transformComplete = 1'b1;
+                nextState = IDLE_TRANSFORM;
+            end
+            default: begin
 
-
+            end
         endcase
-
-
     end
 
     always_ff @(posedge clk, posedge rst) begin

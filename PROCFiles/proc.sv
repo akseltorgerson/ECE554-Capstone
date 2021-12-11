@@ -75,7 +75,15 @@ module proc(
     //The signal number that the accelerator will operate on
     logic [17:0] sigNum;
 
-    
+    //TODO: ?
+    logic readAccel;
+
+    //TODO: ?
+    logic loadInFifo;
+
+    //TODO: ?
+    logic [511:0] mcAccelIn;
+
     //The accelerator is done with it's signal
     logic done;
 
@@ -114,20 +122,21 @@ module proc(
         .loadF(loadF),
         .filter(filter),
         .read(readAccel),
-        .sigNum(sigNum),  
+        .sigNum(sigNum),
+        .loadInFifo(loadInFifo), 
+        .mcDataIn(mcAccelIn),  
         //Outputs
-        .done(done), //TODO: don't think this is actually needed if fftCalculating is right?
+        .done(done),
         .calculating(fftCalculating),
         .sigNumMC(sigNumMC),
-        .real_out(),
-        .imag_out()
+        .mcDataOut(),
     );
 
     mem_arb iMemArbiter(
         //Inputs
         .clk(clk),
         .rst(rst),
-        .halt(halt | exception), //TODO: Change this to dump as a port name?
+        .dump(halt | exception),
         .instrCacheBlkReq(cacheMissFetch),
         .instrCacheAddr(instrAddr),
         .dataCacheBlkReq(cacheMissMemory),

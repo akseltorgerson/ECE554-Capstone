@@ -1,16 +1,16 @@
 module control(
     //Inputs
-    input startF, startI, loadF, loadExternalDone, doFilter, done, clk, rst,
+    input startF, startI, loadF, loadExternalDone, doFilter, done, clk, rst, outLoadDone
     input [17:0] sigNum, 
     //Outputs
-    output reg calculating, loadExternal, loadInternal, writeFilter, isIFFT, fDone, aDone
+    output reg calculating, loadExternal, loadInternal, writeFilter, isIFFT, fDone, aDone, loadOutBuffer
 );
 
     ////////////////////
     /// intermediates //
     ////////////////////
 
-    typedef enum { IDLE, LOADI, LOADF, STARTF, STARTI, CALCULATINGF, CALCULATINGI, DONE } state_t;
+    typedef enum { IDLE, LOADI, LOADF, STARTF, STARTI, CALCULATINGF, CALCULATINGI, LOADOUT, DONE } state_t;
 
     state_t state, next_state;
 
@@ -38,6 +38,7 @@ module control(
         isIFFT = 0;
         fDone = 0;
         aDone = 0;
+        loadOutBuffer = 0;
 
         case(state)
             IDLE: begin
@@ -73,13 +74,21 @@ module control(
                 calculating = 1;
                 loadInternal = 1;
                 if (done)
-                    next_state = DONE;
+                    next_state = LOADOUT;
             end
             CALCULATINGI: begin
                 calculating = 1;
                 isIFFT = 1;
                 loadInternal = 1;
                 if (done)
+                    next_state = LOADOUT;
+            end
+
+            // load the out fifo
+            LOADOUT: begin
+                loadOutBuffer = 1'b1;
+                calculating = 1'b1;
+                if (outLoadDone)
                     next_state = DONE;
             end
 

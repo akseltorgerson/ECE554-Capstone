@@ -1,9 +1,10 @@
 module fft_accel(
-    input clk, rst, startF, startI, loadF, filter, read, lodInFifo,
+    input clk, rst, startF, startI, loadF, filter, read, loadInFifo,
     input [17:0] sigNum
-    input [511:0] mcDataIn,mcDataOut,
+    input [511:0] mcDataIn,
     output done, calculating,
     output reg [17:0] sigNumMC,
+    output [511:0] mcDataOut,
     output outFifoReady, mcDataOutValid
 );
 
@@ -23,11 +24,11 @@ module fft_accel(
                  fifo_imag_out;
 
     logic [4:0] stageCount;
-    logic [9:0] indexA, indexB, loadRamCounter;
+    logic [9:0] indexA, indexB, loadRamCounter, loadFifoCounter;
     logic [8:0] twiddleIndex, cycleCount;
 
     logic loadExternalDone;                                     // external signal for indicating loading RAM is done
-    logic doFilter, writeFilter, isIFFT, fDone, doneCalculating, writeOutFIFO, inFifoReady, accelDataOutValid, loadFromFifo, loadExternal;
+    logic doFilter, writeFilter, isIFFT, fDone, doneCalculating, writeOutFIFO, inFifoReady, accelDataOutValid, loadFromFifo, loadExternal, loadOutBuffer, outLoadDone;
 
     ////////////////////////
     ////// modules//////////
@@ -52,7 +53,9 @@ module fft_accel(
                      .isIFFT(isIFFT), 
                      .fDone(fDone), 
                      .aDone(done),
-                     .loadExternal(loadExternal));
+                     .loadExternal(loadExternal),
+                     .loadOutBuffer(loadOutBuffer),
+                     .outLoadDone(outLoadDone));
 
     butterfly_unit iBUnit(.real_A(butterfly_real_A_in), 
                           .imag_A(butterfly_imag_A_in), 
@@ -75,10 +78,10 @@ module fft_accel(
                  .rst(rst), 
                  .load(loadInternal), 
                  .externalLoad(loadFromFifo), 
-                 .indexA(loadFromFifo | read ? externalIndexA : indexA), 
+                 .indexA(loadFromFifo | read ? loadRamCounter : indexA), 
                  .indexB(indexB), 
-                 .A_real_i(loadFromFifo ? external_real_A : butterfly_real_A_out), 
-                 .A_imag_i(loadFromFifo ? external_imag_A : butterfly_imag_A_out), 
+                 .A_real_i(loadFromFifo ? fifo_real_out : butterfly_real_A_out), 
+                 .A_imag_i(loadFromFifo ? fifo_imag_out : butterfly_imag_A_out), 
                  .B_real_i(butterfly_real_B_out), 
                  .B_imag_i(butterfly_imag_B_out), 
                  .A_real_o(butterfly_real_A_in), 
@@ -89,7 +92,7 @@ module fft_accel(
     a_buf_top iABuf( .clk(clk), 
                      .rst(rst),
                      .accelWrEn(writeOutFIFO),
-                     .mcWrEn(lodInFifo),
+                     .mcWrEn(loadInFifo),
                      .mcDataIn(mcDataIn),
                      .accelDataIn({fifo_imag_in, fifo_real_in}),
                      .outEmptyReady(outFifoReady),
@@ -150,10 +153,26 @@ module fft_accel(
             loadRamCounter <= loadRamCounter + 1;
     end
 
+    // RAM Load FIFO DFF
+    always_ff @(posedge clk, posedge rst) begin
+        if (rst) begin
+            loadFifoCounter <= 10'h000;
+            outLoadDone <= 1'b0;
+        end
+        else if (outLoadDone)
+            outLoadDone <= 1'b0;
+        else if (&loadFifoCounter) begin
+            loadFifoCounter <= 10'h000;
+            outLoadDone <= 1'b1;
+        end
+        else if (read)
+            loadFifoCounter <= loadFifoCounter + 1;
+    end
     
     assign fifo_real_in = butterfly_real_A_in;
     assign fifo_imag_in = butterfly_imag_A_in;
 
     assign loadFromFifo = inFifoReady & loadExternal;
+    assign read = loadOutBuffer;
 
 endmodule
