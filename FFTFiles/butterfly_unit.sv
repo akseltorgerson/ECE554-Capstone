@@ -49,6 +49,6 @@ module butterfly_unit
 	//cla_32bit mult_I(.A(mult_B_imag_left), .B(mult_B_imag_right), .Cin(1'b0), .Sum(mult_B_imag), .Cout(), .P(), .G());
 
 	assign mult_B_real = mult_B_real_left - mult_B_real_right;
-	assign mult_B_imag = mult_B_imag_left + mult_B_imag_right
+	assign mult_B_imag = mult_B_imag_left + mult_B_imag_right;
 	
 endmodule
