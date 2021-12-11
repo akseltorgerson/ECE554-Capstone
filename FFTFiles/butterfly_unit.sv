@@ -16,10 +16,14 @@ module butterfly_unit
 	**********/
 	
 	// The "Butterfly" //
-	cla_32bit crA(.A(real_A), .B(mult_B_real), .Cin(1'b0), .Sum(real_A_out), .Cout(), .P(), .G());
-	cla_32bit ciA(.A(imag_A), .B(mult_B_imag), .Cin(1'b0), .Sum(imag_A_out), .Cout(), .P(), .G());
-	cla_32bit crB(.A(real_A), .B(~(mult_B_real)), .Cin(1'b1), .Sum(real_B_out), .Cout(), .P(), .G());
-	cla_32bit ciB(.A(imag_A), .B(~(mult_B_imag)), .Cin(1'b1), .Sum(imag_B_out), .Cout(), .P(), .G());
+	// cla_32bit crA(.A(real_A), .B(mult_B_real), .Cin(1'b0), .Sum(real_A_out), .Cout(), .P(), .G());
+	// cla_32bit ciA(.A(imag_A), .B(mult_B_imag), .Cin(1'b0), .Sum(imag_A_out), .Cout(), .P(), .G());
+	// cla_32bit crB(.A(real_A), .B(~(mult_B_real)), .Cin(1'b1), .Sum(real_B_out), .Cout(), .P(), .G());
+	// cla_32bit ciB(.A(imag_A), .B(~(mult_B_imag)), .Cin(1'b1), .Sum(imag_B_out), .Cout(), .P(), .G());
+	assign real_A_out = real_A + mult_B_real;
+	assign imag_A_out = imag_A + mult_B_imag;
+	assign real_B_out = real_A - mult_B_real;
+	assign imag_B_out = imag_A - mult_B_imag;
 	
 	////// MULTIPLICATION ///////////////////
 	// 	 B   *  twiddle  =       MULT B
@@ -41,7 +45,10 @@ module butterfly_unit
 	assign mult_B_imag_left = mult_B_imag_left_product[63:32];
 	assign mult_B_imag_right = mult_B_imag_right_product[63:32];
 
-	cla_32bit mult_R(.A(mult_B_real_left), .B(~(mult_B_real_right)), .Cin(1'b1), .Sum(mult_B_real), .Cout(), .P(), .G());
-	cla_32bit mult_I(.A(mult_B_imag_left), .B(mult_B_imag_right), .Cin(1'b0), .Sum(mult_B_imag), .Cout(), .P(), .G());
+	//cla_32bit mult_R(.A(mult_B_real_left), .B(~(mult_B_real_right)), .Cin(1'b1), .Sum(mult_B_real), .Cout(), .P(), .G());
+	//cla_32bit mult_I(.A(mult_B_imag_left), .B(mult_B_imag_right), .Cin(1'b0), .Sum(mult_B_imag), .Cout(), .P(), .G());
+
+	assign mult_B_real = mult_B_real_left - mult_B_real_right;
+	assign mult_B_imag = mult_B_imag_left + mult_B_imag_right
 	
 endmodule
