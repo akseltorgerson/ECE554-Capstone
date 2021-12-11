@@ -80,10 +80,10 @@ namespace priscas
 	class mt_invalid_reg : public mt_exception
 	{
 		public:
-			mt_invalid_reg(int num)
+			mt_invalid_reg()
 			{
 				mt_exception::except_num = 15;
-				mt_exception::message = "Rs, Rt, or Rd may need to be less than 8. RegNum: " + std::to_string(num);
+				mt_exception::message = "Rs, Rt, or Rd may need to be less than 8";
 			}
 	}
 

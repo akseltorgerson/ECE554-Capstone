@@ -238,7 +238,7 @@ namespace priscas
 		{
 			if ((op == priscas::XOR || op == priscas::ANDN || op == priscas::SEQ || op == priscas::SLT || op == priscas::SLE) 
 			&& (rs > 7 ||  rt > 7 || rd > 7) ) {
-				throw "rs, rt, rd should be >7 ";
+				throw priscas::mt_invalid_reg();
 			}
 			//first 15 bits are zero as don't cares
 			w = (w.AsUInt32() | ((rd & ((1 << 4) - 1) ) << 15 ));
@@ -251,10 +251,10 @@ namespace priscas
 		if(i_inst1(op))
 		{
 			if ((op == priscas::XORI || op == priscas::ANDNI) && (rs > 7 || rd > 7)){
-				throw priscas::mt_bad_imm();
+				throw priscas::mt_invalid_reg();
 			}
 			if ((op == priscas::ST || op == priscas::LD || op == priscas::STU) && (rs > 7)) {
-				throw priscas::mt_bad_imm();
+				throw priscas::mt_invalid_reg();
 			}
 			w = (w.AsUInt32() | (imm_shamt_jaddr & ((1 << 19) - 1)));
 			w = (w.AsUInt32() | ((rt & ((1 << 4) - 1) ) << 19 ));
@@ -264,7 +264,7 @@ namespace priscas
 		if (i_inst2(op))
 		{
 			if ((op != priscas::LBI && op != priscas::SLBI) && (rs > 7) ) {
-				throw priscas::mt_bad_imm();
+				throw priscas::mt_invalid_reg();
 			}
 			w = (w.AsUInt32() | (imm_shamt_jaddr & ((1 << 23) - 1)));
 			w = (w.AsUInt32() | ( ((rs & ((1 << 4) - 1)) << 23)) );
