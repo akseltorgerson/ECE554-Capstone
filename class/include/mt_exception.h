@@ -85,7 +85,7 @@ namespace priscas
 				mt_exception::except_num = exception_nums::GENERAL;
 				mt_exception::message = "Rs, Rt, or Rd may need to be less than 8";
 			}
-	}
+	};
 
 
 	// Register Out of Bounds Exception
