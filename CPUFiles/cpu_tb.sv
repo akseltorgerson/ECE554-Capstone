@@ -451,7 +451,7 @@ module cpu_tb();
         // Current reg state: R6 = 10000000, R5 = 1, R4 = 1002, R11= 5, R12 = A, R10 = FFFFFFFB, R1= 0, R15 = 50007, R2 = 10001002, R3 = 4326
         mcInstrIn = {{10{32'h0}}, //HALT, final instrcution
                   32'h79800001, //should get skipped by the JALR
-                  32'h38800001,  //JALR R1 + 1 (so skip 1 instrcution), R15 <- 513a5 (next instr addr) skips 1 
+                  32'h388513a6,  //JALR R1 + 1 (so skip 1 instrcution), R15 <- 513a6 (next instr addr) skips 1 
                   32'h465800c0, //addi R11 <- R12 + CA so R11 gets CA (gets here from bgez) instr addr = 513a3
                   32'h00000000, //HALT, gets skipped because of BGEZ
                   32'h79800001, //BGEZ R3, 1 (R3 greater than zero so should branch, skips 1 instruction)
@@ -487,15 +487,10 @@ module cpu_tb();
         @(posedge clk);
         @(negedge clk);
         //Test JALR
-        if(iCPU.instruction != 32'h38800001 || iCPU.iDecode.regWrite != 1'b1 || iCPU.iDecode.isJR != 1'b1 || iCPU.iDecode.isJAL != 1'b1 || iCPU.iDecode.writeRegSel != 4'b1111 || iCPU.writebackData != 32'h513a5) begin
+        if(iCPU.instruction != 32'h388513a6 || iCPU.iDecode.regWrite != 1'b1 || iCPU.iDecode.isJR != 1'b1 || iCPU.iDecode.isJAL != 1'b1 || iCPU.iDecode.writeRegSel != 4'b1111 || iCPU.iDecode.writeData != 32'h513a5) begin
             errors++;
             $display("Failed JALR Test");
         end
-        //Will have cache miss because of address
-        mcInstrIn = {{15{32'h0}}, //HALT, final instrcution
-                  32'h79800001 //should get skipped by the JALR    
-            };
-        mcInstrValid = 1'b1;
         @(posedge clk);
         @(negedge clk);
         mcInstrValid = 1'b0;
