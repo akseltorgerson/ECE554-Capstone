@@ -1,43 +1,53 @@
 module proc(
     //Inputs
-    clk, rst,
+    clk, rst, common_data_bus_in, tx_done, rd_valid
     //Outputs
-
+    op, common_data_bus_out, io_addr, cv_value
 );
+    localparam WORD_SIZE = 32;
 
     input clk, rst;
+    input [WORD_SIZE-1:0] common_data_bus_in;
+    input tx_done;
+    input rd_valid;
+
+    output [2:0] op;
+    output [WORD_SIZE-1:0] common_data_bus_out
+    output [31:0] io_addr;
+    output logic [63:0] cv_value;
+
     //-------------------------- Memory Controller signals----------------------
     //Lets the dCache know that the data from the MC is valid and ready to write
-    input mcDataValid;
+    logic mcDataValid;
 
     //Lets the iCache know that the data from the MC is valid and ready to write
-    input mcInstrValid;
+    logic mcInstrValid;
 
     //Data from the memory controller to be used on a DMA request (for memory stage i.e dCache)
-    input [511:0] mcDataIn;
+    logic [511:0] mcDataIn;
 
     //Data from the memory controller to be used on a DMA request (for fetch stage i.e iCache)
-    input [511:0] mcInstrIn;
+    logic [511:0] mcInstrIn;
 
     //From memory controller, lets memory know succefully stored into host memory
-    input evictDone;
+    logic evictDone;
 
     //For the memory controller when there is an evict in the data Cache
-    output [511:0] dCacheOut;
+    logic [511:0] dCacheOut;
 
     //For the machine controller to evict the data and WRITE to host mem
-    output dCacheEvict;
+    logic dCacheEvict;
 
     //Address used for the MC on a DMA request
-    output [31:0] mcDataAddr;
+    logic [31:0] mcDataAddr;
 
     //Control signal indicating that there was a cache miss in the fetch stage
     //Will need to do a DMA request to retrieve the data when this occurs
-    output cacheMissFetch;
+    logic cacheMissFetch;
 
     //Control signal indicating that there was a cache miss in the memory stage
     //Will need to do a DMA request to retrieve the data when this occurs
-    output cacheMissMemory;
+    logic cacheMissMemory;
 
     //The current address the PC is on
     logic [31:0] instrAddr;
@@ -69,7 +79,7 @@ module proc(
     logic halt;
 
     //---------------------- Mem Arbiter Signals---------------------------------
-
+    
     cpu iCPU( //Inputs
         .clk(clk),
         .rst(rst),
@@ -95,25 +105,24 @@ module proc(
         .instrAddr(instrAddr)
     );
 
-    accelerator iAccelerator(
-        /*
-        //Inputs
-        (startF),
-        (startI),
-        (loadF),
-        (sigNum),
-        (filter),
+    fft_accel iAccelerator(
+        .clk(clk),
+        .rst(rst),
+        .startF(startF),
+        .startI(startI),
+        .loadF(loadF),
+        .filter(filter),
+        .sigNum(), //TODO: Don't think this is actually needed in accel, just for memArb (But mem arb might have to store this signal when it stores the accel output data?) 
         //Outputs
-        (fftCalculating)
-
-        */
+        .done(), //TODO: don't think this is actually needed if fftCalculating is right?
+        .calculating(fftCalculating)
     );
 
     mem_arb iMemArbiter(
         //Inputs
         .clk(clk),
         .rst(rst),
-        .halt(halt), //TODO: should this be an output of the processor (needed for the mem controller/afu?)
+        .halt(halt | exception), //TODO: Change this to dump as a port name?
         .instrCacheBlkReq(cacheMissFetch),
         .instrCacheAddr(instrAddr),
         .dataCacheBlkReq(cacheMissMemory),
@@ -125,9 +134,9 @@ module proc(
         .accelBlk2Mem(),
         .sigNum(sigNum),
         //Mem Controller Interface inputs
-        .common_data_bus_in(),
-        .tx_done(),
-        .rd_valid(),
+        .common_data_bus_in(common_data_bus_in),
+        .tx_done(tx_done),
+        .rd_valid(rd_valid),
         //Outputs
         .instrBlk2Cache(mcInstrIn),
         .instrBlk2CacheValid(mcInstrValid),
@@ -138,10 +147,10 @@ module proc(
         .accelRdBlkDone(),
         .accelBlk2Buffer(),
         //Mem Controller interface outputs
-        .op(),
-        .common_data_bus_out(),
-        .io_addr(),
-        .cv_value();
+        .op(op),
+        .common_data_bus_out(common_data_bus_out),
+        .io_addr(io_addr),
+        .cv_value(cv_value);
     );
 
 endmodule
