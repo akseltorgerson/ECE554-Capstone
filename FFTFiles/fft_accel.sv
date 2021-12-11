@@ -1,6 +1,6 @@
 module fft_accel(
     input clk, rst, startF, startI, loadF, filter, read, loadInFifo,
-    input [17:0] sigNum
+    input [17:0] sigNum,
     input [511:0] mcDataIn,
     output done, calculating,
     output reg [17:0] sigNumMC,
@@ -34,7 +34,7 @@ module fft_accel(
     ////// modules//////////
     ////////////////////////
     
-    twiddle_ROM rom1(.clk(clk)
+    twiddle_ROM rom1(.clk(clk),
                      .twiddleIndex(twiddleIndex),
                      .twiddle_real(twiddle_real),
                      .twiddle_imag(twiddle_imag));
