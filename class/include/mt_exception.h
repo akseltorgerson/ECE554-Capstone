@@ -76,6 +76,17 @@ namespace priscas
 			std::string message;
 	};
 
+	// Imaginary Register Exception
+	class mt_invalid_reg : public mt_exception
+	{
+		public:
+			mt_invalid_reg(int num)
+			{
+				mt_exception::except_num = 15;
+				mt_exception::message = "Rs, Rt, or Rd may need to be less than 8. RegNum: " + std::to_string(num);
+			}
+	}
+
 
 	// Register Out of Bounds Exception
 	class reg_oob_exception : public mt_exception
