@@ -316,6 +316,7 @@ namespace priscas
 		if ("halt" == args[0]) {current_op = priscas::HALT;}
 		else if ("nop" == args[0]) {current_op = priscas::NOP;}
 		else if ("startf" == args[0]) {current_op = priscas::STARTF;}
+		else if ("starti" == args[0]) {current_op = priscas:STARI;}
 		else if ("loadf" == args[0]) {current_op = priscas::LOADF;}
 		else if ("addi" == args[0]) {current_op = priscas::ADDI;}
 		else if ("subi" == args[0]) {current_op = priscas::SUBI;}
