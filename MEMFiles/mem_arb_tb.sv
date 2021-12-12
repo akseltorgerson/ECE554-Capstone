@@ -47,7 +47,7 @@ module mem_arb_tb();
     logic [63:0] cv_value;
 
     // Test Host Memory 1MB
-    logic [31:0] testMemory [8192];
+    logic [31:0] testMemory [8191:0];
     integer errors;
     integer i;
 
@@ -92,6 +92,7 @@ module mem_arb_tb();
             @(posedge clk);
         end
 
+        /*
         // assign inputs at negedge
         @(negedge clk);
         accelDataRd = 1'b1;
