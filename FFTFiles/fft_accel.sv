@@ -1,21 +1,24 @@
 module fft_accel(
-    input clk, 
-          rst, 
-          startF, 
-          startI, 
-          loadF, 
-          filter, 
-          loadFifoFromRam, 
-          loadInFifo,
-    input [17:0] sigNum,
-    input [511:0] mcDataIn,
-    output done, calculating,
-    output reg [17:0] sigNumMC,
-    output [511:0] mcDataOut,
-    output outFifoReady, mcDataOutValid
+    input clk,                                                      // clk signal
+          rst,                                                      // rst
+          startF,                                                   // Indicates to start FFT
+          startI,                                                   // Indicates to start IFFT
+          loadF,                                                    // indicates to load the filter
+          filter,                                                   // indicates to filter signal
+          loadFifoFromRam,                                          // indicates to load the Out fifo from accel ram
+          loadInFifo,                                               // indicates to load the in fifo from mc
+    input [17:0] sigNum,                                            // input signal number for the FFT
+    input [511:0] mcDataIn,                                         // data sent from mc
+    output done,                                                    // indicates accel done
+    output calculating,                                             // indicates the accel is calculating
+    output reg [17:0] sigNumMC,                                     // holds the signal number used by host mem
+    output [511:0] mcDataOut,                                       // data to send to mc
+    output outFifoReady,                                            // indicates the out fifo is ready to to emptied
+    output mcDataOutValid                                           // mc data out is valid
 );
 
-    logic [31:0] butterfly_to_ram_RealA, 
+    // large data signals
+    logic [31:0] butterfly_to_ram_RealA,                            
                  butterfly_to_ram_RealB, 
                  butterfly_to_ram_ImagA, 
                  butterfly_to_ram_ImagB, 
@@ -30,23 +33,23 @@ module fft_accel(
                  fifo_real_out,
                  fifo_imag_out;
 
-    logic [4:0] stageCount;
-    logic [9:0] indexA, indexB, loadRamCounter, loadFifoCounter;
-    logic [8:0] twiddleIndex, cycleCount;
+    // medium data signals
+    logic [4:0] stageCount;                                         // Counter for the amount of stages done
+    logic [9:0] indexA, indexB, loadRamCounter, loadFifoCounter;    // act as indices for the input to butterfly A and B inputs, and the counter for ram and fifo
+    logic [8:0] twiddleIndex, cycleCount;                           // the index for the 
 
-    logic loadExternalDone;                                     // external signal for indicating loading RAM is done
-    logic doFilter, 
-          writeFilter, 
-          isIFFT, 
-          fDone, 
-          doneCalculating, 
-          inFifoReady, 
-          accelDataOutValid, 
-          loadFromFifo, 
-          loadExternal, 
-          loadOutBuffer, 
-          outLoadDone, 
-          inFifoEmpty;
+    logic loadExternalDone;                                         // indicates Ram is loaded from the In Fifo
+    logic doFilter,                                                 // indicates to start filtering
+          writeFilter,                                              // write window to filter
+          isIFFT,                                                   // indicates if is FFT
+          fDone,                                                    // indicates that the filter is done
+          doneCalculating,                                          // indicates that its done calculating
+          inFifoReady,                                              // indicates that the in fifo is ready to be emptied
+          accelDataOutValid,                                        // indicates data from accel valid
+          loadExternal,                                             // indicates to load from fifo to ram
+          loadOutBuffer,                                            // indicates to load the out buffer
+          outLoadDone,                                              // indicates loading the outbuffer is complete (All ram is gone)
+          inFifoEmpty;                                              // indicates that the in fifo is empty (ready to be loaded from mc)
 
     ////////////////////////
     ////// modules//////////
@@ -99,13 +102,13 @@ module fft_accel(
     fft_ram iRam(.clk(clk), 
                  .rst(rst), 
                  .load(loadInternal), 
-                 .externalLoad(loadFromFifo), 
-                 .indexA(loadFromFifo ? loadRamCounter : 
+                 .externalLoad(loadExternal), 
+                 .indexA(loadExternal ? loadRamCounter : 
                          loadOutBuffer ? loadFifoCounter :
                         indexA), 
                  .indexB(indexB), 
-                 .A_real_i(loadFromFifo ? fifo_real_out : butterfly_to_ram_RealA), 
-                 .A_imag_i(loadFromFifo ? fifo_imag_out : butterfly_to_ram_ImagA), 
+                 .A_real_i(loadExternal ? fifo_real_out : butterfly_to_ram_RealA), 
+                 .A_imag_i(loadExternal ? fifo_imag_out : butterfly_to_ram_ImagA), 
                  .B_real_i(butterfly_to_ram_RealB),
                  .B_imag_i(butterfly_to_ram_ImagB), 
                  .A_real_o(ram_to_butterfly_RealA), 
@@ -199,7 +202,5 @@ module fft_accel(
     //
     assign fifo_real_in = ram_to_butterfly_RealA;           // the data going into the out fifo
     assign fifo_imag_in = ram_to_butterfly_ImagA;           // the data going into the out fifo
-
-    assign loadFromFifo = loadExternal;
 
 endmodule
