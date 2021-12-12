@@ -99,8 +99,11 @@ module proc(
     // lets mc know to grab data from mem
     logic inFifoEmpty;
 
+
     //---------------------- Mem Arbiter Signals---------------------------------
     
+    logic transformComplete;
+
     cpu iCPU( //Inputs
         .clk(clk),
         .rst(rst),
@@ -174,8 +177,8 @@ module proc(
         .dataBlk2Cache(mcDataIn),
         .accelWrBlkDone(loadFifoFromRam),
         .accelRdBlkDone(loadInFifo),
-        .accelBlk2Buffer(mcAccelIn), //is this the right connection?
-        .transformComplete(done), //is this the right connection?
+        .accelBlk2Buffer(mcAccelIn),
+        .transformComplete(transformComplete),
         //Mem Controller interface outputs
         .op(op),
         .common_data_bus_out(common_data_bus_out),
