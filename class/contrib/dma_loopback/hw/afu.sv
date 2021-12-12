@@ -123,19 +123,16 @@ module afu
    wire [31:0] cpu_in;
    wire [31:0] cpu_out; // Todo, parameterize
 
-   cpu
-   mock
-   (
-       .clk(clk),
-       .rst_n(~rst),
-       .tx_done(tx_done),
-       .rd_valid(rd_valid),
-       .op(mem_op),
-       .io_address(cpu_addr),
-       .common_data_bus_in(cpu_in),
-       .common_data_bus_out(cpu_out),
-       .cv_value(cv_value)
-   );
+   proc iProcessor(.clk(clk),
+                   .rst(rst),
+                   .common_data_bus_in(),
+                   .tx_done(tx_done),
+                   .rd_valid(rd_valid),
+                   //Outputs
+                   .op(mem_op),
+                   .common_data_bus_out(),
+                   .io_addr(),
+                   .cv_value(cv_value));
 
    // Address Translation module
    addr_tr_unit
