@@ -177,7 +177,7 @@ module fft_accel(
             loadRamCounter <= 10'h000;
             loadExternalDone <= 1'b1;
         end
-        else if (loadFromFifo)
+        else if (loadExternal)
             loadRamCounter <= loadRamCounter + 1;
     end
 
