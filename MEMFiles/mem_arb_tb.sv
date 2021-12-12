@@ -76,7 +76,7 @@ module mem_arb_tb();
         errors = 0;
 
         // Load test memory with acending data
-        for (i = 0; i < 1048576; i++) begin
+        for (i = 0; i < 8192; i++) begin
             testMemory[i] = i;
         end
 

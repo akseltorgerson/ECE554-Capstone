@@ -54,7 +54,6 @@ module mem_arb(
     opcode op_out;
 
     assign op = opcode'(op_out);
-    // TODO may want to OR this with another signal
     assign cv_value[0] = dump;
 
     // state enum
@@ -112,7 +111,6 @@ module mem_arb(
     assign dataAddrAligned = dataAddr & 32'hfffffff0;
     assign instrAddrAligned = instrAddr & 32'hfffffff0;
 
-    // TODO I think this is right now
     assign sigBaseAddr = {3'b0, signumTable[sigNum][0], 11'b0} + 32'h1000_0000;
     assign sigEndAddr = {3'b0, signumTable[sigNum][1], 11'b0} + 32'h1000_0000;
 
@@ -121,14 +119,14 @@ module mem_arb(
         if (rst) begin
             sigOffset <= 8'b0;
             accelTransferDone <= 1'b0;
-            signumTable[0][0] = 36'b0;
-            signumTable[0][1] = 36'b0; 
+            signumTable[0][0] <= 36'b0;
+            signumTable[0][1] <= 36'b0; 
         end else begin
             sigOffset <= sigOffset + 1'b1;
             accelTransferDone <= 1'b0;
         end
-        if (sigOffset & 8'b10000000) begin
-            accelTransferDone = 1'b1;
+        if (sigOffset == 128) begin
+            accelTransferDone <= 1'b1;
             sigOffset <= 1'b0;
         end
     end
@@ -235,7 +233,7 @@ module mem_arb(
             end
             ACCEL_RD_DONE: begin
                 accelBlk2Buffer = common_data_bus_in;
-                accelRdBlkDone = rd_valid;
+                accelRdBlkDone = 1'b1;
                 nextState = rd_valid ? (accelTransferDone ? IDLE : ACCEL_RD) : ACCEL_RD_DONE;
             end
             // EMPTYING BUFFER TO HOST
