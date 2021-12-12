@@ -85,7 +85,7 @@ module fft_noControl_tb();
     task mult_complex;
         input [31:0] real_A, imag_A, real_B, imag_B, twiddle_real, twiddle_imag;
         output [31:0] real_A_out, real_B_out, imag_A_out, imag_B_out;
-        logic [63:0] real_left_prod, real_right_prod, imag_left_prod, imag_right_prod;
+        logic [63:0] real_left_prod, real_right_prod, imag_left_prod, imag_right_prod, inter_real, inter_imag;
         logic [31:0] mult_B_real, mult_B_imag;
 
         begin
@@ -94,8 +94,11 @@ module fft_noControl_tb();
             imag_left_prod = real_B * twiddle_imag;
             imag_right_prod = imag_B * twiddle_real;
 
-            mult_B_real = (real_left_prod - real_right_prod)[63:32];
-            mult_B_imag = (imag_left_prod + imag_right_prod)[63:32];
+            inter_real = (real_left_prod - real_right_prod);
+            inter_imag = (imag_left_prod + imag_right_prod);
+
+            mult_B_real = inter_real[63:32];
+            mult_B_imag = inter_imag[63:32];
 
             real_A_out = real_A + mult_B_real;
 	        imag_A_out = imag_A + mult_B_imag;
