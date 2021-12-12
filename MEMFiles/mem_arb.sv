@@ -89,10 +89,11 @@ module mem_arb(
     reg [35:0] signumTable [8192][2];
     logic [31:0] sigBaseAddr;
     logic [31:0] sigEndAddr;
-    logic [7:0] sigOffset;
+    reg [6:0] sigOffset;
     reg accelTransferDone;
     logic [17:0] sigBaseBlkAddr;
     logic [17:0] sigEndBlkAddr;
+    logic en;
     //logic [31:0] sigPtr;
 
     // Address alignment
@@ -114,22 +115,21 @@ module mem_arb(
     assign sigBaseAddr = {3'b0, signumTable[sigNum][0], 11'b0} + 32'h1000_0000;
     assign sigEndAddr = {3'b0, signumTable[sigNum][1], 11'b0} + 32'h1000_0000;
 
-    // TODO may need to be one more bit
-    always_ff @(posedge accelWrBlkDone, posedge accelRdBlkDone, posedge rst) begin
+    always_ff @(posedge clk, posedge rst) begin
         if (rst) begin
             sigOffset <= 8'b0;
-            accelTransferDone <= 1'b0;
+            // TODO These wont be here
             signumTable[0][0] <= 36'b0;
             signumTable[0][1] <= 36'b0; 
         end else begin
-            sigOffset <= sigOffset + 1'b1;
-            accelTransferDone <= 1'b0;
-        end
-        if (sigOffset == 128) begin
-            accelTransferDone <= 1'b1;
-            sigOffset <= 1'b0;
+            if (en) begin
+                sigOffset <= sigOffset + 1'b1;
+            end
         end
     end
+
+    assign accelTransferDone = rst ? 1'b0 : &sigOffset;
+    assign transformComplete = accelTransferDone;
 
     /************************************************************************
     *                           PRIORITY ENCODER                            *
@@ -159,6 +159,7 @@ module mem_arb(
         accelBlk2Buffer = 512'b0;
         accelRdBlkDone = 1'b0;
         accelWrBlkDone = 1'b0;
+        en = 1'b0;
 
         case(currState)
             INIT: begin
@@ -234,6 +235,7 @@ module mem_arb(
             ACCEL_RD_DONE: begin
                 accelBlk2Buffer = common_data_bus_in;
                 accelRdBlkDone = 1'b1;
+                en = 1'b1;
                 nextState = rd_valid ? (accelTransferDone ? IDLE : ACCEL_RD) : ACCEL_RD_DONE;
             end
             // EMPTYING BUFFER TO HOST
@@ -246,6 +248,7 @@ module mem_arb(
             end
             ACCEL_WR_DONE: begin
                 accelWrBlkDone = 1'b1;
+                en = 1'b1;
                 nextState = accelTransferDone ? IDLE : ACCEL_WR;
             end
             default: begin
