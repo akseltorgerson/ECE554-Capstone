@@ -189,10 +189,15 @@ module fft_noControl_tb();
                          .imag_B(fake_mem[2*k + 1025]),    // imag B in
                          .twiddle_real(twiddle_mem[2*k]),        // twiddle factors
                          .twiddle_imag(twiddle_mem[2*k + 1]),
-                         .real_A_out(fake_mem[2*k]),           // outputs
-                         .imag_A_out(fake_mem[2*k + 1]),
-                         .real_B_out(fake_mem[2*k + 1024]),
-                         .imag_B_out(fake_mem[2*k + 1025]));    
+                         .real_A_out(test_realA),           // outputs
+                         .imag_A_out(test_imagA),
+                         .real_B_out(test_realB),
+                         .imag_B_out(test_imagB));
+
+            fake_mem[2*k] = test_realA;
+            fake_mem[2*k + 1] = test_imagA;
+            fake_mem[2*k + 1024] = test_realB;
+            fake_mem[2*k + 1025] = test_imagB;    
         end
 
         // set scan high to test that the values that are stored in mem and fake mem are correct (equal)
