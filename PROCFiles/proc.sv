@@ -170,8 +170,8 @@ module proc(
         .dataBlk2Cache(mcDataIn),
         .accelWrBlkDone(),
         .accelRdBlkDone(),
-        .accelBlk2Buffer(),
-        .transformComplete(),
+        .accelBlk2Buffer(mcAccelIn), //is this the right connection?
+        .transformComplete(done), //is this the right connection?
         //Mem Controller interface outputs
         .op(op),
         .common_data_bus_out(common_data_bus_out),
