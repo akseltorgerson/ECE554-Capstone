@@ -30,7 +30,7 @@ module fft_noControl_tb();
                 indexB, 
                 externalIndexA, 
                 cycleCount;
-    logic [8:0] twiddleIndex;
+    logic [8:0] twiddleIndex, fake_twiddleIndex;
 
     // rom
     reg [31:0] twiddle_mem [0:1023];
@@ -120,6 +120,7 @@ module fft_noControl_tb();
         externalIndexA = 0;
         external_real_A = 32'h00000000;
         external_imag_A = 32'h00000000;
+        fake_twiddleIndex = 9'h000;
         stageCount = 0;
         cycleCount = 0;
         $readmemh("twiddleHex.mem", twiddle_mem);
@@ -183,12 +184,18 @@ module fft_noControl_tb();
         // set load to 0 and start setting the expected output values
         load = 0;
         for (k = 0; k < 512; k++) begin
+            fake_twiddleIndex = 2 * k / 1024;
+            
+            fake_twiddleIndex = {fake_twiddleIndex[0], fake_twiddleIndex[1], fake_twiddleIndex[2],
+                                 fake_twiddleIndex[3], fake_twiddleIndex[4], fake_twiddleIndex[5],
+                                 fake_twiddleIndex[6], fake_twiddleIndex[7], fake_twiddleIndex[8]};
+
             mult_complex(.real_A(fake_mem[2*k]),           // real A in
                          .imag_A(fake_mem[2*k + 1]),       // imag A in
                          .real_B(fake_mem[2*k + 1024]),    // real B in
                          .imag_B(fake_mem[2*k + 1025]),    // imag B in
-                         .twiddle_real(twiddle_mem[2*k]),        // twiddle factors
-                         .twiddle_imag(twiddle_mem[2*k + 1]),
+                         .twiddle_real(twiddle_mem[2* fake_twiddleIndex]),        // twiddle factors
+                         .twiddle_imag(twiddle_mem[2*fake_twiddleIndex + 1]),
                          .real_A_out(test_realA),           // outputs
                          .imag_A_out(test_imagA),
                          .real_B_out(test_realB),
