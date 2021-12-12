@@ -76,7 +76,7 @@ module proc(
     logic [17:0] sigNum;
 
     //TODO: ?
-    logic readAccel;
+    logic loadFifoFromRam;
 
     //TODO: ?
     logic loadInFifo;
@@ -95,6 +95,9 @@ module proc(
 
     //The accelerator is done with it's signal
     logic done;
+
+    // lets mc know to grab data from mem
+    logic inFifoEmpty;
 
     //---------------------- Mem Arbiter Signals---------------------------------
     
@@ -130,7 +133,7 @@ module proc(
         .startI(startI),
         .loadF(loadF),
         .filter(filter),
-        .read(readAccel),
+        .loadFifoFromRam(loadFifoFromRam),
         .sigNum(sigNum),
         .loadInFifo(loadInFifo), 
         .mcDataIn(mcAccelIn),  
@@ -140,7 +143,8 @@ module proc(
         .sigNumMC(sigNumMC),
         .mcDataOut(mcAccelOut),
         .outFifoReady(outFifoReady),
-        .mcDataOutValid(mcAccelDataOutValid)
+        .mcDataOutValid(mcAccelDataOutValid),
+        .inFifoEmpty(inFifoEmpty)
     );
 
     mem_arb iMemArbiter(
@@ -154,7 +158,7 @@ module proc(
         .dataAddr(mcDataAddr),
         .dataCacheEvictReq(dCacheEvict),
         .dataBlk2Mem(dCacheOut),
-        .accelDataRd(startF | startI), //Fine with 1 8kb chunk
+        .accelDataRd(inFifoEmpty), //Fine with 1 8kb chunk
         .accelDataWr(outFifoReady),
         .accelBlk2Mem(mcAccelOut),
         .sigNum(sigNumMC),
@@ -168,8 +172,8 @@ module proc(
         .dataEvictAck(evictDone),
         .dataBlk2CacheValid(mcDataValid),
         .dataBlk2Cache(mcDataIn),
-        .accelWrBlkDone(),
-        .accelRdBlkDone(),
+        .accelWrBlkDone(loadFifoFromRam),
+        .accelRdBlkDone(loadInFifo),
         .accelBlk2Buffer(mcAccelIn), //is this the right connection?
         .transformComplete(done), //is this the right connection?
         //Mem Controller interface outputs

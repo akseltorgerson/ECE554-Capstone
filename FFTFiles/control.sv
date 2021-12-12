@@ -1,6 +1,6 @@
 module control(
     //Inputs
-    input startF, startI, loadF, loadExternalDone, doFilter, done, clk, rst, outLoadDone,
+    input startF, startI, loadF, loadExternalDone, doFilter, done, clk, rst, outLoadDone, startLoadingOutFifo, outFifoReady, startLoadingRam, inFifoEmpty,
     input [17:0] sigNum, 
     //Outputs
     output reg calculating, loadExternal, loadInternal, writeFilter, isIFFT, fDone, aDone, loadOutBuffer
@@ -10,7 +10,7 @@ module control(
     /// intermediates //
     ////////////////////
 
-    typedef enum { IDLE, LOADI, LOADF, STARTF, STARTI, CALCULATINGF, CALCULATINGI, LOADOUT, DONE } state_t;
+    typedef enum { IDLE, IDLE_LOADI, IDLE_LOADF LOADI, LOADF, STARTF, STARTI, CALCULATINGF, CALCULATINGI, START_LOADOUT IDLE_LOADOUT, LOADOUT, DONE } state_t;
 
     state_t state, next_state;
 
@@ -53,44 +53,69 @@ module control(
                 end
 
             end
-            
+
             // Await for RAM to be loaded from MC
-            LOADI: begin
-                loadExternal = 1;
+            // LOADI
+            IDLE_LOADI: begin
                 calculating = 1'b1;
-                if (loadExternalDone) begin
+                if (loadExternalDone)
                     next_state = CALCULATINGI;
-                end
+                else if(startLoadingRam)
+                    next_state = LOADI;
             end
-            LOADF: begin
-                loadExternal = 1;
+
+            LOADI: begin
+                loadExternal = 1'b1;
                 calculating = 1'b1;
-                if(loadExternalDone) begin
+                (inFifoEmpty)
+                    next_state = IDLE_LOADI;
+            end
+
+            // LOADF
+            IDLE_LOADF: begin
+                calculating = 1'b1;
+                if (loadExternalDone)
                     next_state = CALCULATINGF;
-                end
+                else if(startLoadingRam)
+                    next_state = LOADF;
+            end
+
+            LOADF: begin
+                loadExternal = 1'b1;
+                calculating = 1'b1;
+                if (inFifoEmpty)
+                    next_state = IDLE_LOADF;
             end
 
             // calculations
             CALCULATINGF: begin
-                calculating = 1;
-                loadInternal = 1;
+                calculating = 1'b1;
+                loadInternal = 1'b1;
                 if (done)
                     next_state = LOADOUT;
             end
             CALCULATINGI: begin
-                calculating = 1;
-                isIFFT = 1;
-                loadInternal = 1;
+                calculating = 1'b1;
+                isIFFT = 1'b1;
+                loadInternal = 1'b1;
                 if (done)
                     next_state = LOADOUT;
             end
 
             // load the out fifo
-            LOADOUT: begin
-                loadOutBuffer = 1'b1;
+            IDLE_LOADOUT: begin
                 calculating = 1'b1;
                 if (outLoadDone)
                     next_state = DONE;
+                if (startLoadingOutFifo)
+                    next_state = LOADOUT;
+            end
+
+            LOADOUT: begin
+                loadOutBuffer = 1'b1;
+                calculating = 1'b1;
+                if (outFifoReady)
+                    next_state = IDLE_LOADOUT;
             end
 
             // DONE STATE

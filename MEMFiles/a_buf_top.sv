@@ -10,7 +10,8 @@ module a_buf_top(
     output reg [63:0] accelDataOut,
     output reg [511:0] mcDataOut,
     output reg mcDataOutValid,
-    output reg accelDataOutValid
+    output reg accelDataOutValid,
+    output reg inFifoEmpty
 
 );
 
@@ -22,7 +23,8 @@ module a_buf_top(
                     .dataIn(mcDataIn),
                     .emptyReady(inEmptyReady),
                     .dataOut(accelDataOut),
-                    .dataOutValid(accelDataOutValid));
+                    .dataOutValid(accelDataOutValid),
+                    .emptyFifo(inFifoEmpty));
 
     /********************************************************
     *          Buffers data from accelerator to host        *

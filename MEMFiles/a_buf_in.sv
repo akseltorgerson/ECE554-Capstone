@@ -6,7 +6,8 @@ module a_buf_in (
     input [511:0] dataIn,       // data going into the buffer
     output reg emptyReady,      // signals to accel that the buffer can start being emptied
     output reg [63:0] dataOut,  // data going to accelerator
-    output reg dataOutValid    // signal to let the accelerator know the data on the bus is valid
+    output reg dataOutValid,    // signal to let the accelerator know the data on the bus is valid
+    output reg fifoEmpty        // signal to let accelerator and mc know that is empty
 
 );
 
@@ -83,8 +84,10 @@ module a_buf_in (
         end
         if (&outIndex) begin
             emptyReady <= 1'b0;
+            fifoEmpty <= 1'b1;
         end else begin
             emptyReady <= 1'b1;
+            fifoEmpty <= 1'b0;
         end
     end
 
