@@ -128,8 +128,13 @@ module mem_arb(
         end
     end
 
-    assign accelTransferDone = rst ? 1'b0 : &sigOffset;
-    assign transformComplete = accelTransferDone;
+    always_ff @(posedge clk, posedge rst) begin
+        if (rst) begin
+            accelTransferDone <= 1'b0;
+        end if (en) begin
+            accelTransferDone <= &sigOffset;
+        end
+    end
 
     /************************************************************************
     *                           PRIORITY ENCODER                            *
