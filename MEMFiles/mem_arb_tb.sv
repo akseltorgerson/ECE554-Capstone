@@ -49,7 +49,7 @@ module mem_arb_tb();
     // Test Host Memory 1MB
     logic [31:0] testMemory [8191:0];
     integer errors;
-    integer i;
+    integer i, j;
 
     mem_arb iMemArb(.*);
 
@@ -92,7 +92,7 @@ module mem_arb_tb();
             @(posedge clk);
         end
 
-        /*
+        
         // assign inputs at negedge
         @(negedge clk);
         accelDataRd = 1'b1;
@@ -102,6 +102,7 @@ module mem_arb_tb();
         @(negedge clk);
 
         for (i = 0; i < 128; i++) begin
+            /*
             common_data_bus_in = {  testMemory[15+(i*16)],
                                     testMemory[14+(i*16)],
                                     testMemory[13+(i*16)],
@@ -118,6 +119,23 @@ module mem_arb_tb();
                                     testMemory[2+(i*16)],
                                     testMemory[1+(i*16)],
                                     testMemory[0+(i*16)]};
+                                    */
+            common_data_bus_in = {32'hffffffff,
+                                    32'hfffffffe,
+                                    32'hfffffffd,
+                                    32'hfffffffc,
+                                    32'hfffffffb,
+                                    32'hfffffffa,
+                                    32'hfffffff9,
+                                    32'hfffffff8,
+                                    32'hfffffff7,
+                                    32'hfffffff6,
+                                    32'hfffffff5,
+                                    32'hfffffff4,
+                                    32'hfffffff3,
+                                    32'hfffffff2,
+                                    32'hfffffff1,
+                                    32'hfffffff0};
 
             tx_done = 1'b1;
             @(posedge clk);
