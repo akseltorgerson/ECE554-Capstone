@@ -49,7 +49,7 @@ module fft_noControl_tb();
     assign cycleLimit = 512 / bucketsMAX;
     assign dftSize = 1024 / bucketsMAX;
     assign startingPos = bucket * dftSize;
-    assign indexB_fake = indexA_fake + {512 >> stageCount}[9:0];
+    assign indexB_fake = indexA_fake + (512 >> stageCount);
 
     ////////////////////////
     ////// modules /////////
@@ -274,7 +274,7 @@ module fft_noControl_tb();
         k = 0; 
         for (bucket = 0; bucket < bucketsMAX && k < 512; bucket++) begin
             for(bucketIterationCnt = 0; bucketIterationCnt < cycleLimit; bucketIterationCnt++) begin
-                fake_twiddleIndex = k * (2 ** (stageCount + 1)) / 1024;
+                fake_twiddleIndex = $floor(k * (2 ** (stageCount + 1)) / 1024);
                 
                 fake_twiddleIndex = {fake_twiddleIndex[0], fake_twiddleIndex[1], fake_twiddleIndex[2],
                                     fake_twiddleIndex[3], fake_twiddleIndex[4], fake_twiddleIndex[5],
@@ -285,10 +285,10 @@ module fft_noControl_tb();
                 mult_complex(.real_A(fake_mem[2*indexA_fake]),          // real A in
                             .imag_A(fake_mem[2*indexA_fake + 1]),       // imag A in
                             .real_B(fake_mem[2*indexB_fake]),           // real B in
-                            .imag_B(fake_mem[2*indexB_fake]),           // imag B in
+                            .imag_B(fake_mem[2*indexB_fake + 1]),           // imag B in
                             .twiddle_real(twiddle_mem[2* fake_twiddleIndex]),        // twiddle factors
                             .twiddle_imag(twiddle_mem[2*fake_twiddleIndex + 1]),
-                            .real_A_out(test_realA),           // outputs
+                            .real_A_out(test_realA),                                 // outputs
                             .imag_A_out(test_imagA),
                             .real_B_out(test_realB),
                             .imag_B_out(test_imagB));
