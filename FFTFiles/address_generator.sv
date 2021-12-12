@@ -1,12 +1,13 @@
 module  address_generator
-    #(
+    /*#(
         NUM_FACTORS=512,
         FFT_SIZE=1024
-    )
+    )*/
     (
         input [4:0] stageCount,
         input [8:0] cycleCount,
-        output [9:0] indexA, indexB,
+        output [9:0] indexA, 
+        output [9:0] indexB,
         output [8:0] twiddleIndex
     );
 
@@ -14,7 +15,7 @@ module  address_generator
     ///// localparams //////
     ////////////////////////
 
-    localparam [4:0] numFactorBits = $clog2(FFT_SIZE);
+    //localparam numFactorBits = $clog2(FFT_SIZE);
 
     /////////////////////////
     ///// intermediates /////
@@ -47,11 +48,11 @@ module  address_generator
                            twiddle_int[8]};
 
     // which DFT the current cycle falls into
-    assign indexB = indexA_reg + (NUM_FACTORS >> stageCount);
+    assign indexB = indexA_reg + (512 >> stageCount);
     assign indexA = indexA_reg;
 
     //////// Hardcoded address algorithm ////////
-    always @(stageCount or cycleCount) begin
+    always_comb begin
         indexA_reg = 10'h000;
 
         case(stageCount)
