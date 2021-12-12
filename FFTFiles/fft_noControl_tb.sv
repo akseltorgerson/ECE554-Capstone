@@ -61,6 +61,8 @@ module fft_noControl_tb();
 
         rst = 0;
 
+        
+
         /////////////////
         // load the ram
         /////////////////

@@ -1,7 +1,7 @@
 module fft_register(
     input clk, rst, en,
     input [31:0] d,
-    output [31:0] q
+    output reg [31:0] q
 );
     genvar i;
 
