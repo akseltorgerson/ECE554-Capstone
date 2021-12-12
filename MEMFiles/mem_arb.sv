@@ -2,9 +2,7 @@ module mem_arb(
 
     input clk,
     input rst,
-
-    // todo might want a signal that ORS halt, write back, etc
-    input halt,
+    input dump,
 
     // Instr Cache Interface
     input instrCacheBlkReq,             // cacheMiss    
