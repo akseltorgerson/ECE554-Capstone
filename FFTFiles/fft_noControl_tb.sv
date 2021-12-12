@@ -84,7 +84,7 @@ module fft_noControl_tb();
     /////////////////////////////////////////////////
     task mult_complex;
         input [31:0] real_A, imag_A, real_B, imag_B, twiddle_real, twiddle_imag;
-        output [31:0] real_A_out, real_B_out, imag_A_out, imag_B_out;
+        output [31:0] real_A_out, imag_A_out, real_B_out, imag_B_out;
         logic [63:0] real_left_prod, real_right_prod, imag_left_prod, imag_right_prod, inter_real, inter_imag;
         logic [31:0] mult_B_real, mult_B_imag;
 
@@ -183,17 +183,16 @@ module fft_noControl_tb();
         // set load to 0 and start setting the expected output values
         load = 0;
         for (k = 0; k < 512; k++) begin
-            
-            mult_complex(fake_mem[2*k],           // real A in
-                         fake_mem[2*k + 1],       // imag A in
-                         fake_mem[2*k + 1024],    // real B in
-                         fake_mem[2*k + 1025],    // imag B in
-                         twiddle_mem[2*k],        // twiddle factors
-                         twiddle_mem[2*k + 1],
-                         fake_mem[2*k],           // outputs
-                         fake_mem[2*k + 1],
-                         fake_mem[2*k + 1024],
-                         fake_mem[2*k + 1025]);    
+            mult_complex(.real_A(fake_mem[2*k]),           // real A in
+                         .imag_A(fake_mem[2*k + 1]),       // imag A in
+                         .real_B(fake_mem[2*k + 1024]),    // real B in
+                         .imag_B(fake_mem[2*k + 1025]),    // imag B in
+                         .twiddle_real(twiddle_mem[2*k]),        // twiddle factors
+                         .twiddle_imag(twiddle_mem[2*k + 1]),
+                         .real_A_out(fake_mem[2*k]),           // outputs
+                         .imag_A_out(fake_mem[2*k + 1]),
+                         .real_B_out(fake_mem[2*k + 1024]),
+                         .imag_B_out(fake_mem[2*k + 1025]));    
         end
 
         // set scan high to test that the values that are stored in mem and fake mem are correct (equal)
@@ -202,9 +201,9 @@ module fft_noControl_tb();
         for (k = 0; k < 1024; k++) begin
             externalIndexA = k;
 
-            if (butterfly_real_A_in !== fake_mem[2*k] || butterfly_imag_A_in !== fake_mem[2*i + 1]) begin
+            if (butterfly_real_A_in !== fake_mem[2*k] || butterfly_imag_A_in !== fake_mem[2*k + 1]) begin
                 $display("RAM OUT REAL: %h, RAM OUT IMAG: %h", butterfly_real_A_in, butterfly_imag_A_in);
-                $display("EXPECTED RAM OUT REAL: %h, EXPECTED RAM OUT IMAG: %h", fake_mem[2*i], fake_mem[2*i + 1]);
+                $display("EXPECTED RAM OUT REAL: %h, EXPECTED RAM OUT IMAG: %h", fake_mem[2*k], fake_mem[2*k + 1]);
                 $stop();
             end
         end
