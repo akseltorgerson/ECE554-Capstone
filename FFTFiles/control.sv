@@ -10,7 +10,7 @@ module control(
     /// intermediates //
     ////////////////////
 
-    typedef enum { IDLE, IDLE_LOADI, IDLE_LOADF LOADI, LOADF, STARTF, STARTI, CALCULATINGF, CALCULATINGI, START_LOADOUT IDLE_LOADOUT, LOADOUT, DONE } state_t;
+    typedef enum { IDLE, IDLE_LOADI, IDLE_LOADF, LOADI, LOADF, STARTF, STARTI, CALCULATINGF, CALCULATINGI, START_LOADOUT, IDLE_LOADOUT, LOADOUT, DONE } state_t;
 
     state_t state, next_state;
 
@@ -67,8 +67,9 @@ module control(
             LOADI: begin
                 loadExternal = 1'b1;
                 calculating = 1'b1;
-                (inFifoEmpty)
+                if (inFifoEmpty) begin
                     next_state = IDLE_LOADI;
+                end
             end
 
             // LOADF

@@ -107,7 +107,7 @@ module fft_accel(
                  .A_real_i(loadFromFifo ? fifo_real_out : butterfly_to_ram_RealA), 
                  .A_imag_i(loadFromFifo ? fifo_imag_out : butterfly_to_ram_ImagA), 
                  .B_real_i(butterfly_to_ram_RealB),
-                 .B_imag_i(butterfly_to_ram_ImagB) 
+                 .B_imag_i(butterfly_to_ram_ImagB), 
                  .A_real_o(ram_to_butterfly_RealA), 
                  .A_imag_o(ram_to_butterfly_ImagA), 
                  .B_real_o(ram_to_butterfly_RealB), 
