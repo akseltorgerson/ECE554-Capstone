@@ -68,7 +68,7 @@ module mem_arb_tb();
         accelDataRd = '0;
         accelDataWr = '0;
         accelBlk2Mem = '0;
-        sigNum = '0;
+        sigNum = 18'b0;
         common_data_bus_in = '0;
         tx_done = '0;
         rd_valid = '0;
@@ -101,7 +101,7 @@ module mem_arb_tb();
         @(posedge clk);
         @(negedge clk);
 
-        for (i = 0; i < 128; i++) begin
+        repeat (128) begin
             /*
             common_data_bus_in = {  testMemory[15+(i*16)],
                                     testMemory[14+(i*16)],
