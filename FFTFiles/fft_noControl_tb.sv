@@ -29,7 +29,9 @@ module fft_noControl_tb();
     logic [9:0] indexA, 
                 indexB, 
                 externalIndexA, 
-                cycleCount;
+                cycleCount,
+                indexA_fake,
+                indexB_fake;
     logic [8:0] twiddleIndex, fake_twiddleIndex;
 
     // rom
@@ -38,7 +40,16 @@ module fft_noControl_tb();
 
     int i, j, fd, k, meth;
 
+    //////////////////////////
+    // ADDRESS GEN BITS
+    //////////////////////////
+    integer bucket, bucketsMAX, cycleLimit, startingPos, bucketIterationCnt, dftSize;    // bucket refers to which DFT the cycle iteration refers to
 
+    assign bucketsMAX = 2 ** stageCount;
+    assign cycleLimit = 512 / bucketsMAX;
+    assign dftSize = 1024 / bucketsMAX;
+    assign startingPos = bucket * dftSize;
+    assign indexB_fake = indexA_fake + {512 >> stageCount}[9:0];
 
     ////////////////////////
     ////// modules /////////
@@ -123,6 +134,7 @@ module fft_noControl_tb();
         fake_twiddleIndex = 9'h000;
         stageCount = 0;
         cycleCount = 0;
+        indexA_fake = 10'h000;
         $readmemh("twiddleHex.mem", twiddle_mem);
         $readmemh("testSignalHex.mem", fake_mem);
 
@@ -171,7 +183,7 @@ module fft_noControl_tb();
         // First: Run through the first stage. then, update the fake mem to be the expected values and check
         //
         // run through first cycle
-        //////////////// STAGE 0 ////////////////////////////////////////////////////////////////////////////
+        //////////////// STAGE 1 ////////////////////////////////////////////////////////////////////////////
         for (cycleCount = 0; cycleCount < 512; cycleCount++) begin
 
             twiddle_real = twiddle_mem[2*twiddleIndex];
@@ -228,6 +240,95 @@ module fft_noControl_tb();
         end
 
         // go through all stages
+
+        scan = 0;
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        //////////////////////////////// END STAGE 1 //////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+
+
+        // ///////////////////////////////////////////////////
+        // go through stage 2 and check outputs of the butterfly unit
+        // First: Run through the first stage. then, update the fake mem to be the expected values and check
+        //
+        // run through first cycle
+        //////////////// STAGE 2 ////////////////////////////////////////////////////////////////////////////
+
+        stageCount = 1;
+        load = 1;
+
+        for (cycleCount = 0; cycleCount < 512; cycleCount++) begin
+
+            twiddle_real = twiddle_mem[2*twiddleIndex];
+            twiddle_imag = twiddle_mem[2*twiddleIndex + 1];
+
+            @(posedge clk);
+            @(negedge clk);
+        end
+        
+        // set load to 0 and start setting the expected output values
+        load = 0;
+
+        // should go through each "Bucket" and compute the correct indices. 
+        k = 0; 
+        for (bucket = 0; bucket < bucketsMAX && k < 512; bucket++) begin
+            for(bucketIterationCnt = 0; bucketIterationCnt < cycleLimit; bucketIterationCnt++) begin
+                fake_twiddleIndex = k * (2 ** (stageCount + 1)) / 1024;
+                
+                fake_twiddleIndex = {fake_twiddleIndex[0], fake_twiddleIndex[1], fake_twiddleIndex[2],
+                                    fake_twiddleIndex[3], fake_twiddleIndex[4], fake_twiddleIndex[5],
+                                    fake_twiddleIndex[6], fake_twiddleIndex[7], fake_twiddleIndex[8]};
+
+                indexA_fake = startingPos + bucketIterationCnt;
+
+                mult_complex(.real_A(fake_mem[2*indexA_fake]),          // real A in
+                            .imag_A(fake_mem[2*indexA_fake + 1]),       // imag A in
+                            .real_B(fake_mem[2*indexB_fake]),           // real B in
+                            .imag_B(fake_mem[2*indexB_fake]),           // imag B in
+                            .twiddle_real(twiddle_mem[2* fake_twiddleIndex]),        // twiddle factors
+                            .twiddle_imag(twiddle_mem[2*fake_twiddleIndex + 1]),
+                            .real_A_out(test_realA),           // outputs
+                            .imag_A_out(test_imagA),
+                            .real_B_out(test_realB),
+                            .imag_B_out(test_imagB));
+
+                @(posedge clk);
+                @(negedge clk);
+
+                fake_mem[2*indexA_fake] = test_realA;
+                fake_mem[2*indexA_fake + 1] = test_imagA;
+                fake_mem[2*indexB_fake] = test_realB;
+                fake_mem[2*indexB_fake + 1] = test_imagB;
+
+                k++;
+            end   
+        end
+
+        // set scan high to test that the values that are stored in mem and fake mem are correct (equal)
+        scan = 1;
+
+        for (k = 0; k < 1024; k++) begin
+            externalIndexA = k;
+
+            @(posedge clk);
+            @(negedge clk);
+
+            if (butterfly_real_A_in !== fake_mem[2*k] || butterfly_imag_A_in !== fake_mem[2*k + 1]) begin
+                $display("RAM OUT REAL: %h, RAM OUT IMAG: %h", butterfly_real_A_in, butterfly_imag_A_in);
+                $display("EXPECTED RAM OUT REAL: %h, EXPECTED RAM OUT IMAG: %h", fake_mem[2*k], fake_mem[2*k + 1]);
+                $display("STAGE: %d INDEX: %d", stageCount, 2*k);
+                $stop();
+            end
+        end
+
+        // go through all stages
+
+        scan = 0;
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        //////////////////////////////// END STAGE 2 //////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////////////////////////////
 
         for (stageCount = 1; stageCount < 10; stageCount++) begin
             for (cycleCount = 0; cycleCount < 512; cycleCount++) begin
