@@ -55,7 +55,7 @@ module mem_arb(
 
     assign op = opcode'(op_out);
     // TODO may want to OR this with another signal
-    assign cv_value[0] = halt;
+    assign cv_value[0] = dump;
 
     // state enum
     typedef enum reg[3:0] {
@@ -94,7 +94,7 @@ module mem_arb(
     reg accelTransferDone;
     logic [17:0] sigBaseBlkAddr;
     logic [17:0] sigEndBlkAddr;
-    logic [31:0] sigPtr;
+    //logic [31:0] sigPtr;
 
     // Address alignment
     logic dataAddrAligned;
@@ -121,13 +121,15 @@ module mem_arb(
         if (rst) begin
             sigOffset <= 8'b0;
             accelTransferDone <= 1'b0;
+            signumTable[0][0] = 36'b0;
+            signumTable[0][1] = 36'b0; 
         end else begin
             sigOffset <= sigOffset + 1'b1;
             accelTransferDone <= 1'b0;
         end
-        if (&sigOffset) begin
+        if (sigOffset & 8'b10000000) begin
             accelTransferDone = 1'b1;
-            sigOffset <= sigOffset + 1'b1;
+            sigOffset <= 1'b0;
         end
     end
 
@@ -163,7 +165,7 @@ module mem_arb(
         case(currState)
             INIT: begin
                 // TODO Need to load the accel sigNums from host mem
-                // for now lets just assume its 
+                // for now lets just assume its
                 nextState = IDLE;
             end
             IDLE: begin
@@ -226,19 +228,19 @@ module mem_arb(
             ************************************************************************/
             // FILLING BUFFER FROM HOST
             ACCEL_RD: begin
-                io_addr = sigPtr + (sigOffset << 9);
+                io_addr = sigBaseAddr + (sigOffset << 11);
                 op_out = READ;
-                accelBlk2Buffer = common_data_bus_in;
                 accelRdBlkDone = 1'b0;
                 nextState = tx_done ? ACCEL_RD_DONE : ACCEL_RD;
             end
             ACCEL_RD_DONE: begin
+                accelBlk2Buffer = common_data_bus_in;
                 accelRdBlkDone = rd_valid;
                 nextState = rd_valid ? (accelTransferDone ? IDLE : ACCEL_RD) : ACCEL_RD_DONE;
             end
             // EMPTYING BUFFER TO HOST
             ACCEL_WR: begin
-                io_addr = sigPtr + (sigOffset << 9);
+                io_addr = sigBaseAddr + (sigOffset << 11);
                 op_out = WRITE;
                 common_data_bus_out = accelBlk2Mem;
                 accelWrBlkDone = 1'b0;

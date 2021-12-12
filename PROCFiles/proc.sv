@@ -5,14 +5,15 @@ module proc(
     op, common_data_bus_out, io_addr, cv_value
 );
     localparam WORD_SIZE = 32;
+    localparam LINE_SIZE = 512;
 
     input clk, rst;
-    input [WORD_SIZE-1:0] common_data_bus_in;
+    input [LINE_SIZE-1:0] common_data_bus_in;
     input tx_done;
     input rd_valid;
 
-    output [2:0] op;
-    output [WORD_SIZE-1:0] common_data_bus_out
+    output [1:0] op;
+    output [LINE_SIZE-1:0] common_data_bus_out
     output [31:0] io_addr;
     output logic [63:0] cv_value;
 
