@@ -7,13 +7,12 @@ module fft_ram(
 
     genvar i;
 
-    wire [31:0] q_imag [0:2047];
-    wire [31:0] q_real [0:2047];
+    wire [31:0] q_packed [0:2047];
 
-   assign A_real_o = q_real[2 * indexA];
-   assign A_imag_o = q_imag[2 * indexA + 1];
-   assign B_real_o = q_real[2 * indexB];
-   assign B_imag_o = q_imag[2 * indexB + 1];
+   assign A_real_o = q_packed[2 * indexA];
+   assign A_imag_o = q_packed[2 * indexA + 1];
+   assign B_real_o = q_packed[2 * indexB];
+   assign B_imag_o = q_packed[2 * indexB + 1];
 
     generate
         for (i = 0; i < 1024; i++) begin
@@ -21,16 +20,16 @@ module fft_ram(
                                .rst(rst), 
                                .d(indexA === i ? A_real_i :
                                   indexB === i ? B_real_i :
-                                  q_real[2*i]), 
-                               .q(q_real[2*i]),
+                                  q_packed[2*i]), 
+                               .q(q_packed[2*i]),
                                .en(externalLoad ? indexA === i : 
                                    load && (indexA === i || indexB === i)));
             fft_register reg_i(.clk(clk), 
                                .rst(rst), 
                                .d(indexA === i ? A_imag_i :
                                   indexB === i ? B_imag_i :
-                                  q_imag[2*i + 1]), 
-                               .q(q_imag[2*i + 1]), 
+                                  q_packed[2*i + 1]), 
+                               .q(q_packed[2*i + 1]), 
                                .en(externalLoad ? indexA === i : 
                                    load && (indexA === i || indexB === i)));
         end
