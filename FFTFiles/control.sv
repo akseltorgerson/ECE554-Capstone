@@ -1,9 +1,27 @@
 module control(
     //Inputs
-    input startF, startI, loadF, loadExternalDone, doFilter, done, clk, rst, outLoadDone, startLoadingOutFifo, outFifoReady, startLoadingRam, inFifoEmpty,
+    input startF, 
+          startI,  
+          loadExternalDone, 
+          doFilter, 
+          done, 
+          clk, 
+          rst, 
+          outLoadDone, 
+          startLoadingOutFifo, 
+          outFifoReady, 
+          startLoadingRam, 
+          inFifoEmpty,
     input [17:0] sigNum, 
     //Outputs
-    output reg calculating, loadExternal, loadInternal, writeFilter, isIFFT, fDone, aDone, loadOutBuffer
+    output reg calculating, 
+               loadExternal, 
+               loadInternal, 
+               writeFilter, 
+               isIFFT, 
+               fDone, 
+               aDone, 
+               loadOutBuffer
 );
 
     ////////////////////

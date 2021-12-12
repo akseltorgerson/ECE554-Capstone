@@ -24,7 +24,7 @@ module a_buf_top(
                     .emptyReady(inEmptyReady),
                     .dataOut(accelDataOut),
                     .dataOutValid(accelDataOutValid),
-                    .emptyFifo(inFifoEmpty));
+                    .fifoEmpty(inFifoEmpty));
 
     /********************************************************
     *          Buffers data from accelerator to host        *
