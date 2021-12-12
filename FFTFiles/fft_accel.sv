@@ -165,7 +165,7 @@ module fft_accel(
             loadFifoCounter <= 10'h000;
             outLoadDone <= 1'b1;
         end
-        else if (read)
+        else if (read & loadOutBuffer)
             loadFifoCounter <= loadFifoCounter + 1;
     end
     
@@ -173,6 +173,5 @@ module fft_accel(
     assign fifo_imag_in = butterfly_imag_A_in;
 
     assign loadFromFifo = inFifoReady & loadExternal;
-    assign read = loadOutBuffer;
 
 endmodule
