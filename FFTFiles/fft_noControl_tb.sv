@@ -194,6 +194,9 @@ module fft_noControl_tb();
                          .real_B_out(test_realB),
                          .imag_B_out(test_imagB));
 
+            @(posedge clk);
+            @(negedge clk);
+
             fake_mem[2*k] = test_realA;
             fake_mem[2*k + 1] = test_imagA;
             fake_mem[2*k + 1024] = test_realB;
@@ -205,6 +208,9 @@ module fft_noControl_tb();
 
         for (k = 0; k < 1024; k++) begin
             externalIndexA = k;
+
+            @(posedge clk);
+            @(negedge clk);
 
             if (butterfly_real_A_in !== fake_mem[2*k] || butterfly_imag_A_in !== fake_mem[2*k + 1]) begin
                 $display("RAM OUT REAL: %h, RAM OUT IMAG: %h", butterfly_real_A_in, butterfly_imag_A_in);
