@@ -190,7 +190,7 @@ module fft_noControl_tb();
                          fake_mem[2*k + 1025],    // imag B in
                          twiddle_mem[2*k],        // twiddle factors
                          twiddle_mem[2*k + 1],
-                         fake_mame[2*k],           // outputs
+                         fake_mem[2*k],           // outputs
                          fake_mem[2*k + 1],
                          fake_mem[2*k + 1024],
                          fake_mem[2*k + 1025]);    
