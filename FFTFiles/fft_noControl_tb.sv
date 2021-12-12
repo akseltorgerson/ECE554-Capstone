@@ -286,7 +286,7 @@ module fft_noControl_tb();
                             .imag_A(fake_mem[2*indexA_fake + 1]),       // imag A in
                             .real_B(fake_mem[2*indexB_fake]),           // real B in
                             .imag_B(fake_mem[2*indexB_fake + 1]),           // imag B in
-                            .twiddle_real(twiddle_mem[2* fake_twiddleIndex]),        // twiddle factors
+                            .twiddle_real(twiddle_mem[2*fake_twiddleIndex]),        // twiddle factors
                             .twiddle_imag(twiddle_mem[2*fake_twiddleIndex + 1]),
                             .real_A_out(test_realA),                                 // outputs
                             .imag_A_out(test_imagA),
