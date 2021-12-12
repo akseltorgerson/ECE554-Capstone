@@ -47,7 +47,7 @@ module mem_arb_tb();
     logic [63:0] cv_value;
 
     // Test Host Memory 1MB
-    logic [31:0] testMemory [8191:0];
+    logic [31:0] testMemory [8192];
     integer errors;
     integer i, j;
 
@@ -59,19 +59,20 @@ module mem_arb_tb();
         // zero out inputs
         clk = 1'b0;
         rst = 1'b0;
-        instrCacheBlkReq = '0;
-        instrAddr = '0;
-        dataCacheBlkReq = '0;
-        dataAddr = '0;
-        dataCacheEvictReq = '0;
-        dataBlk2Mem = '0;
-        accelDataRd = '0;
-        accelDataWr = '0;
-        accelBlk2Mem = '0;
+        dump = 1'b0;
+        instrCacheBlkReq = 1'b0;
+        instrAddr = 32'b0;
+        dataCacheBlkReq = 1'b0;
+        dataAddr = 32'b0;
+        dataCacheEvictReq = 1'b0;
+        dataBlk2Mem = 512'b0;
+        accelDataRd = 1'b0;
+        accelDataWr = 1'b0;
+        accelBlk2Mem = 512'b0;
         sigNum = 18'b0;
-        common_data_bus_in = '0;
-        tx_done = '0;
-        rd_valid = '0;
+        common_data_bus_in = 512'b0;
+        tx_done = 1'b0;
+        rd_valid = 1'b0;
 
         errors = 0;
 
@@ -96,59 +97,45 @@ module mem_arb_tb();
         // assign inputs at negedge
         @(negedge clk);
         accelDataRd = 1'b1;
-        sigNum = 18'b0;
-
         @(posedge clk);
         @(negedge clk);
-
+        accelDataRd = 1'b0;
+        sigNum = 18'b0;
+        j = 0;
+        
         repeat (128) begin
-            /*
-            common_data_bus_in = {  testMemory[15+(i*16)],
-                                    testMemory[14+(i*16)],
-                                    testMemory[13+(i*16)],
-                                    testMemory[12+(i*16)],
-                                    testMemory[11+(i*16)],
-                                    testMemory[10+(i*16)],
-                                    testMemory[9+(i*16)],
-                                    testMemory[8+(i*16)],
-                                    testMemory[7+(i*16)],
-                                    testMemory[6+(i*16)],
-                                    testMemory[5+(i*16)],
-                                    testMemory[4+(i*16)],
-                                    testMemory[3+(i*16)],
-                                    testMemory[2+(i*16)],
-                                    testMemory[1+(i*16)],
-                                    testMemory[0+(i*16)]};
-                                    */
-            common_data_bus_in = {32'hffffffff,
-                                    32'hfffffffe,
-                                    32'hfffffffd,
-                                    32'hfffffffc,
-                                    32'hfffffffb,
-                                    32'hfffffffa,
-                                    32'hfffffff9,
-                                    32'hfffffff8,
-                                    32'hfffffff7,
-                                    32'hfffffff6,
-                                    32'hfffffff5,
-                                    32'hfffffff4,
-                                    32'hfffffff3,
-                                    32'hfffffff2,
-                                    32'hfffffff1,
-                                    32'hfffffff0};
-
+            // ACCEL_RD
+            @(posedge clk);
+            @(negedge clk);
             tx_done = 1'b1;
             @(posedge clk);
             @(negedge clk);
+            common_data_bus_in = {  testMemory[16*j]+15,
+                                    testMemory[16*j]+14,
+                                    testMemory[16*j]+13,
+                                    testMemory[16*j]+12,
+                                    testMemory[16*j]+11,
+                                    testMemory[16*j]+10,
+                                    testMemory[16*j]+9,
+                                    testMemory[16*j]+8,
+                                    testMemory[16*j]+7,
+                                    testMemory[16*j]+6,
+                                    testMemory[16*j]+5,
+                                    testMemory[16*j]+4,
+                                    testMemory[16*j]+3,
+                                    testMemory[16*j]+2,
+                                    testMemory[16*j]+1,
+                                    testMemory[16*j]+0};
             rd_valid = 1'b1;
-            
-            @(posedge clk);
-            @(negedge clk);
             tx_done = 1'b0;
+            @(posedge clk);
+            @(negedge clk);            
+            common_data_bus_in = 512'b0;
             rd_valid = 1'b0;
+            j += 1;
+
+
         end
-
-
 
 
         /*
