@@ -125,13 +125,13 @@ module afu
 
    proc iProcessor(.clk(clk),
                    .rst(rst),
-                   .common_data_bus_in(),
+                   .common_data_bus_in(cpu_in),
                    .tx_done(tx_done),
                    .rd_valid(rd_valid),
                    //Outputs
                    .op(mem_op),
-                   .common_data_bus_out(),
-                   .io_addr(),
+                   .common_data_bus_out(cpu_out),
+                   .io_addr(cpu_addr),
                    .cv_value(cv_value));
 
    // Address Translation module
