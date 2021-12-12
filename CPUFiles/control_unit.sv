@@ -59,10 +59,6 @@ module control_unit(
         isSLBI = 1'b0;
         aluOp = 4'b0000;
         isJump = 1'b0;
-        //branchOp = 2'b00;
-        //pcSrc = 1'b0;
-        // Possibly want to just make these an output of the fetch stage
-        // This way the instruction can go to the accelerator as fast as possible
         startI = 1'b0;
         startF = 1'b0;
         loadF = 1'b0;
