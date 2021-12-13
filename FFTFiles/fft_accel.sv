@@ -5,7 +5,7 @@ module fft_accel(
           startI,                                                   // Indicates to start IFFT
           loadF,                                                    // indicates to load the filter
           filter,                                                   // indicates to filter signal
-          loadFifoFromRam,                                          // indicates to load the Out fifo from accel ram
+          blockWrittenToHost,                                       // indicates to the out buffer that a block [512] has been written to the host
           loadInFifo,                                               // indicates to load the in fifo from mc
     input [17:0] sigNum,                                            // input signal number for the FFT
     input [511:0] mcDataIn,                                         // data sent from mc
@@ -78,7 +78,7 @@ module fft_accel(
                      .loadExternal(loadExternal),
                      .loadOutBuffer(loadOutBuffer),
                      .outLoadDone(outLoadDone),
-                     .startLoadingOutFifo(loadFifoFromRam),
+                     .startLoadingOutFifo(blockWrittenToHost),
                      .startLoadingRam(inFifoReady),
                      .outFifoReady(outFifoReady),
                      .inFifoEmpty(inFifoEmpty));
@@ -119,7 +119,7 @@ module fft_accel(
 
     a_buf_top iABuf( .clk(clk), 
                      .rst(rst),
-                     .accelWrEn(loadFifoFromRam),
+                     .accelWrEn(blockWrittenToHost),
                      .inFifoEmpty(inFifoEmpty),
                      .mcWrEn(loadInFifo),
                      .mcDataIn(mcDataIn),
