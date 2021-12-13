@@ -280,7 +280,7 @@ module fft_noControl_tb();
                 test_realB = 0;
                 test_imagB = 0;
 
-                fake_twiddleIndex = {$floor(k * (2 ** (stageCount + 1)) / 1024)}[8:0];
+                fake_twiddleIndex = $floor(k * (2 ** (stageCount + 1)) / 1024);
                 
                 fake_twiddleIndex = {fake_twiddleIndex[0], fake_twiddleIndex[1], fake_twiddleIndex[2],
                                     fake_twiddleIndex[3], fake_twiddleIndex[4], fake_twiddleIndex[5],
