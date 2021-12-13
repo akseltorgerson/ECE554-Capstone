@@ -243,102 +243,104 @@ module fft_noControl_tb();
 
         scan = 0;
 
-        ///////////////////////////////////////////////////////////////////////////////////////////////
-        //////////////////////////////// END STAGE 1 //////////////////////////////////////////////////
-        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // ///////////////////////////////////////////////////////////////////////////////////////////////
+        // //////////////////////////////// END STAGE 1 //////////////////////////////////////////////////
+        // ///////////////////////////////////////////////////////////////////////////////////////////////
 
 
-        // ///////////////////////////////////////////////////
-        // go through stage 2 and check outputs of the butterfly unit
-        // First: Run through the first stage. then, update the fake mem to be the expected values and check
-        //
-        // run through first cycle
-        //////////////// STAGE 2 ////////////////////////////////////////////////////////////////////////////
+        // // ///////////////////////////////////////////////////
+        // // go through stage 2 and check outputs of the butterfly unit
+        // // First: Run through the first stage. then, update the fake mem to be the expected values and check
+        // //
+        // // run through first cycle
+        // //////////////// STAGE 2 ////////////////////////////////////////////////////////////////////////////
 
-        stageCount = 1;
-        load = 1;
+        // stageCount = 1;
+        // load = 1;
 
-        for (cycleCount = 0; cycleCount < 512; cycleCount++) begin
+        // for (cycleCount = 0; cycleCount < 512; cycleCount++) begin
 
-            twiddle_real = twiddle_mem[2*twiddleIndex];
-            twiddle_imag = twiddle_mem[2*twiddleIndex + 1];
+        //     twiddle_real = twiddle_mem[2*twiddleIndex];
+        //     twiddle_imag = twiddle_mem[2*twiddleIndex + 1];
 
-            @(posedge clk);
-            @(negedge clk);
-        end
+        //     @(posedge clk);
+        //     @(negedge clk);
+        // end
         
-        // set load to 0 and start setting the expected output values
-        load = 0;
+        // // set load to 0 and start setting the expected output values
+        // load = 0;
 
-        @(posedge clk);
-        @(negedge clk);
+        // @(posedge clk);
+        // @(negedge clk);
 
-        // should go through each "Bucket" and compute the correct indices. 
-        k = 0; 
-        for (bucket = 0; bucket < bucketsMAX && k < 512; bucket++) begin
-            for(bucketIterationCnt = 0; bucketIterationCnt < cycleLimit; bucketIterationCnt++) begin
+        // // should go through each "Bucket" and compute the correct indices. 
+        // k = 0; 
+        // for (bucket = 0; bucket < bucketsMAX && k < 512; bucket++) begin
+        //     for(bucketIterationCnt = 0; bucketIterationCnt < cycleLimit; bucketIterationCnt++) begin
                 
-                indexA_fake = k === 0 ? k : startingPos + bucketIterationCnt;
+        //         indexA_fake = k === 0 ? k : startingPos + bucketIterationCnt;
 
-                test_realA = 0;
-                test_imagA = 0;
-                test_realB = 0;
-                test_imagB = 0;
+        //         test_realA = 0;
+        //         test_imagA = 0;
+        //         test_realB = 0;
+        //         test_imagB = 0;
 
-                fake_twiddleIndex = $floor(k * (2 ** (stageCount + 1)) / 1024);
+        //         fake_twiddleIndex = $floor(k * (2 ** (stageCount + 1)) / 1024);
                 
-                fake_twiddleIndex = {fake_twiddleIndex[0], fake_twiddleIndex[1], fake_twiddleIndex[2],
-                                    fake_twiddleIndex[3], fake_twiddleIndex[4], fake_twiddleIndex[5],
-                                    fake_twiddleIndex[6], fake_twiddleIndex[7], fake_twiddleIndex[8]};
+        //         fake_twiddleIndex = {fake_twiddleIndex[0], fake_twiddleIndex[1], fake_twiddleIndex[2],
+        //                             fake_twiddleIndex[3], fake_twiddleIndex[4], fake_twiddleIndex[5],
+        //                             fake_twiddleIndex[6], fake_twiddleIndex[7], fake_twiddleIndex[8]};
 
-                mult_complex(.real_A(fake_mem[2*indexA_fake ]),                     // real A in
-                            .imag_A(fake_mem[2*indexA_fake + 1]),                   // imag A in
-                            .real_B(fake_mem[2*indexB_fake ]),                      // real B in
-                            .imag_B(fake_mem[2*indexB_fake + 1]),                   // imag B in
-                            .twiddle_real(twiddle_mem[2*fake_twiddleIndex]),        // twiddle factors
-                            .twiddle_imag(twiddle_mem[2*fake_twiddleIndex + 1]),
-                            .real_A_out(test_realA),                                 // outputs
-                            .imag_A_out(test_imagA),
-                            .real_B_out(test_realB),
-                            .imag_B_out(test_imagB));
+        //         mult_complex(.real_A(fake_mem[2*indexA_fake ]),                     // real A in
+        //                     .imag_A(fake_mem[2*indexA_fake + 1]),                   // imag A in
+        //                     .real_B(fake_mem[2*indexB_fake ]),                      // real B in
+        //                     .imag_B(fake_mem[2*indexB_fake + 1]),                   // imag B in
+        //                     .twiddle_real(twiddle_mem[2*fake_twiddleIndex]),        // twiddle factors
+        //                     .twiddle_imag(twiddle_mem[2*fake_twiddleIndex + 1]),
+        //                     .real_A_out(test_realA),                                 // outputs
+        //                     .imag_A_out(test_imagA),
+        //                     .real_B_out(test_realB),
+        //                     .imag_B_out(test_imagB));
 
-                fake_mem[2*indexA_fake] = test_realA;
-                fake_mem[2*indexA_fake + 1] = test_imagA;
-                fake_mem[2*indexB_fake] = test_realB;
-                fake_mem[2*indexB_fake + 1] = test_imagB;
+        //         fake_mem[2*indexA_fake] = test_realA;
+        //         fake_mem[2*indexA_fake + 1] = test_imagA;
+        //         fake_mem[2*indexB_fake] = test_realB;
+        //         fake_mem[2*indexB_fake + 1] = test_imagB;
 
-                @(posedge clk);
-                @(negedge clk);
+        //         @(posedge clk);
+        //         @(negedge clk);
 
-                k++;
-            end   
-        end
+        //         k++;
+        //     end   
+        // end
 
-        // set scan high to test that the values that are stored in mem and fake mem are correct (equal)
-        scan = 1;
+        // // set scan high to test that the values that are stored in mem and fake mem are correct (equal)
+        // scan = 1;
 
-        for (k = 0; k < 1024; k++) begin
-            externalIndexA = k;
+        // for (k = 0; k < 1024; k++) begin
+        //     externalIndexA = k;
 
-            @(posedge clk);
-            @(negedge clk);
+        //     @(posedge clk);
+        //     @(negedge clk);
 
-            if (butterfly_real_A_in !== fake_mem[2*k] || butterfly_imag_A_in !== fake_mem[2*k + 1]) begin
-                $display("RAM OUT REAL: %h, RAM OUT IMAG: %h", butterfly_real_A_in, butterfly_imag_A_in);
-                $display("EXPECTED RAM OUT REAL: %h, EXPECTED RAM OUT IMAG: %h", fake_mem[2*k], fake_mem[2*k + 1]);
-                $display("STAGE: %d INDEX: %d", stageCount, 2*k);
-                $stop();
-            end
-        end
+        //     if (butterfly_real_A_in !== fake_mem[2*k] || butterfly_imag_A_in !== fake_mem[2*k + 1]) begin
+        //         $display("RAM OUT REAL: %h, RAM OUT IMAG: %h", butterfly_real_A_in, butterfly_imag_A_in);
+        //         $display("EXPECTED RAM OUT REAL: %h, EXPECTED RAM OUT IMAG: %h", fake_mem[2*k], fake_mem[2*k + 1]);
+        //         $display("STAGE: %d INDEX: %d", stageCount, 2*k);
+        //         $stop();
+        //     end
+        // end
 
-        // go through all stages
+        // // go through all stages
 
-        scan = 0;
+        // scan = 0;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         //////////////////////////////// END STAGE 2 //////////////////////////////////////////////////
         ///////////////////////////////////////////////////////////////////////////////////////////////
 
+        load = 1;
+        
         for (stageCount = 1; stageCount < 10; stageCount++) begin
             for (cycleCount = 0; cycleCount < 512; cycleCount++) begin
 
