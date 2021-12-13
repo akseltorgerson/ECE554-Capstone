@@ -48,7 +48,7 @@ module control(
     ////////////////
     always_comb begin
         // defaults
-        next_state = IDLE;
+        next_state = state;
         calculating = 1'b0;
         loadExternal = 0;
         loadInternal = 0;
@@ -126,7 +126,7 @@ module control(
                 calculating = 1'b1;
                 if (outLoadDone)
                     next_state = DONE;
-                if (startLoadingOutFifo)
+                else if (startLoadingOutFifo)
                     next_state = LOADOUT;
             end
 
