@@ -3,7 +3,6 @@ module cpu(//Inputs
            //Outputs
            startI, startF, loadF, sigNum, filter, dCacheOut, dCacheEvict, aluResult, exception, halt,
            cacheMissFetch, cacheMissMemory, instrAddr
-           //TODO: need to add in other accelerator and memory controller signals
            );
     
     input clk, rst, fftCalculating;
