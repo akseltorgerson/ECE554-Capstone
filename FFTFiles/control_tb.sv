@@ -59,8 +59,19 @@ module control_tb();
 
         startF = 1'b0;
 
-        if (calculating !== 1'b1 && loadExternal !== 1'b1) begin
-            $display("ERROR: Expected calculating and loadExternal to be 1 after startF set high");
+        if (calculating !== 1'b1 && loadExternal !== 1'b0) begin
+            $display("ERROR: Expected calculating 1 and loadExternal to be 0 after startF set high");
+            $stop();
+        end
+
+        // set startLoadingRam high to get back into the loading state
+        startLoadingRam = 1'b1;
+
+        @(posedge clk);
+        @(negedge clk);
+
+        if (loadExternal !== 1'b1 && calculating !== 1'b1) begin
+            $display("ERROR: Expected to be back in the LOAD state");
             $stop();
         end
 

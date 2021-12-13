@@ -138,7 +138,7 @@ module fft_accel(
 
     //////////// cycleCount dff ///////////////
     always_ff @(posedge clk, posedge rst) begin
-        if (rst )
+        if (rst)
             cycleCount <= 9'b000000000;
         else if(&cycleCount)
             cycleCount <= 9'b0;
