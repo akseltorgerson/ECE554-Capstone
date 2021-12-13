@@ -108,7 +108,7 @@ module control_tb();
         // assert outFifoReady to go to idle state
         outFifoReady = 1'b1;
 
-        @(posedge clk):
+        @(posedge clk);
 
         if (calculating !== 1'b1 && loadOutBuffer !== 1'b0) begin
             $display("ERROR: expected loadOutBuffer to be low");
