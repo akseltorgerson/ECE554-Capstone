@@ -130,10 +130,13 @@ module control(
             end
 
             LOADOUT: begin
-                loadOutBuffer = 1'b1;
                 calculating = 1'b1;
-                if (outFifoReady)
+                
+                if (outFifoReady) begin
                     next_state = IDLE_LOADOUT;
+                end else begin
+                    loadOutBuffer = 1'b1;
+                end
             end
 
             // DONE STATE

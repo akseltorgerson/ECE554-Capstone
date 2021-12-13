@@ -27,6 +27,7 @@ module fft_accel_tb();
     /////////////////////////////
     integer loadInFifoLoop;                                          // loop vairable to load the in fifo
     integer cycleCounter, stageCounter;                              // for running the FFT
+    integer loadOutFifoLoop;                                         // counter for loading the out fifo
 
     //////////////////////////////
     ///////// modules ////////////
@@ -106,7 +107,7 @@ module fft_accel_tb();
             $stop();
         end
 
-        // await for the positive edge of inFifoEmpty (RAM has been loaded)
+        // await for the positive edge of loadExternalDone (RAM has been loaded)
         @(posedge iDUT.loadExternalDone);
 
         // loadExternal should still be being loaded ?????? CHECK THIS FOR TIMING
@@ -160,6 +161,33 @@ module fft_accel_tb();
 
         if (iDUT.doneCalculating !== 1'b1) begin
             $display("ERROR: doneCalculating should be set high.");
+            $stop();
+        end
+
+        @(posedge clk);
+        @(negedge clk);
+
+        for (loadOutFifoLoop = 0; loadOutFifoLoop < 1024; loadOutFifoLoop++) begin
+            // should start loading the out FIFO
+            if (iDUT.loadOutBuffer !== 1'b1) begin
+                $display("ERROR: loadOutBuffer should be set high.");
+                $stop();
+            end
+
+            @(posedge clk);
+            @(negedge clk);
+
+        end
+
+        // make sure loadOutBuffer is set low
+        if (iDUT.loadOutBuffer !== 1'b0) begin
+                $display("ERROR: loadOutBuffer should be set low.");
+                $stop();
+        end
+
+        // outFifo should be high
+        if (iDUT.outFifoReady !== 1'b1) begin
+            $display("ERROR: outFifoReady should be set high after");
             $stop();
         end
 
