@@ -137,8 +137,8 @@ module proc(
         .startI(startI),
         .loadF(loadF),
         .filter(filter),
-        .loadFifoFromRam(loadFifoFromRam),
         .sigNum(sigNum),
+        .loadFifoFromRam(loadFifoFromRam),
         .loadInFifo(loadInFifo), 
         .mcDataIn(mcAccelIn),  
         //Outputs
