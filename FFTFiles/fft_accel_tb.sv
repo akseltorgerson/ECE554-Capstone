@@ -37,7 +37,7 @@ module fft_accel_tb();
         filter = 0;
         loadFifoFromRam = 0;
         loadInFifo = 0;
-        signum = 18'h00000;
+        sigNum = 18'h00000;
 
         // reset the accelerator
         rst = 1;
