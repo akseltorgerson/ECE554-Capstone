@@ -4,12 +4,11 @@ module fft_accel(
           startF,                                                   // Indicates to start FFT
           startI,                                                   // Indicates to start IFFT
           loadF,                                                    // indicates to load the filter
-          filter,                                                   // indicates to filter signal
-          blockWrittenToHost,                                       // indicates to the out buffer that a block [512] has been written to the host
+          filter,                                                   // indicates to filter signal                                       
           loadInFifo,                                               // indicates to load the in fifo from mc
     input [17:0] sigNum,                                            // input signal number for the FFT
     input [511:0] mcDataIn,                                         // data sent from mc
-    input accelWrBlkDone,
+    input accelWrBlkDone,                                           // indicates to the out buffer that a block [512] has been written to the host
     output done,                                                    // indicates accel done
     output calculating,                                             // indicates the accel is calculating
     output reg [17:0] sigNumMC,                                     // holds the signal number used by host mem
@@ -78,7 +77,7 @@ module fft_accel(
                      .loadExternal(loadExternal),
                      .loadOutBuffer(loadOutBuffer),
                      .outLoadDone(outLoadDone),
-                     .startLoadingOutFifo(blockWrittenToHost),
+                     .startLoadingOutFifo(1'b0),
                      .startLoadingRam(inFifoReady),
                      .outFifoReady(outFifoReady),
                      .inFifoEmpty(inFifoEmpty));
@@ -119,7 +118,7 @@ module fft_accel(
 
     a_buf_top iABuf( .clk(clk), 
                      .rst(rst),
-                     .accelWrEn(blockWrittenToHost),
+                     .accelWrEn(loadOutBuffer),
                      .inFifoEmpty(inFifoEmpty),
                      .mcWrEn(loadInFifo),
                      .mcDataIn(mcDataIn),
