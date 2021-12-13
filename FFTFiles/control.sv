@@ -126,7 +126,7 @@ module control(
                 calculating = 1'b1;
                 if (outLoadDone)
                     next_state = DONE;
-                if (startLoadingOutFifo)
+                else if (startLoadingOutFifo)
                     next_state = LOADOUT;
             end
 
