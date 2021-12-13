@@ -272,10 +272,15 @@ module fft_noControl_tb();
         // set load to 0 and start setting the expected output values
         load = 0;
 
+        @(posedge clk);
+        @(negedge clk);
+
         // should go through each "Bucket" and compute the correct indices. 
         k = 0; 
         for (bucket = 0; bucket < bucketsMAX && k < 512; bucket++) begin
             for(bucketIterationCnt = 0; bucketIterationCnt < cycleLimit; bucketIterationCnt++) begin
+                
+                indexA_fake = k == 0 ? k[9:0] : startingPos + bucketIterationCnt;
 
                 test_realA = 0;
                 test_imagA = 0;
@@ -287,8 +292,6 @@ module fft_noControl_tb();
                 fake_twiddleIndex = {fake_twiddleIndex[0], fake_twiddleIndex[1], fake_twiddleIndex[2],
                                     fake_twiddleIndex[3], fake_twiddleIndex[4], fake_twiddleIndex[5],
                                     fake_twiddleIndex[6], fake_twiddleIndex[7], fake_twiddleIndex[8]};
-
-                indexA_fake = k == 0 ? k[9:0] : {startingPos + bucketIterationCnt}[9:0];
 
                 mult_complex(.real_A(fake_mem[2*indexA_fake ]),                     // real A in
                             .imag_A(fake_mem[2*indexA_fake + 1]),                   // imag A in
