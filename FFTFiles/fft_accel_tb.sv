@@ -26,6 +26,7 @@ module fft_accel_tb();
     //////// intermediates //////
     /////////////////////////////
     integer loadInFifoLoop;                                          // loop vairable to load the in fifo
+    integer cycleCounter, stageCounter;                              // for running the FFT
 
     //////////////////////////////
     ///////// modules ////////////
@@ -88,6 +89,8 @@ module fft_accel_tb();
 
         end
 
+        loadInFifo = 1'b0;
+
         // check if inFifoReady is correctly asserted
         if (iDUT.inFifoReady !== 1'b1) begin
             $display("ERROR: inFifoReady was not set high when it should have been");
@@ -116,10 +119,17 @@ module fft_accel_tb();
         @(posedge clk);
         @(negedge clk);
 
-        // Check loadInternal (should be 1'b1)
-        if (iDUT.loadInternal !== 1'b1) begin
-            $display("ERROR: loadInternal should start to be asserted after finished loading the wam.");
-            $stop();
+        for (stageCounter = 0; stageCounter < 10; stageCounter++) begin
+            for (cycleCounter = 0; cycleCounter < 512; cycleCounter++) begin
+
+                // Check loadInternal (should be 1'b1)
+                if (iDUT.loadInternal !== 1'b1) begin
+                    $display("ERROR: loadInternal should be asserted for every stage and every stage.");
+                    $display("STAGE: %d,  CYCLE: %d", stageCounter, cycleCounter);
+                    $stop();
+                end
+
+            end
         end
 
         $display("YAHOO! ALL TESTS PASSED");
