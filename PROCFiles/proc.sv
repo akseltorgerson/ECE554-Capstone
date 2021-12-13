@@ -163,7 +163,7 @@ module proc(
         .dataAddr(mcDataAddr),
         .dataCacheEvictReq(dCacheEvict),
         .dataBlk2Mem(dCacheOut),
-        .accelDataRd(inFifoEmpty), //Fine with 1 8kb chunk
+        .accelDataRd(startF | startI), //Fine with 1 8kb chunk
         .accelDataWr(outFifoReady),
         .accelBlk2Mem(mcAccelOut),
         .sigNum(sigNumMC),
