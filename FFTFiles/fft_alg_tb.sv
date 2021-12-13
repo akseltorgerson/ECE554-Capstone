@@ -188,8 +188,8 @@ module fft_alg_tb();
             @(posedge clk);
             @(negedge clk);
 
-            $fdisplay(fd, "%h", fake_mem[2*j]);
-            $fdisplay(fd, "%h", fake_mem[2*j + 1]);
+            $fdisplay(fd, "%h", fake_mem[2*outIndex]);
+            $fdisplay(fd, "%h", fake_mem[2*outIndex + 1]);
 
         end
 
