@@ -139,7 +139,7 @@ module proc(
         .loadF(loadF),
         .filter(filter),
         .sigNum(sigNum),
-        .accelWrBlockDone(accelBlockWrittenToHost),
+        .accelWrBlkDone(accelBlockWrittenToHost),
         .loadInFifo(loadInFifo), 
         .mcDataIn(mcAccelIn),  
         //Outputs
