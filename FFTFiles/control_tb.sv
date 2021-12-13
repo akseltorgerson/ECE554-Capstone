@@ -108,9 +108,11 @@ module control_tb();
         @(negedge clk);
 
         if (calculating !== 1'b1 && loadOutBuffer !== 1'b1) begin
-            $display("ERROR: expected loadOutBuffer to be high");
+            $display("ERROR: expected loadOutBuffer to be high 1");
             $stop();
         end
+
+        done = 1'b0;
 
         // assert outFifoReady to go to idle state
         outFifoReady = 1'b1;
@@ -123,6 +125,8 @@ module control_tb();
             $stop();
         end
 
+        outFifoRead = 1'b0;
+
         // assert startLoadingOutFifo to get back into the LOADOUT state
         startLoadingOutFifo = 1'b1;
 
@@ -130,7 +134,7 @@ module control_tb();
         @(negedge clk);
 
         if (calculating !== 1'b1 && loadOutBuffer !== 1'b1) begin
-            $display("ERROR: expected loadOutBuffer to be high");
+            $display("ERROR: expected loadOutBuffer to be high 2");
             $stop();
         end
 
@@ -145,7 +149,7 @@ module control_tb();
         outLoadDone = 1'b0;
 
         if (aDone !== 1'b1) begin
-            $display("ERROR: expected loadOutBuffer to be high");
+            $display("ERROR: expected aDone to be high");
             $stop();
         end
 
