@@ -8,8 +8,7 @@ module butterfly_unit
 	////// Intermediates ////
 	/////////////////////////
 	
-	wire [31:0] mult_B_real, mult_B_imag, mult_B_real_left, mult_B_real_right, mult_B_imag_left, mult_B_imag_right;
-	wire [63:0] mult_B_real_left_product, mult_B_real_right_product, mult_B_imag_left_product, mult_B_imag_right_product;
+	wire [63:0] mult_B_real_left_product, mult_B_real_right_product, mult_B_imag_left_product, mult_B_imag_right_product, inter_real, inter_imag;
 	
 	/*********
 	* modules
@@ -39,16 +38,15 @@ module butterfly_unit
 	assign mult_B_imag_left_product = real_B * twiddle_imag;
 	assign mult_B_imag_right_product = imag_B * twiddle_real;
 
-	// assign actual values
-	assign mult_B_real_left = mult_B_real_left_product[63:32];
-	assign mult_B_real_right = mult_B_real_right_product[63:32];
-	assign mult_B_imag_left = mult_B_imag_left_product[63:32];
-	assign mult_B_imag_right = mult_B_imag_right_product[63:32];
+	// assign intermediate full vals
+	assign inter_real = mult_B_real_left_product - mult_B_real_right_product;
+	assign inter_imag = mult_B_imag_left_product + mult_B_imag_right_product;
 
 	//cla_32bit mult_R(.A(mult_B_real_left), .B(~(mult_B_real_right)), .Cin(1'b1), .Sum(mult_B_real), .Cout(), .P(), .G());
 	//cla_32bit mult_I(.A(mult_B_imag_left), .B(mult_B_imag_right), .Cin(1'b0), .Sum(mult_B_imag), .Cout(), .P(), .G());
 
-	assign mult_B_real = mult_B_real_left - mult_B_real_right;
-	assign mult_B_imag = mult_B_imag_left + mult_B_imag_right;
+	// shorten to 32
+	assign mult_B_real = inter_real[63:32];
+	assign mult_B_imag = inter_imag[63:32];
 	
 endmodule
