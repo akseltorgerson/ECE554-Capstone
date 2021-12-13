@@ -12,6 +12,8 @@ module proc_tb();
     logic [31:0] io_addr_actual, io_addr_expected;
     logic [63:0] cv_value_actual, cv_value_expected;
 
+    //Probably want some memory here
+    
     proc iProcessor(.clk(clk),
                     .rst(rst),
                     .common_data_bus_in(common_data_bus_in),
