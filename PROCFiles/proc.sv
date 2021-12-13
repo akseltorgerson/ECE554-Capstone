@@ -77,7 +77,7 @@ module proc(
     logic [17:0] sigNum;
 
     //TODO: ?
-    logic loadFifoFromRam;
+    logic accelBlockWrittenToHost;
 
     //TODO: ?
     logic loadInFifo;
@@ -138,10 +138,9 @@ module proc(
         .loadF(loadF),
         .filter(filter),
         .sigNum(sigNum),
-        .loadFifoFromRam(loadFifoFromRam),
+        .blockWrittenToHost(accelBlockWrittenToHost),
         .loadInFifo(loadInFifo), 
         .mcDataIn(mcAccelIn),  
-        .accelWrBlkDone(loadFifoFromRam),
         //Outputs
         .done(done),
         .calculating(fftCalculating),
@@ -158,7 +157,7 @@ module proc(
         .rst(rst),
         .dump(halt | exception),
         .instrCacheBlkReq(cacheMissFetch),
-        .instrCacheAddr(instrAddr),
+        .instrAddr(instrAddr),
         .dataCacheBlkReq(cacheMissMemory),
         .dataAddr(mcDataAddr),
         .dataCacheEvictReq(dCacheEvict),
@@ -177,7 +176,7 @@ module proc(
         .dataEvictAck(evictDone),
         .dataBlk2CacheValid(mcDataValid),
         .dataBlk2Cache(mcDataIn),
-        .accelWrBlkDone(loadFifoFromRam),
+        .accelWrBlkDone(accelBlockWrittenToHost),
         .accelRdBlkDone(loadInFifo),
         .accelBlk2Buffer(mcAccelIn),
         .transformComplete(transformComplete),
