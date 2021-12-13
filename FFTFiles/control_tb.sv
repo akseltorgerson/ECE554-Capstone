@@ -125,7 +125,7 @@ module control_tb();
             $stop();
         end
 
-        outFifoRead = 1'b0;
+        outFifoReady = 1'b0;
 
         // assert startLoadingOutFifo to get back into the LOADOUT state
         startLoadingOutFifo = 1'b1;
