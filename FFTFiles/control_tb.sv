@@ -59,6 +59,7 @@ module control_tb();
 
         if (calculating !== 1'b1 && loadExternal !== 1'b1) begin
             $display("ERROR: Expected calculating and loadExternal to be 1 after startF set high");
+            $stop();
         end
 
         // set inFifoEmpty to one to go back to loading IDLE
@@ -68,6 +69,7 @@ module control_tb();
 
         if (loadExternal !== 1'b0 && calculating !== 1'b1) begin
             $display("ERROR: Expected loadExternal to be 0 after inFifoEmpty called in LOAD state");
+            $stop();
         end
 
         // set startLoadingRam high to get back into the loading state
@@ -77,10 +79,69 @@ module control_tb();
 
         if (loadExternal !== 1'b1 && calculating !== 1'b1) begin
             $display("ERROR: Expected to be back in the LOAD state");
+            $stop();
         end
 
-        
+        // set inFifoEmpty, should go back to IDLE_LOAD state, then go into calculating state (RAM LOADED)
+        inFifoEmpty = 1'b1;
+        @(posedge clk);
+        inFifoEmpty = 1'b0;
+        loadExternalDone = 1'b1;
+        @(posedge clk);
+        loadExternalDone = 1'b0;
 
+        if (calculating !== 1'b1 && loadInternal !== 1'b1) begin
+            $display("ERROR: expected loadInternal to be high");
+            $stop();
+        end
+
+        // assert done
+        done = 1'b1;
+
+        @(posedge clk);
+
+        if (calculating !== 1'b1 && loadOutBuffer !== 1'b1) begin
+            $display("ERROR: expected loadOutBuffer to be high");
+            $stop();
+        end
+
+        // assert outFifoReady to go to idle state
+        outFifoReady = 1'b1;
+
+        @(posedge clk):
+
+        if (calculating !== 1'b1 && loadOutBuffer !== 1'b0) begin
+            $display("ERROR: expected loadOutBuffer to be low");
+            $stop();
+        end
+
+        // assert startLoadingOutFifo to get back into the LOADOUT state
+        startLoadingOutFifo = 1'b1;
+
+        @(posedge clk);
+
+        if (calculating !== 1'b1 && loadOutBuffer !== 1'b1) begin
+            $display("ERROR: expected loadOutBuffer to be high");
+            $stop();
+        end
+
+        // go back to IDLE then to Done
+        outFifoReady = 1'b1;
+        @(posedge clk);
+        outFifoReady = 1'b0;
+        outLoadDone = 1'b1;
+        @(posedge clk);
+        outLoadDone = 1'b0;
+
+        if (aDone !== 1'b1) begin
+            $display("ERROR: expected loadOutBuffer to be high");
+            $stop();
+        end
+
+        @(posedge clk);
+
+        $display("YAHOO! All tests passed");
+        $stop();
     end
 
 endmodule
