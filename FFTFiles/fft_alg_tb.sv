@@ -1,4 +1,4 @@
-module fft_noControl_tb();
+module fft_alg_tb();
 
     ////////////////////////
     ///// intermediates ////
