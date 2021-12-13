@@ -68,6 +68,7 @@ module control_tb();
         inFifoEmpty = 1'b1;
 
         @(posedge clk);
+        @(negedge clk);
 
         if (loadExternal !== 1'b0 && calculating !== 1'b1) begin
             $display("ERROR: Expected loadExternal to be 0 after inFifoEmpty called in LOAD state");
@@ -78,6 +79,7 @@ module control_tb();
         startLoadingRam = 1'b1;
 
         @(posedge clk);
+        @(negedge clk);
 
         if (loadExternal !== 1'b1 && calculating !== 1'b1) begin
             $display("ERROR: Expected to be back in the LOAD state");
@@ -87,9 +89,11 @@ module control_tb();
         // set inFifoEmpty, should go back to IDLE_LOAD state, then go into calculating state (RAM LOADED)
         inFifoEmpty = 1'b1;
         @(posedge clk);
+        @(negedge clk);
         inFifoEmpty = 1'b0;
         loadExternalDone = 1'b1;
         @(posedge clk);
+        @(negedge clk);
         loadExternalDone = 1'b0;
 
         if (calculating !== 1'b1 && loadInternal !== 1'b1) begin
@@ -101,6 +105,7 @@ module control_tb();
         done = 1'b1;
 
         @(posedge clk);
+        @(negedge clk);
 
         if (calculating !== 1'b1 && loadOutBuffer !== 1'b1) begin
             $display("ERROR: expected loadOutBuffer to be high");
@@ -111,6 +116,7 @@ module control_tb();
         outFifoReady = 1'b1;
 
         @(posedge clk);
+        @(negedge clk);
 
         if (calculating !== 1'b1 && loadOutBuffer !== 1'b0) begin
             $display("ERROR: expected loadOutBuffer to be low");
@@ -121,6 +127,7 @@ module control_tb();
         startLoadingOutFifo = 1'b1;
 
         @(posedge clk);
+        @(negedge clk);
 
         if (calculating !== 1'b1 && loadOutBuffer !== 1'b1) begin
             $display("ERROR: expected loadOutBuffer to be high");
@@ -130,9 +137,11 @@ module control_tb();
         // go back to IDLE then to Done
         outFifoReady = 1'b1;
         @(posedge clk);
+        @(negedge clk);
         outFifoReady = 1'b0;
         outLoadDone = 1'b1;
         @(posedge clk);
+        @(negedge clk);
         outLoadDone = 1'b0;
 
         if (aDone !== 1'b1) begin
@@ -141,6 +150,7 @@ module control_tb();
         end
 
         @(posedge clk);
+        @(negedge clk);
 
         $display("YAHOO! All tests passed");
         $stop();
