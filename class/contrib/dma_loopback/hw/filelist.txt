@@ -14,7 +14,7 @@ ccip_std_afu.sv
 ../../../rtl/mem_ctrl.sv
 ../../../../CPUFiles/alu.sv
 ../../../../CPUFiles/cause_register.sv
-../../../../CPUFiles/cla4_bit.sv
+../../../../CPUFiles/cla_4bit.sv
 ../../../../CPUFiles/cla_32bit.sv
 ../../../../CPUFiles/control_unit.sv
 ../../../../CPUFiles/cpu.sv
@@ -24,7 +24,7 @@ ccip_std_afu.sv
 ../../../../CPUFiles/execute_stage.sv
 ../../../../CPUFiles/fetch_stage.sv
 ../../../../CPUFiles/memory_stage.sv
-../../../../CPUFiles/prgoram_counter.sv
+../../../../CPUFiles/program_counter.sv
 ../../../../CPUFiles/reg_1bit.sv
 ../../../../CPUFiles/reg_multi_bit.sv
 ../../../../CPUFiles/rf.sv
