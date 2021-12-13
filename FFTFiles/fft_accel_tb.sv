@@ -129,6 +129,9 @@ module fft_accel_tb();
                     $stop();
                 end
 
+                @(posedge clk);
+                @(negedge clk);
+
             end
         end
 
