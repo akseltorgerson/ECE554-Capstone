@@ -104,16 +104,22 @@ module control(
             // calculations
             CALCULATINGF: begin
                 calculating = 1'b1;
-                loadInternal = 1'b1;
-                if (done)
+                
+                if (done) begin
                     next_state = LOADOUT;
+                end else begin
+                    loadInternal = 1'b1;
+                end
             end
             CALCULATINGI: begin
                 calculating = 1'b1;
                 isIFFT = 1'b1;
-                loadInternal = 1'b1;
-                if (done)
+                
+                if (done) begin
                     next_state = LOADOUT;
+                end else begin
+                    loadInternal = 1'b1;
+                end
             end
 
             // load the out fifo
