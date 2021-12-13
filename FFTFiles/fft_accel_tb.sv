@@ -104,7 +104,7 @@ module fft_accel_tb();
         end
 
         // await for the positive edge of inFifoEmpty (RAM has been loaded)
-        @(posedge iDUT.inFifoEmpty);
+        @(posedge iDUT.loadExternalDone);
 
         // loadExternal should still be being loaded ?????? CHECK THIS FOR TIMING
         if (iDUT.loadExternal !== 1'b1) begin
