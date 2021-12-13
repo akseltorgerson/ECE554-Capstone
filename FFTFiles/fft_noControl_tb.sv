@@ -280,7 +280,7 @@ module fft_noControl_tb();
         for (bucket = 0; bucket < bucketsMAX && k < 512; bucket++) begin
             for(bucketIterationCnt = 0; bucketIterationCnt < cycleLimit; bucketIterationCnt++) begin
                 
-                indexA_fake = k === 0 ? k[9:0] : startingPos[9:0] + bucketIterationCnt[9:0];
+                indexA_fake = startingPos[9:0] + bucketIterationCnt[9:0];
 
                 test_realA = 0;
                 test_imagA = 0;
