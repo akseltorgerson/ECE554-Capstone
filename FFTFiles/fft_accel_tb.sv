@@ -19,6 +19,7 @@ module fft_accel_tb();
     logic [511:0] mcDataOut;                                        // data to send to mc
     logic outFifoReady;                                             // indicates the out fifo is ready to to emptied
     logic mcDataOutValid;                                           // mc data out is valid
+    logic inFifoEmpty;                                              // indicates that the in fifo is empty
 
 
     /////////////////////////////
