@@ -100,6 +100,7 @@ module proc(
     // lets mc know to grab data from mem
     logic inFifoEmpty;
 
+    logic [17:0] sigNumMC;
 
     //---------------------- Mem Arbiter Signals---------------------------------
     
