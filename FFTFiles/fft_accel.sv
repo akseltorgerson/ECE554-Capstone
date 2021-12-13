@@ -9,6 +9,7 @@ module fft_accel(
           loadInFifo,                                               // indicates to load the in fifo from mc
     input [17:0] sigNum,                                            // input signal number for the FFT
     input [511:0] mcDataIn,                                         // data sent from mc
+    input accelWrBlkDone,
     output done,                                                    // indicates accel done
     output calculating,                                             // indicates the accel is calculating
     output reg [17:0] sigNumMC,                                     // holds the signal number used by host mem
@@ -123,6 +124,7 @@ module fft_accel(
                      .mcWrEn(loadInFifo),
                      .mcDataIn(mcDataIn),
                      .accelDataIn({fifo_imag_in, fifo_real_in}),
+                     .accelWrBlkDone(accelWrBlkDone),
                      .outBufferFull(outFifoReady),
                      .inBufferFull(inFifoReady),
                      .accelDataOut({fifo_imag_out, fifo_real_out}),

@@ -141,6 +141,7 @@ module proc(
         .sigNum(sigNum),
         .loadInFifo(loadInFifo), 
         .mcDataIn(mcAccelIn),  
+        .accelWrBlkDone(loadFifoFromRam),
         //Outputs
         .done(done),
         .calculating(fftCalculating),
