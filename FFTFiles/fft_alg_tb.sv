@@ -29,7 +29,8 @@ module fft_alg_tb();
     logic [9:0] indexA, 
                 indexB, 
                 externalIndexA, 
-                cycleCount;
+                cycleCount,
+                outIndex;
     logic [8:0] twiddleIndex, fake_twiddleIndex;
 
     // rom
@@ -131,6 +132,7 @@ module fft_alg_tb();
         fake_twiddleIndex = 9'h000;
         stageCount = 0;
         cycleCount = 0;
+        outIndex = 0;
         $readmemh("twiddleHex.mem", twiddle_mem);
         $readmemh("testSignalHex.mem", fake_mem);
 
@@ -180,6 +182,8 @@ module fft_alg_tb();
         fd = $fopen("./fftOutput.txt","w");
 
         for (j = 0; j < 1024; j++) begin
+
+            outIndex = {j[0], j[1], j[2], j[3], j[4], j[5], j[6], j[7], j[8], j[9]};
 
             @(posedge clk);
             @(negedge clk);
