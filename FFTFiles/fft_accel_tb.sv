@@ -43,9 +43,11 @@ module fft_accel_tb();
         rst = 1;
 
         @(posedge clk);
+        @(negedge clk);
 
         rst = 0;
 
+        // start the FFT Accelerator
         
 
         $stop();

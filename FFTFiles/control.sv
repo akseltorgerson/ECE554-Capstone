@@ -61,10 +61,10 @@ module control(
         case(state)
             IDLE: begin
                 if (startF)begin
-                    next_state = LOADF;
+                    next_state = IDLE_LOADF;
                 end
                 else if (startI) begin
-                    next_state = LOADI;
+                    next_state = IDLE_LOADI;
                 end
                 else begin
                     next_state = IDLE;
