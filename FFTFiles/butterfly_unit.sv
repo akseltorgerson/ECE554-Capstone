@@ -7,7 +7,7 @@ module butterfly_unit
 	/////////////////////////
 	////// Intermediates ////
 	/////////////////////////
-	
+	wire [31:0] mult_B_real, mult_B_imag;
 	wire [63:0] mult_B_real_left_product, mult_B_real_right_product, mult_B_imag_left_product, mult_B_imag_right_product, inter_real, inter_imag;
 	
 	/*********
