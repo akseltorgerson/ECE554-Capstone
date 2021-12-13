@@ -106,8 +106,8 @@ module fft_alg_tb();
             inter_real = (real_left_prod - real_right_prod);
             inter_imag = (imag_left_prod + imag_right_prod);
 
-            mult_B_real = inter_real[63:32];
-            mult_B_imag = inter_imag[63:32];
+            mult_B_real = inter_real[47:16];
+            mult_B_imag = inter_imag[47:16];
 
             real_A_out = real_A + mult_B_real;
 	        imag_A_out = imag_A + mult_B_imag;
