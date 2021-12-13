@@ -110,7 +110,17 @@ module fft_accel_tb();
         if (iDUT.loadExternal !== 1'b1) begin
             $display("ERROR: loadExternal should still be asserted.");
             $stop();
-        end 
+        end
+
+        // should now go into the next calculating state
+        @(posedge clk);
+        @(negedge clk);
+
+        // Check loadInternal (should be 1'b1)
+        if (iDUT.loadInternal !== 1'b1) begin
+            $display("ERROR: loadInternal should start to be asserted after finished loading the wam.");
+            $stop();
+        end
 
         $display("YAHOO! ALL TESTS PASSED");
         $stop();
