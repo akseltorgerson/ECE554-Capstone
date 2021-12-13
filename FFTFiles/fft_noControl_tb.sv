@@ -191,57 +191,57 @@ module fft_noControl_tb();
             @(negedge clk);
         end
         
-        // set load to 0 and start setting the expected output values
-        load = 0;
-        for (k = 0; k < 512; k++) begin
-            fake_twiddleIndex = 2 * k / 1024;
+        // // set load to 0 and start setting the expected output values
+        // load = 0;
+        // for (k = 0; k < 512; k++) begin
+        //     fake_twiddleIndex = 2 * k / 1024;
             
-            fake_twiddleIndex = {fake_twiddleIndex[0], fake_twiddleIndex[1], fake_twiddleIndex[2],
-                                 fake_twiddleIndex[3], fake_twiddleIndex[4], fake_twiddleIndex[5],
-                                 fake_twiddleIndex[6], fake_twiddleIndex[7], fake_twiddleIndex[8]};
+        //     fake_twiddleIndex = {fake_twiddleIndex[0], fake_twiddleIndex[1], fake_twiddleIndex[2],
+        //                          fake_twiddleIndex[3], fake_twiddleIndex[4], fake_twiddleIndex[5],
+        //                          fake_twiddleIndex[6], fake_twiddleIndex[7], fake_twiddleIndex[8]};
 
-            mult_complex(.real_A(fake_mem[2*k]),           // real A in
-                         .imag_A(fake_mem[2*k + 1]),       // imag A in
-                         .real_B(fake_mem[2*k + 1024]),    // real B in
-                         .imag_B(fake_mem[2*k + 1025]),    // imag B in
-                         .twiddle_real(twiddle_mem[2* fake_twiddleIndex]),        // twiddle factors
-                         .twiddle_imag(twiddle_mem[2*fake_twiddleIndex + 1]),
-                         .real_A_out(test_realA),           // outputs
-                         .imag_A_out(test_imagA),
-                         .real_B_out(test_realB),
-                         .imag_B_out(test_imagB));
+        //     mult_complex(.real_A(fake_mem[2*k]),           // real A in
+        //                  .imag_A(fake_mem[2*k + 1]),       // imag A in
+        //                  .real_B(fake_mem[2*k + 1024]),    // real B in
+        //                  .imag_B(fake_mem[2*k + 1025]),    // imag B in
+        //                  .twiddle_real(twiddle_mem[2* fake_twiddleIndex]),        // twiddle factors
+        //                  .twiddle_imag(twiddle_mem[2*fake_twiddleIndex + 1]),
+        //                  .real_A_out(test_realA),           // outputs
+        //                  .imag_A_out(test_imagA),
+        //                  .real_B_out(test_realB),
+        //                  .imag_B_out(test_imagB));
 
 
-            fake_mem[2*k] = test_realA;
-            fake_mem[2*k + 1] = test_imagA;
-            fake_mem[2*k + 1024] = test_realB;
-            fake_mem[2*k + 1025] = test_imagB;   
+        //     fake_mem[2*k] = test_realA;
+        //     fake_mem[2*k + 1] = test_imagA;
+        //     fake_mem[2*k + 1024] = test_realB;
+        //     fake_mem[2*k + 1025] = test_imagB;   
 
-            @(posedge clk);
-            @(negedge clk);
+        //     @(posedge clk);
+        //     @(negedge clk);
 
-        end
+        // end
 
-        // set scan high to test that the values that are stored in mem and fake mem are correct (equal)
-        scan = 1;
+        // // set scan high to test that the values that are stored in mem and fake mem are correct (equal)
+        // scan = 1;
 
-        for (k = 0; k < 1024; k++) begin
-            externalIndexA = k;
+        // for (k = 0; k < 1024; k++) begin
+        //     externalIndexA = k;
 
-            @(posedge clk);
-            @(negedge clk);
+        //     @(posedge clk);
+        //     @(negedge clk);
 
-            if (butterfly_real_A_in !== fake_mem[2*k] || butterfly_imag_A_in !== fake_mem[2*k + 1]) begin
-                $display("RAM OUT REAL: %h, RAM OUT IMAG: %h", butterfly_real_A_in, butterfly_imag_A_in);
-                $display("EXPECTED RAM OUT REAL: %h, EXPECTED RAM OUT IMAG: %h", fake_mem[2*k], fake_mem[2*k + 1]);
-                $display("INDEX: %d", 2*k);
-                $stop();
-            end
-        end
+        //     if (butterfly_real_A_in !== fake_mem[2*k] || butterfly_imag_A_in !== fake_mem[2*k + 1]) begin
+        //         $display("RAM OUT REAL: %h, RAM OUT IMAG: %h", butterfly_real_A_in, butterfly_imag_A_in);
+        //         $display("EXPECTED RAM OUT REAL: %h, EXPECTED RAM OUT IMAG: %h", fake_mem[2*k], fake_mem[2*k + 1]);
+        //         $display("INDEX: %d", 2*k);
+        //         $stop();
+        //     end
+        // end
 
-        // go through all stages
+        // // go through all stages
 
-        scan = 0;
+        // scan = 0;
 
         // ///////////////////////////////////////////////////////////////////////////////////////////////
         // //////////////////////////////// END STAGE 1 //////////////////////////////////////////////////
@@ -340,7 +340,7 @@ module fft_noControl_tb();
         ///////////////////////////////////////////////////////////////////////////////////////////////
 
         load = 1;
-        
+
         for (stageCount = 1; stageCount < 10; stageCount++) begin
             for (cycleCount = 0; cycleCount < 512; cycleCount++) begin
 
