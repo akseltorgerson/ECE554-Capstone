@@ -191,6 +191,15 @@ module fft_accel_tb();
             $stop();
         end
 
+        @(posedge clk);
+        @(negedge clk);
+
+        // outFifo should be high
+        if (done !== 1'b1) begin
+            $display("ERROR: done should be asserted.");
+            $stop();
+        end
+
         $display("YAHOO! ALL TESTS PASSED");
         $stop();
     end

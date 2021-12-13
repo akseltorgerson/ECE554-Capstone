@@ -27,7 +27,7 @@ module control(
     /// intermediates //
     ////////////////////
 
-    typedef enum { IDLE, IDLE_LOADI, IDLE_LOADF, LOADI, LOADF, STARTF, STARTI, CALCULATINGF, CALCULATINGI, START_LOADOUT, IDLE_LOADOUT, LOADOUT, DONE } state_t;
+    typedef enum { IDLE, IDLE_LOADI, IDLE_LOADF, LOADI, LOADF, STARTF, STARTI, CALCULATINGF, CALCULATINGI, START_LOADOUT, LOADOUT, DONE } state_t;
 
     state_t state, next_state;
 
@@ -122,18 +122,11 @@ module control(
                 end
             end
 
-            // load the out fifo
-            IDLE_LOADOUT: begin
-                calculating = 1'b1;
-                if (outLoadDone)
-                    next_state = DONE;
-            end
-
             LOADOUT: begin
                 calculating = 1'b1;
-                
+
                 if (outFifoReady) begin
-                    next_state = IDLE_LOADOUT;
+                    next_state = DONE;
                 end else begin
                     loadOutBuffer = 1'b1;
                 end
