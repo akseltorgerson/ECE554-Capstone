@@ -29,15 +29,14 @@ module fft_noControl_tb();
     logic [9:0] indexA, 
                 indexB, 
                 externalIndexA, 
-                cycleCount,
-                indexB_fake;
+                cycleCount;
     logic [8:0] twiddleIndex, fake_twiddleIndex;
 
     // rom
     reg signed [31:0] twiddle_mem [0:1023];
     reg signed [31:0] fake_mem [0:2047];
 
-    integer i, j, k;
+    integer i, j, k, fd;
 
     //////////////////////////
     // ADDRESS GEN BITS
