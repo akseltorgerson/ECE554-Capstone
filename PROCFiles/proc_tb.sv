@@ -49,6 +49,8 @@ module proc_tb();
         repeat(10) begin
             @(posedge clk);
         end
+
+        $stop();
     end
 
     always #5 clk = ~clk;
