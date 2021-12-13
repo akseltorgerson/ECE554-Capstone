@@ -121,10 +121,23 @@ module fft_accel_tb();
 
         for (stageCounter = 0; stageCounter < 10; stageCounter++) begin
             for (cycleCounter = 0; cycleCounter < 512; cycleCounter++) begin
+                
+                // check if the stages and the cycles match ups
+                if (stageCounter[4:0] !== iDUT.stageCount) begin
+                    $display("ERROR: TB Stage and actual Stage not in sync.");
+                    $display("TB STAGE: %d,  ACC STAGE: %d", stageCounter, iDUT.stageCount);
+                    $stop();
+                end
+
+                if (cycleCounter[8:0] !== iDUT.cycleCount) begin
+                    $display("ERROR: TB Cycle and actual Cycle not in sync.");
+                    $display("TB CYCLE: %d,  ACC CYCLE: %d", stageCounter, iDUT.stageCount);
+                    $stop();
+                end
 
                 // Check loadInternal (should be 1'b1)
                 if (iDUT.loadInternal !== 1'b1) begin
-                    $display("ERROR: loadInternal should be asserted for every stage and every stage.");
+                    $display("ERROR: loadInternal should be asserted for every stage and every cycle.");
                     $display("STAGE: %d,  CYCLE: %d", stageCounter, cycleCounter);
                     $stop();
                 end
