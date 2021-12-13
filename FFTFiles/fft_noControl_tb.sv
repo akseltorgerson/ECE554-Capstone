@@ -43,7 +43,7 @@ module fft_noControl_tb();
     //////////////////////////
     // ADDRESS GEN BITS
     //////////////////////////
-    integer bucket, bucketsMAX, cycleLimit, startingPos, bucketIterationCnt, dftSize;    // bucket refers to which DFT the cycle iteration refers to
+    integer bucket, bucketsMAX, cycleLimit, startingPos, bucketIterationCnt, dftSize, indexA_fake;    // bucket refers to which DFT the cycle iteration refers to
 
     assign bucketsMAX = 2 ** stageCount;
     assign cycleLimit = 512 / bucketsMAX;
@@ -134,7 +134,6 @@ module fft_noControl_tb();
         fake_twiddleIndex = 9'h000;
         stageCount = 0;
         cycleCount = 0;
-        indexA_fake = 10'h000;
         $readmemh("twiddleHex.mem", twiddle_mem);
         $readmemh("testSignalHex.mem", fake_mem);
 
@@ -280,7 +279,7 @@ module fft_noControl_tb();
         for (bucket = 0; bucket < bucketsMAX && k < 512; bucket++) begin
             for(bucketIterationCnt = 0; bucketIterationCnt < cycleLimit; bucketIterationCnt++) begin
                 
-                indexA_fake = startingPos[9:0] + bucketIterationCnt[9:0];
+                indexA_fake = k === 0 ? k[9:0] : startingPos[9:0] + bucketIterationCnt[9:0];
 
                 test_realA = 0;
                 test_imagA = 0;
