@@ -8,7 +8,6 @@ module a_buf_in (
     output reg [63:0] dataOut,  // data going to accelerator
     output reg dataOutValid,    // signal to let the accelerator know the data on the bus is valid
     output reg fifoEmpty        // signal to let accelerator and mc know that is empty
-
 );
 
     localparam DEPTH = 1024;
