@@ -14,7 +14,8 @@ module fft_accel(
     output reg [17:0] sigNumMC,                                     // holds the signal number used by host mem
     output [511:0] mcDataOut,                                       // data to send to mc
     output outFifoReady,                                            // indicates the out fifo is ready to to emptied
-    output mcDataOutValid                                           // mc data out is valid
+    output mcDataOutValid,                                          // mc data out is valid
+    output inFifoEmpty                                              // indicates that the in fifo is empty (ready to be loaded from mc) 
 );
 
     // large data signals
@@ -48,8 +49,7 @@ module fft_accel(
           accelDataOutValid,                                        // indicates data from accel valid
           loadExternal,                                             // indicates to load from fifo to ram
           loadOutBuffer,                                            // indicates to load the out buffer
-          outLoadDone,                                              // indicates loading the outbuffer is complete (All ram is gone)
-          inFifoEmpty;                                              // indicates that the in fifo is empty (ready to be loaded from mc)
+          outLoadDone;                                              // indicates loading the outbuffer is complete (All ram is gone)
 
     ////////////////////////
     ////// modules//////////

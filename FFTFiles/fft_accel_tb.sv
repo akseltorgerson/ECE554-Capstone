@@ -1,5 +1,6 @@
 module fft_accel_tb();
 
+    // inputs
     logic clk,                                                      // clk signal
           rst,                                                      // rst
           startF,                                                   // Indicates to start FFT
@@ -10,12 +11,14 @@ module fft_accel_tb();
           loadInFifo;                                               // indicates to load the in fifo from mc
     logic [17:0] sigNum;                                            // input signal number for the FFT
     logic [511:0] mcDataIn;                                         // data sent from mc
+    
+    // outputs
     logic done;                                                     // indicates accel done
     logic calculating;                                              // indicates the accel is calculating
     logic [17:0] sigNumMC;                                          // holds the signal number used by host mem
     logic [511:0] mcDataOut;                                        // data to send to mc
     logic outFifoReady;                                             // indicates the out fifo is ready to to emptied
-    logic mcDataOutValid;                                            // mc data out is valid
+    logic mcDataOutValid;                                           // mc data out is valid
 
     //////////////////////////////
     ///////// modules ////////////
@@ -34,8 +37,16 @@ module fft_accel_tb();
         filter = 0;
         loadFifoFromRam = 0;
         loadInFifo = 0;
+        signum = 18'h00000;
+
+        // reset the accelerator
+        rst = 1;
 
         @(posedge clk);
+
+        rst = 0;
+
+        
 
         $stop();
     end
