@@ -136,7 +136,7 @@ module fft_noControl_tb();
         $readmemh("testSignalHex.mem", fake_mem);
 
         // run through the FFT on the regular ram
-        for(stageCount = 0; stageCount < 10; stageCount+) begin
+        for(stageCount = 0; stageCount < 10; stageCount++) begin
             for (bucket = 0; bucket < bucketsMAX && k < 512; bucket++) begin
                 for(bucketIterationCnt = 0; bucketIterationCnt < cycleLimit; bucketIterationCnt++) begin
                     
