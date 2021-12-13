@@ -44,6 +44,11 @@ module proc_tb();
         @(negedge clk);
         rst = 1'b0;
         //START TESTING
+
+        //wait some clk cycles
+        repeat(10) begin
+            @(posedge clk);
+        end
     end
 
     always #5 clk = ~clk;

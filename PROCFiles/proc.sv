@@ -1,6 +1,6 @@
 module proc(
     //Inputs
-    clk, rst, common_data_bus_in, tx_done, rd_valid
+    clk, rst, common_data_bus_in, tx_done, rd_valid,
     //Outputs
     op, common_data_bus_out, io_addr, cv_value
 );
@@ -13,7 +13,7 @@ module proc(
     input rd_valid;
 
     output [1:0] op;
-    output [LINE_SIZE-1:0] common_data_bus_out
+    output [LINE_SIZE-1:0] common_data_bus_out;
     output [31:0] io_addr;
     output logic [63:0] cv_value;
 
@@ -185,7 +185,7 @@ module proc(
         .op(op),
         .common_data_bus_out(common_data_bus_out),
         .io_addr(io_addr),
-        .cv_value(cv_value);
+        .cv_value(cv_value)
     );
 
 endmodule
