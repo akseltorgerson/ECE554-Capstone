@@ -77,7 +77,6 @@ module fft_accel(
                      .loadExternal(loadExternal),
                      .loadOutBuffer(loadOutBuffer),
                      .outLoadDone(outLoadDone),
-                     .startLoadingOutFifo(1'b0),
                      .startLoadingRam(inFifoReady),
                      .outFifoReady(outFifoReady),
                      .inFifoEmpty(inFifoEmpty));

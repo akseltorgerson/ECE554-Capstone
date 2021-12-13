@@ -8,7 +8,6 @@ module control(
           clk, 
           rst, 
           outLoadDone, 
-          startLoadingOutFifo, 
           outFifoReady, 
           startLoadingRam, 
           inFifoEmpty,
@@ -126,8 +125,6 @@ module control(
                 calculating = 1'b1;
                 if (outLoadDone)
                     next_state = DONE;
-                else if (startLoadingOutFifo)
-                    next_state = LOADOUT;
             end
 
             LOADOUT: begin
