@@ -75,34 +75,30 @@ module control(
             // LOADI
             IDLE_LOADI: begin
                 calculating = 1'b1;
-                if (loadExternalDone)
-                    next_state = CALCULATINGI;
-                else if(startLoadingRam)
+                if(startLoadingRam)
                     next_state = LOADI;
             end
 
             LOADI: begin
                 loadExternal = 1'b1;
                 calculating = 1'b1;
-                if (inFifoEmpty) begin
-                    next_state = IDLE_LOADI;
+                if (loadExternalDone) begin
+                    next_state = CALCULATINGI;
                 end
             end
 
             // LOADF
             IDLE_LOADF: begin
                 calculating = 1'b1;
-                if (loadExternalDone)
-                    next_state = CALCULATINGF;
-                else if(startLoadingRam)
+                if(startLoadingRam)
                     next_state = LOADF;
             end
 
             LOADF: begin
                 loadExternal = 1'b1;
                 calculating = 1'b1;
-                if (inFifoEmpty)
-                    next_state = IDLE_LOADF;
+                if (loadExternalDone)
+                    next_state = CALCULATINGF;
             end
 
             // calculations
