@@ -103,7 +103,7 @@ module mem_arb_tb();
         sigNum = 18'b0;
         j = 0;
         
-        repeat (128) begin
+        while (transformComplete != 1'b1) begin
             // ACCEL_RD
             @(posedge clk);
             @(negedge clk);
@@ -137,8 +137,13 @@ module mem_arb_tb();
 
         end
 
+        // RESET
+        @(negedge clk);
+        rst = 1'b1;
+        @(posedge clk);
+        @(negedge clk);
+        rst = 1'b0;
 
-        /*
         // test an instr read req
         instrCacheBlkReq = 1'b1;
         instrAddr = 1'b0;
@@ -372,8 +377,49 @@ module mem_arb_tb();
         repeat(10) begin
             @(posedge clk);
         end
-        */
 
+        // IDLE STAGE
+         // assign inputs at negedge
+        @(negedge clk);
+        accelDataWr = 1'b1;
+        @(posedge clk);
+        @(negedge clk);
+        accelDataWr = 1'b0;
+        sigNum = 18'b0;
+        j = 0;
+        
+        while (transformComplete != 1'b1) begin
+            // ACCEL_RD
+            accelBlk2Mem = {j+15,
+                            j+14,
+                            j+13,
+                            j+12,
+                            j+11,
+                            j+10,
+                            j+9,
+                            j+8,
+                            j+7,
+                            j+6,
+                            j+5,
+                            j+4,
+                            j+3,
+                            j+2,
+                            j+1,
+                            j};
+
+            @(posedge clk);
+            @(negedge clk);
+
+            tx_done = 1'b1;
+            if (common_data_bus_out != accelBlk2Mem) begin
+                $display("ERROR: common_data_bus_out, Expected: %32h, Got: %32h", accelBlk2Mem, common_data_bus_out);
+                errors += 1;
+            end   
+            @(posedge clk);
+            @(negedge clk);         
+            tx_done = 1'b0;
+            j += 16;
+        end
 
         if (errors != 0) begin
             $display("TEST FAILED: %d ERROR(S)", errors);
