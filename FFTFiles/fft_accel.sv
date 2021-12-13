@@ -150,7 +150,7 @@ module fft_accel(
             stageCount <= 5'b00000;
         else if (doneCalculating)
             doneCalculating <= 1'b0;
-        else if (stageCount[3] & stageCount[0]) begin
+        else if (stageCount[3] & stageCount[1]) begin
             stageCount <= 5'b00000;
             doneCalculating <= 1'b1;
         end else if (calculating & loadInternal & &cycleCount)
