@@ -78,7 +78,7 @@ module fft_accel_tb();
         loadInFifo = 1'b1;              // indicates that the mc has data ready to be loaded into the FFT
 
         // should go through and load the fifo 128 times
-        for (loadInFifoLoop = 0; loadInFifo < 128; loadInFifo) begin
+        for (loadInFifoLoop = 0; loadInFifo < 128; loadInFifo++) begin
             mcDataIn = 512'd1080;
 
             @(posedge clk);
