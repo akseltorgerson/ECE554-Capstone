@@ -30,7 +30,6 @@ module fft_noControl_tb();
                 indexB, 
                 externalIndexA, 
                 cycleCount,
-                indexA_fake,
                 indexB_fake;
     logic [8:0] twiddleIndex, fake_twiddleIndex;
 
