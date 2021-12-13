@@ -51,11 +51,11 @@ module control_tb();
         rst = 0;
 
         // test out start F and make sure we go through all the states correctly
-        startF = 1;
+        startF = 1'b1;
         
         @(posedge clk);
 
-        startF = 0;
+        startF = 1'b0;
 
         if (calculating !== 1'b1 && loadExternal !== 1'b1) begin
             $display("ERROR: Expected calculating and loadExternal to be 1 after startF set high");
