@@ -139,7 +139,8 @@ module control(
 
             // DONE STATE
             DONE: begin
-                aDone = 1;
+                aDone = 1'b1;
+                calculating = 1'b1;
                 next_state = IDLE;
             end
         endcase

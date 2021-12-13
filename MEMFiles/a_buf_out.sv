@@ -4,6 +4,7 @@ module a_buf_out (
     input clk, rst,
     input wrEn,                     // control signal from the accelerator CU to let us know that the data is valid
     input reg [63:0] dataIn,        // data point from the accelerator
+    input accelWrBlkDone,           // signal form the 
     output reg bufferFull,          // control signal to let the MC know we can start writing data
     output reg [511:0] dataOut,     // data leaving the buffer going to host mem
     output reg dataOutValid        // signal to let the MC know the data on the bus is valid
@@ -56,7 +57,7 @@ module a_buf_out (
     *                    Empty Sequence                     *
     ********************************************************/
     always_ff @(posedge clk) begin
-        if (bufferFull) begin 
+        if (bufferFull & accelWrBlkDone) begin 
             if (outIndex == 10'h3F8) begin
                 bufferFull <= 1'b0;
                 dataOutValid <= 1'b0;
