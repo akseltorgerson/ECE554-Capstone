@@ -150,7 +150,9 @@ module fft_accel(
     always_ff @(posedge clk, posedge rst) begin
         if (rst)
             stageCount <= 5'b00000;
-        else if (&stageCount) begin
+        else if (doneCalculating)
+            doneCalculating <= 1'b0;
+        else if (stageCount[3] & stageCount[0]) begin
             stageCount <= 5'b00000;
             doneCalculating <= 1'b1;
         end else if (calculating & loadInternal & &cycleCount)
