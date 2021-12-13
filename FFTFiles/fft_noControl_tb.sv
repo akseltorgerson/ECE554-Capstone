@@ -213,13 +213,15 @@ module fft_noControl_tb();
                          .real_B_out(test_realB),
                          .imag_B_out(test_imagB));
 
-            @(posedge clk);
-            @(negedge clk);
 
             fake_mem[2*k] = test_realA;
             fake_mem[2*k + 1] = test_imagA;
             fake_mem[2*k + 1024] = test_realB;
-            fake_mem[2*k + 1025] = test_imagB;    
+            fake_mem[2*k + 1025] = test_imagB;   
+
+            @(posedge clk);
+            @(negedge clk);
+
         end
 
         // set scan high to test that the values that are stored in mem and fake mem are correct (equal)
@@ -299,13 +301,13 @@ module fft_noControl_tb();
                             .real_B_out(test_realB),
                             .imag_B_out(test_imagB));
 
-                @(posedge clk);
-                @(negedge clk);
-
                 fake_mem[2*indexA_fake] = test_realA;
                 fake_mem[2*indexA_fake + 1] = test_imagA;
                 fake_mem[2*indexB_fake] = test_realB;
                 fake_mem[2*indexB_fake + 1] = test_imagB;
+
+                @(posedge clk);
+                @(negedge clk);
 
                 k++;
             end   
