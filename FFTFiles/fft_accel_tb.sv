@@ -88,10 +88,29 @@ module fft_accel_tb();
 
         end
 
+        // check if inFifoReady is correctly asserted
         if (iDUT.inFifoReady !== 1'b1) begin
             $display("ERROR: inFifoReady was not set high when it should have been");
             $stop();
         end
+
+        @(posedge clk);
+        @(negedge clk);
+
+        // loadExternal should be set high (WAM is being loaded)
+        if (iDUT.loadExternal !== 1'b1) begin
+            $display("ERROR: loadExternal was not set high when it should have been");
+            $stop();
+        end
+
+        // await for the positive edge of inFifoEmpty (RAM has been loaded)
+        @(posedge iDUT.inFifoEmpty);
+
+        // loadExternal should still be being loaded ?????? CHECK THIS FOR TIMING
+        if (iDUT.loadExternal !== 1'b1) begin
+            $display("ERROR: loadExternal should still be asserted.");
+            $stop();
+        end 
 
         $display("YAHOO! ALL TESTS PASSED");
         $stop();
