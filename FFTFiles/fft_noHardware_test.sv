@@ -34,8 +34,8 @@ module fft_noControl_tb();
     logic [8:0] twiddleIndex, fake_twiddleIndex;
 
     // rom
-    reg [31:0] twiddle_mem [0:1023];
-    reg [31:0] fake_mem [0:2047];
+    reg signed [31:0] twiddle_mem [0:1023];
+    reg signed [31:0] fake_mem [0:2047];
 
     integer i, j, k;
 
@@ -182,24 +182,11 @@ module fft_noControl_tb();
 
         for (j = 0; j < 1024; j++) begin
 
-            externalIndexA = j;
-
-            externalIndexA = {externalIndexA[0],
-                              externalIndexA[1],
-                              externalIndexA[2],
-                              externalIndexA[3],
-                              externalIndexA[4],
-                              externalIndexA[5],
-                              externalIndexA[6],
-                              externalIndexA[7],
-                              externalIndexA[8],
-                              externalIndexA[9]};
-
             @(posedge clk);
             @(negedge clk);
 
-            $fdisplay(fd, "%h", butterfly_real_A_in);
-            $fdisplay(fd, "%h", butterfly_imag_A_in);
+            $fdisplay(fd, "%h", fake_mem[2*j]);
+            $fdisplay(fd, "%h", fake_mem[2*j + 1]);
 
         end
 
