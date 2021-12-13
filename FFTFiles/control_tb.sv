@@ -47,6 +47,7 @@ module control_tb();
         rst = 1;
 
         @(posedge clk);
+        @(negedge clk);
 
         rst = 0;
 
@@ -54,6 +55,7 @@ module control_tb();
         startF = 1'b1;
         
         @(posedge clk);
+        @(negedge clk);
 
         startF = 1'b0;
 
