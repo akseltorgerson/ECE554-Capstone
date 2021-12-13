@@ -4,7 +4,7 @@ module a_buf_out (
     input clk, rst,
     input wrEn,                     // control signal from the accelerator CU to let us know that the data is valid
     input reg [63:0] dataIn,        // data point from the accelerator
-    output reg emptyReady,          // control signal to let the MC know we can start writing data
+    output reg bufferFull,          // control signal to let the MC know we can start writing data
     output reg [511:0] dataOut,     // data leaving the buffer going to host mem
     output reg dataOutValid        // signal to let the MC know the data on the bus is valid
 );
@@ -28,7 +28,8 @@ module a_buf_out (
         if (rst) begin
             index <= 10'b0;
             outIndex <= 10'b0;
-            emptyReady <= 1'b0;
+            bufferFull <= 1'b0;
+            dataOutValid <= 1'b0;
             for (i = 0; i < DEPTH; i++) begin
                 buffer[i] <= 64'b0;
             end
@@ -41,12 +42,13 @@ module a_buf_out (
     always_ff @(posedge clk) begin
         if (wrEn) begin
             buffer[index] <= dataIn;
+            if (&index) begin
+                bufferFull <= 1'b1;
+                dataOutValid <= 1'b1;
+            end else begin
+                bufferFull <= 1'b0;
+            end
             index <= index + 1'b1;
-        end
-        if (&index) begin
-            emptyReady <= 1'b1;
-        end else begin
-            emptyReady <= 1'b0;
         end
     end
 
@@ -54,13 +56,14 @@ module a_buf_out (
     *                    Empty Sequence                     *
     ********************************************************/
     always_ff @(posedge clk) begin
-        if (emptyReady) begin
+        if (bufferFull) begin 
+            if (outIndex == 10'h3F8) begin
+                bufferFull <= 1'b0;
+                dataOutValid <= 1'b0;
+            end else begin
+                dataOutValid <= 1'b1;
+            end
             outIndex <= outIndex + 4'b1000;
-        end
-        if (outIndex == 10'h3F8) begin
-            emptyReady <= 1'b0;
-        end else begin
-            emptyReady <= 1'b1;
         end
     end
 

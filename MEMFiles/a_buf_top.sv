@@ -5,8 +5,8 @@ module a_buf_top(
     input mcWrEn,
     input [511:0] mcDataIn,
     input [63:0] accelDataIn,
-    output reg outEmptyReady,
-    output reg inEmptyReady,
+    output reg outBufferFull,
+    output reg inBufferFull,
     output reg [63:0] accelDataOut,
     output reg [511:0] mcDataOut,
     output reg mcDataOutValid,
@@ -21,7 +21,7 @@ module a_buf_top(
     a_buf_in iBufIn(.clk(clk), .rst(rst), 
                     .wrEn(mcWrEn), 
                     .dataIn(mcDataIn),
-                    .emptyReady(inEmptyReady),
+                    .bufferFull(inBufferFull),
                     .dataOut(accelDataOut),
                     .dataOutValid(accelDataOutValid),
                     .fifoEmpty(inFifoEmpty));
@@ -32,7 +32,7 @@ module a_buf_top(
     a_buf_out iBufOut(  .clk(clk), .rst(rst),
                         .wrEn(accelWrEn),
                         .dataIn(accelDataIn),
-                        .emptyReady(outEmptyReady),
+                        .bufferFull(outBufferFull),
                         .dataOut(mcDataOut),
                         .dataOutValid(mcDataOutValid));
 
