@@ -148,7 +148,20 @@ module fft_accel_tb();
             end
         end
 
-        
+        // make sure that load internal is set low
+        @(posedge clk);
+        @(negedge clk);
+
+        // loadInternal should be low
+        if (iDUT.loadInternal !== 1'b0) begin
+            $display("ERROR: load Internal should be set low.");
+            $stop();
+        end
+
+        if (iDUT.doneCalculating !== 1'b1) begin
+            $display("ERROR: doneCalculating should be set high.");
+            $stop();
+        end
 
         $display("YAHOO! ALL TESTS PASSED");
         $stop();
