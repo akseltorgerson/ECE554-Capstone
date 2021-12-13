@@ -87,7 +87,7 @@ module fft_accel_tb();
 
         end
 
-        if (iDUT.control1.inFifoReady !== 1'b1) begin
+        if (iDUT.inFifoReady !== 1'b1) begin
             $display("ERROR: inFifoReady was not set high when it should have been");
             $stop();
         end
