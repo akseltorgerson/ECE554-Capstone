@@ -280,13 +280,13 @@ module fft_noControl_tb();
                 test_realB = 0;
                 test_imagB = 0;
 
-                fake_twiddleIndex = $floor(k * (2 ** (stageCount + 1)) / 1024);
+                fake_twiddleIndex = {$floor(k * (2 ** (stageCount + 1)) / 1024)}[8:0];
                 
                 fake_twiddleIndex = {fake_twiddleIndex[0], fake_twiddleIndex[1], fake_twiddleIndex[2],
                                     fake_twiddleIndex[3], fake_twiddleIndex[4], fake_twiddleIndex[5],
                                     fake_twiddleIndex[6], fake_twiddleIndex[7], fake_twiddleIndex[8]};
 
-                indexA_fake = k == 0 ? k[9:0] : {startingPos + bucketIterationCnt}[8:0];
+                indexA_fake = k == 0 ? k[9:0] : {startingPos + bucketIterationCnt}[9:0];
 
                 mult_complex(.real_A(fake_mem[2*indexA_fake ]),                     // real A in
                             .imag_A(fake_mem[2*indexA_fake + 1]),                   // imag A in
