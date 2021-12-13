@@ -54,7 +54,7 @@ module mem_arb(
     opcode op_out;
 
     assign op = opcode'(op_out);
-    assign cv_value[0] = rst ? 64'b0 : {63'b0, dump};
+    assign cv_value = rst ? 64'b0 : {63'b0, dump};
 
     // state enum
     typedef enum reg[3:0] {
