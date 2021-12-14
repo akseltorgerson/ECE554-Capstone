@@ -283,19 +283,8 @@ module proc_tb();
         // fuck around and find out
         for (k = 0; k < 1024; k++) begin
 
-            outIndex = {k[0],
-                        k[1],
-                        k[2],
-                        k[3],
-                        k[4],
-                        k[5],
-                        k[6],
-                        k[7],
-                        k[8],
-                        k[9]};
-
-            $fdisplay(fid, "%h", accelMemory[2*outIndex]);
-            $fdisplay(fid, "%h", accelMemory[2*outIndex + 1]);
+            $fdisplay(fid, "%h", accelMemory[2*k]);
+            $fdisplay(fid, "%h", accelMemory[2*k + 1]);
 
         end
 
