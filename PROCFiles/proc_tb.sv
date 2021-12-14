@@ -142,10 +142,10 @@ module proc_tb();
 
         @(posedge clk);
         @(negedge clk);
-        //Check SLBI Signals again to show that the processor has stalled since there should be a data cache miss
+        //Check ST Signals again to show that the processor has stalled since there should be a data cache miss
         if(iProcessor.iCPU.instruction != 32'h83280000 || iProcessor.iCPU.iDecode.isSignExtend != 1'b1 || iProcessor.iCPU.iDecode.isIType1 != 1'b1  || iProcessor.iCPU.iDecode.memWrite != 1'b1) begin
             errors++;
-            $display("FAILED SLBI TEST");
+            $display("FAILED ST TEST");
         end
 
         // will get a request from data cache now

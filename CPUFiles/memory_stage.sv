@@ -208,11 +208,11 @@ module memory_stage(
 
     //Right now it's just overall fftCalculating
     //NOTE: want it to check if its calculating on the address of the specific signal
-    assign memWriteEx = (fftCalculating != 1'b1) && (^aluResult[31:28] != 1'b1) && memWrite ? 1'b1 : 1'b0;
+    assign memWriteEx = (fftCalculating != 1'b1) && (|aluResult[31:28] != 1'b1) && memWrite ? 1'b1 : 1'b0;
 
     //Right now it's just overall fftCalculating
     //NOTE: want it to check if its calculating on the address of the specific signal
-    assign memAccessEx = (fftCalculating != 1'b1) && (^aluResult[31:28] != 1'b1) && memRead ? 1'b1 : 1'b0;
+    assign memAccessEx = (fftCalculating != 1'b1) && (|aluResult[31:28] != 1'b1) && memRead ? 1'b1 : 1'b0;
 
     //Right now it's just overall fftCalculating
     //NOTE: want it to check if its calculating on the address of the specific signal
