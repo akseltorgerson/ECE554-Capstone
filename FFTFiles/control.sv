@@ -9,7 +9,8 @@ module control(
           rst, 
           outLoadDone, 
           outFifoReady, 
-          startLoadingRam, 
+          startLoadingRam,
+          transformComplete,
           inFifoEmpty,
     input [17:0] sigNum, 
     //Outputs
@@ -138,7 +139,7 @@ module control(
             DONE: begin
                 aDone = 1'b1;
                 calculating = 1'b1;
-                next_state = IDLE;
+                next_state = transformComplete ? IDLE : DONE;
             end
         endcase
     end

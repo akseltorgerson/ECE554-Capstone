@@ -6,6 +6,7 @@ module fft_accel(
           loadF,                                                    // indicates to load the filter
           filter,                                                   // indicates to filter signal                                       
           loadInFifo,                                               // indicates to load the in fifo from mc
+          transformComplete,                                        // Indicates that the arbiter is done writing everything from the accel to host
     input [17:0] sigNum,                                            // input signal number for the FFT
     input [511:0] mcDataIn,                                         // data sent from mc
     input accelWrBlkDone,                                           // indicates to the out buffer that a block [512] has been written to the host
@@ -66,6 +67,7 @@ module fft_accel(
                      .loadExternalDone(loadExternalDone), 
                      .doFilter(doFilter),
                      .sigNum(sigNum),
+                     .transformComplete(transformComplete),
                      .startF(startF), 
                      .startI(startI), 
                      .calculating(calculating), 
