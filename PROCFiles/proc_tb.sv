@@ -52,7 +52,7 @@ module proc_tb();
         instrMemory[4] = 32'h8B200000; // LD R4 <- MEM [R6 + 0 'h30000000] R4('h3002) //should be a hit
         instrMemory[5] = 32'h10000000; // STARTF signum(0), filter (0)*/ //should cause accelerator request
         instrMemory[6] = 32'ha600000a; // LBI R12 <- 10 load 10 should work while accelerator is doing startF
-        instrMemory[7] = 32'h00000000; // STARTF signum (0), filter (0) gets stalled while accelerator does work
+        instrMemory[7] = 32'h10000000; // STARTF signum (0), filter (0) gets stalled while accelerator does work
         instrMemory[8] = 32'h00000000; //HALT (nothing after this gets executed)
         instrMemory[9] = 32'h00000000;
         instrMemory[10] = 32'h00000000;
