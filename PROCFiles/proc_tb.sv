@@ -16,7 +16,7 @@ module proc_tb();
     logic [31:0] instrMemory[2048];     // instructions     // 0x0000_0000 - 0x0000_7fff
     logic [31:0] accelMemory[2048];     // accelerator      // 0x1000_0000 - 0x1000_7fff
     logic [31:0] dataMemory[2048];      // cpu data         // 0x2000_0000 - 0x2000_7fff
-    integer i, j;
+    integer i, j, k, fid;
     integer errors = 0;
     
     proc iProcessor(.clk(clk),
@@ -275,6 +275,16 @@ module proc_tb();
             j += 1;
         end 
 
+        fid = $fopen("./fftOutputFull.txt");
+
+        // write out accel mem to a file
+        // fuck around and find out
+        for (k = 0; k < 1024; k++) begin
+
+            $fdisplay(fid, "%h", accelMemory[2*k]);
+            $fdisplay(fid, "%h", accelMemory[2*k + 1]);
+
+        end
 
         
         if(errors == 0) begin
@@ -283,7 +293,7 @@ module proc_tb();
             $display("ARG! Yar code be blasted!");
         end
 
-
+        $fclose(fid);
         $stop();
     end
 
