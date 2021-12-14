@@ -16,6 +16,7 @@ def plt_fft():
             print(f'Arg {file} does not contain a ".wav" ending')
             continue
         fs, data = wav.read(file)
+        data = data.T[0]
         filename = file[:-4]
         duration = len(data)/fs
         time = np.arange(0,duration,1/fs) # time vector
@@ -31,7 +32,6 @@ def plt_fft():
 
         # Freq domain after fft
         plt.figure()
-        data = data.T[0]
         yf = fft(data)
         xf = fftfreq(len(data), 1 / fs)
         plt.plot(xf, np.abs(yf))
