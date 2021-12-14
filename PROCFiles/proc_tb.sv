@@ -51,7 +51,7 @@ module proc_tb();
         instrMemory[4] = 32'h8B200000; // LD R4 <- MEM [R6 + 0 'h30000000] R4('h3002) //should be a hit
         instrMemory[5] = 32'h10000000; // STARTF signum(0), filter (0)*/ //should cause accelerator request
         instrMemory[6] = 32'ha600000a; // LBI R12 <- 10 load 10 should work while accelerator is doing startF
-        instrMemory[7] = 32'h10000000; // STARTF signum (0), filter (0) gets stalled while accelerator does work
+        instrMemory[7] = 32'h00000000; // STARTF signum (0), filter (0) gets stalled while accelerator does work
         instrMemory[8] = 32'h00000000; //HALT (nothing after this gets executed)
         instrMemory[9] = 32'h00000000;
         instrMemory[10] = 32'h00000000;
@@ -201,22 +201,22 @@ module proc_tb();
         @(negedge clk);
         repeat (128) begin
             tx_done = 1'b1;
-            common_data_bus_in = {  accelMemory[j*16]+15,
-                                    accelMemory[j*16]+14,
-                                    accelMemory[j*16]+13,
-                                    accelMemory[j*16]+12,
-                                    accelMemory[j*16]+11,
-                                    accelMemory[j*16]+10,
-                                    accelMemory[j*16]+9,
-                                    accelMemory[j*16]+8,
-                                    accelMemory[j*16]+7,
-                                    accelMemory[j*16]+6,
-                                    accelMemory[j*16]+5,
-                                    accelMemory[j*16]+4,
-                                    accelMemory[j*16]+3,
-                                    accelMemory[j*16]+2,
-                                    accelMemory[j*16]+1,
-                                    accelMemory[j*16]+0};
+            common_data_bus_in = {  accelMemory[(j*16)+15],
+                                    accelMemory[(j*16)+14],
+                                    accelMemory[(j*16)+13],
+                                    accelMemory[(j*16)+12],
+                                    accelMemory[(j*16)+11],
+                                    accelMemory[(j*16)+10],
+                                    accelMemory[(j*16)+9],
+                                    accelMemory[(j*16)+8],
+                                    accelMemory[(j*16)+7],
+                                    accelMemory[(j*16)+6],
+                                    accelMemory[(j*16)+5],
+                                    accelMemory[(j*16)+4],
+                                    accelMemory[(j*16)+3],
+                                    accelMemory[(j*16)+2],
+                                    accelMemory[(j*16)+1],
+                                    accelMemory[(j*16)];
             @(posedge clk);
             // ACCEL_RD_DONE stage
             @(negedge clk);
