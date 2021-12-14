@@ -179,16 +179,35 @@ module proc_tb();
         @(posedge clk);
         @(negedge clk);
         rd_valid = 1'b0;
+        //Check ST Signals again to show the writeback data is now valid
+        if(iProcessor.iCPU.instruction != 32'h83280000 || iProcessor.iCPU.iDecode.isSignExtend != 1'b1 || iProcessor.iCPU.iDecode.isIType1 != 1'b1  || iProcessor.iCPU.iDecode.memWrite != 1'b1 || iProcessor.iCPU.iDecode.read2Data != 32'h3002) begin
+            errors++;
+            $display("FAILED ST 3rd Check TEST");
+        end 
+
+        //wait two clk cycles for state machine
+        @(posedge clk);
+        @(negedge clk);
+        @(posedge clk);
+        @(negedge clk);
         //should have a cache hit here so no stalling
         //Check LD signals
-        if(iProcessor.iCPU.instruction != 32'h8B200000 || iProcessor.iCPU.iDecode.memRead != 1'b1 || iProcessor.iCPU.iDecode.memToReg != 1'b1 || iProcessor.iCPU.iDecode.isSignExtend != 1'b1 || iProcessor.iCPU.iDecode.IType1 != 1'b1 || iProcessor.iCPU.iDecode.regWrite != 1'b1 || iProcessor.iCPU.iDecode.writeRegSel != 4'b0100 || iProcessor.iCPU.iDecode.writeData != 32'h3002) begin
+        if(iProcessor.iCPU.instruction != 32'h8B200000 || iProcessor.iCPU.iDecode.memRead != 1'b1 || iProcessor.iCPU.iDecode.memToReg != 1'b1 || iProcessor.iCPU.iDecode.isSignExtend != 1'b1 || iProcessor.iCPU.iDecode.isIType1 != 1'b1 || iProcessor.iCPU.iDecode.regWrite != 1'b1 || iProcessor.iCPU.iDecode.writeRegSel != 4'b0100) begin
             errors++;
             $display("FAILED LD TEST");
+        end
+        //2 cycles for state machine
+        @(posedge clk);
+        @(negedge clk);
+        //writeData should be ready now
+        if(iProcessor.iCPU.instruction != 32'h8B200000 || iProcessor.iCPU.iDecode.memRead != 1'b1 || iProcessor.iCPU.iDecode.memToReg != 1'b1 || iProcessor.iCPU.iDecode.isSignExtend != 1'b1 || iProcessor.iCPU.iDecode.isIType1 != 1'b1 || iProcessor.iCPU.iDecode.regWrite != 1'b1 || iProcessor.iCPU.iDecode.writeRegSel != 4'b0100 || iProcessor.iCPU.iDecode.writeData != 32'h3002) begin
+            errors++;
+            $display("FAILED 2nd LD TEST");
         end
         @(posedge clk);
         @(negedge clk);
         //Check StartF singals
-        if(iProcessor.iCPU.instruction != 32'h10000000 || iProcessor.iCPU.iDecode.isSignExtend != 1'b1 || iProcessor.iCPU.iDecode.isIType1 != 1'b1  || iProcessor.iCPU.iDecode.memWrite != 1'b1) begin
+        if(iProcessor.iCPU.instruction != 32'h10000000 || iProcessor.startF != 1'b1) begin
             errors++;
             $display("FAILED StartF TEST");
         end
@@ -196,7 +215,7 @@ module proc_tb();
         @(posedge clk);
         @(negedge clk);
         //Check LBI, should execute while accelerator is processing
-        if(iProcessor.iCPU.instruction != 32'ha600000a || iProcessor.iCPU.iDecode.isSignExtend != 1'b1 || iProcessor.iCPU.iDecode.isIType1 != 1'b1  || iProcessor.iCPU.iDecode.memWrite != 1'b1) begin
+        if(iProcessor.iCPU.instruction != 32'ha600000a) begin
             errors++;
             $display("FAILED 2nd LBI TEST");
         end
@@ -204,7 +223,7 @@ module proc_tb();
         @(posedge clk);
         @(negedge clk);
         //Check 2nd Start F, should stall the cpu now and not issue a startF, since accelerator still calculating
-        if(iProcessor.iCPU.instruction != 32'h8B200000 || iProcessor.iCPU.iDecode.isSignExtend != 1'b1 || iProcessor.iCPU.iDecode.isIType1 != 1'b1  || iProcessor.iCPU.iDecode.memWrite != 1'b1) begin
+        if(iProcessor.iCPU.instruction != 32'h10000000 || iProcessor.startF != 1'b0) begin
             errors++;
             $display("FAILED 2nd StartF TEST");
         end
@@ -256,13 +275,6 @@ module proc_tb();
             j += 1;
         end
 
-        // Arb should go back to idle here
-        //repeat (1040) begin
-            // tons of data being loaded into the buffer,
-            // should start transform process
-        //    @(posedge clk);
-        //end
-
         while (op_actual != 2'b11) begin
             @(posedge clk);
         end
@@ -294,6 +306,21 @@ module proc_tb();
             @(posedge clk);
             @(negedge clk);
             j += 1;
+        end
+
+        //accelerator should be done now
+        //Check that startF is asserted now
+        if(iProcessor.iCPU.instruction != 32'h10000000 || iProcessor.startF != 1'b1) begin
+            errors++;
+            $display("Failed last startF test");
+        end
+
+        @(posedge clk);
+        @(negedge clk);
+        //Check that we are halted, other startF still gets processed
+        if(iProcessor.iCPU.instruction != 32'h00000000) begin
+            errors++;
+            $display("Failed Halt test");
         end 
 
         fid = $fopen("./fftOutputFull.txt", "w");
