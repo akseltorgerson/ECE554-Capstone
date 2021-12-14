@@ -137,7 +137,7 @@ module control(
 
             // DONE STATE
             DONE: begin
-                aDone = 1'b1;
+                aDone = transformComplete ? 1'b1 : 1'b0;
                 calculating = 1'b1;
                 next_state = transformComplete ? IDLE : DONE;
             end
