@@ -277,7 +277,7 @@ module proc_tb();
             j += 1;
         end 
 
-        fid = $fopen("./fftOutputFull.txt");
+        fid = $fopen("./fftOutputFull.txt", "w");
 
         // write out accel mem to a file
         // fuck around and find out
