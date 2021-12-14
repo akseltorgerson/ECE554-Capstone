@@ -129,8 +129,6 @@ module mem_arb(
     end
 
     assign accelTransferDone = (rst) ? 1'b0 : ((en) ? &sigOffset : accelTransferDone);
-    // TODO this needs to be changed when signals are larger than 8kB
-    assign transformComplete = accelTransferDone;
 
     /************************************************************************
     *                           PRIORITY ENCODER                            *
@@ -161,6 +159,7 @@ module mem_arb(
         accelRdBlkDone = 1'b0;
         accelWrBlkDone = 1'b0;
         en = 1'b0;
+        transformComplete = 1'b0;
 
         case(currState)
             INIT: begin
@@ -250,6 +249,7 @@ module mem_arb(
             ACCEL_WR_DONE: begin
                 accelWrBlkDone = 1'b1;
                 en = 1'b1;
+                transformCompelte = accelTransferDone ? 1'b1 : 1'b0;
                 nextState = accelTransferDone ? IDLE : ACCEL_WR;
             end
             default: begin
