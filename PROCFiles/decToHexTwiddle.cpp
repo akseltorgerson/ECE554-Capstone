@@ -10,7 +10,7 @@ int main()
 {
 	ifstream myfile;
 	ofstream outputFile;
-	myfile.open("twiddleFactorList.txt");
+	myfile.open("twiddleFactors.txt");
 	outputFile.open("twiddleHex.mem");
 
 	if (myfile.is_open() && outputFile.is_open())
