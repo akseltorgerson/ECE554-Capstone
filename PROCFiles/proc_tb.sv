@@ -275,22 +275,6 @@ module proc_tb();
             j += 1;
         end
 
-        //wait for the accelerator to finish
-        @(posedge iProcessor.done);
-        @(posedge clk);
-        @(negedge clk);
-        if(iProcessor.iCPU.instruction != 32'h10000000 || iProcessor.startF != 1'b1) begin
-            errors++;
-            $display("Failed last startF test");
-        end
-
-        @(posedge clk);
-        @(negedge clk);
-        if(iProcessor.iCPU.instruction != 32'h00000000) begin
-            errors++;
-            $display("Failed Halt test");
-        end 
-
         while (op_actual != 2'b11) begin
             @(posedge clk);
         end
@@ -323,6 +307,22 @@ module proc_tb();
             @(negedge clk);
             j += 1;
         end
+
+        //wait for the accelerator to finish
+        @(posedge iProcessor.done);
+        @(posedge clk);
+        @(negedge clk);
+        if(iProcessor.iCPU.instruction != 32'h10000000 || iProcessor.startF != 1'b1) begin
+            errors++;
+            $display("Failed last startF test");
+        end
+
+        @(posedge clk);
+        @(negedge clk);
+        if(iProcessor.iCPU.instruction != 32'h00000000) begin
+            errors++;
+            $display("Failed Halt test");
+        end 
 
         fid = $fopen("./fftOutputFull.txt", "w");
 
