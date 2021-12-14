@@ -308,8 +308,7 @@ module proc_tb();
             j += 1;
         end
 
-        //wait for the accelerator to finish
-        @(posedge iProcessor.done);
+        //accelerator should be done now
         @(posedge clk);
         @(negedge clk);
         if(iProcessor.iCPU.instruction != 32'h10000000 || iProcessor.startF != 1'b1) begin
