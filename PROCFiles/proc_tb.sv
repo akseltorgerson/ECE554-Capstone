@@ -317,6 +317,7 @@ module proc_tb();
 
         @(posedge clk);
         @(negedge clk);
+        //Check that we are halted, other startF still gets processed
         if(iProcessor.iCPU.instruction != 32'h00000000) begin
             errors++;
             $display("Failed Halt test");
