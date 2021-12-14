@@ -1,52 +1,28 @@
 // 32KB instruction cache
 
-localparam BLOCKS = 256;       // 1024 cache lines
+localparam BLOCKS = 256;        // 256 cache lines
 localparam BLOCK_SIZE = 512;    // 512b (64B) cache line size
 localparam WORDS = 16;          // 16 words per line
 localparam WORD_SIZE = 32;      // 32 bit words
 localparam OFFSET_BITS = 4;     // 2^4 = 16 (words per line)
-localparam INDEX_BITS = 8;     // 2^10 = 1024
+localparam INDEX_BITS = 8;      // 2^10 = 1024
 localparam TAG_BITS = 20;       // 32 - 4 - 10 = 18
 
 module data_cache (
     input clk,
     input rst,
-
-    // enables the cache
-    input en,
-
-    // address of request
-    input [31:0] addr,
-
-    // block that is getting stored to a cache line
-    input [511:0] blkIn,
-
-    // data coming into cache
-    input [31:0] dataIn,
-
-    // indicates we want a cache read
-    input rd,
-
-    // indicates we want a cache write
-    input wr,
-
-    // indicates that we are loading a cache line
-    input ld,
-
-    // output data read from cache
-    output reg [31:0] dataOut,
-
-    // request was a hit
-    output reg hit,
-
-    // request was a miss
-    output reg miss,
-
-    // block needs to be evicted
-    output reg evict,
-
-    // block that is getting evicted
-    output reg [511:0] blkOut
+    input en,                   // enables the cache
+    input [31:0] addr,          // address of request
+    input [511:0] blkIn,        // block that is getting stored to a cache line
+    input [31:0] dataIn,        // data coming into cache
+    input rd,                   // indicates we want a cache read
+    input wr,                   // indicates we want a cache write
+    input ld,                   // indicates that we are loading a cache line
+    output reg [31:0] dataOut,  // output data read from cache
+    output reg hit,             // request was a hit
+    output reg miss,            // request was a miss
+    output reg evict,           // block needs to be evicted
+    output reg [511:0] blkOut   // block that is getting evicted
     );
 
     // TODO talk to winor or josh about cache coherency
