@@ -22,7 +22,7 @@ def plt_fft():
         xf = fftfreq(len(data), 1 / fs)
         plt.plot(xf, np.abs(yf))
         filename = file[:-4]
-        plt.savefig(filename)
+        plt.savefig(f'figures/{filename}')
         plt.close()
 
 if __name__ == "__main__":
