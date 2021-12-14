@@ -13,13 +13,16 @@ def plt_fft():
         if not file.endswith(".wav"):
             print(f'Arg {file} does not contain a ".wav" ending')
             continue
+        print(file[:-4])
         fig = plt.figure()
         fs, data = wav.read(file)
         data = data.T[0]
         yf = fft(data)
         xf = fftfreq(len(data), 1 / fs)
         plt.plot(xf, np.abs(yf), figure=fig)
-    plt.show()
+        filename = file[:-4]
+        plt.savefig(filename, figure=fig)
 
 if __name__ == "__main__":
     plt_fft()
+
