@@ -138,14 +138,6 @@ module proc_tb();
 
         @(posedge clk);
         @(negedge clk);
-        //Check SLBI Signals
-        if(iProcessor.iCPU.instruction != 32'h83280000 || iProcessor.iCPU.iDecode.isSignExtend != 1'b1 || iProcessor.iCPU.iDecode.isIType1 != 1'b1  || iProcessor.iCPU.iDecode.memWrite != 1'b1) begin
-            errors++;
-            $display("FAILED SLBI TEST");
-        end
-
-        @(posedge clk);
-        @(negedge clk);
         //Check ST Signals again to show that the processor has stalled since there should be a data cache miss
         if(iProcessor.iCPU.instruction != 32'h83280000 || iProcessor.iCPU.iDecode.isSignExtend != 1'b1 || iProcessor.iCPU.iDecode.isIType1 != 1'b1  || iProcessor.iCPU.iDecode.memWrite != 1'b1) begin
             errors++;
@@ -187,8 +179,35 @@ module proc_tb();
         @(posedge clk);
         @(negedge clk);
         rd_valid = 1'b0;
+        //should have a cache hit here so no stalling
+        //Check LD signals
+        if(iProcessor.iCPU.instruction != 32'h8B200000 || iProcessor.iCPU.iDecode.memRead != 1'b1 || iProcessor.iCPU.iDecode.memToReg != 1'b1 || iProcessor.iCPU.iDecode.isSignExtend != 1'b1 || iProcessor.iCPU.iDecode.IType1 != 1'b1 || iProcessor.iCPU.iDecode.regWrite != 1'b1 || iProcessor.iCPU.iDecode.writeRegSel != 4'b0100 || iProcessor.iCPU.iDecode.writeData != 32'h3002) begin
+            errors++;
+            $display("FAILED LD TEST");
+        end
         @(posedge clk);
         @(negedge clk);
+        //Check StartF singals
+        if(iProcessor.iCPU.instruction != 32'h10000000 || iProcessor.iCPU.iDecode.isSignExtend != 1'b1 || iProcessor.iCPU.iDecode.isIType1 != 1'b1  || iProcessor.iCPU.iDecode.memWrite != 1'b1) begin
+            errors++;
+            $display("FAILED StartF TEST");
+        end
+
+        @(posedge clk);
+        @(negedge clk);
+        //Check LBI, should execute while accelerator is processing
+        if(iProcessor.iCPU.instruction != 32'ha600000a || iProcessor.iCPU.iDecode.isSignExtend != 1'b1 || iProcessor.iCPU.iDecode.isIType1 != 1'b1  || iProcessor.iCPU.iDecode.memWrite != 1'b1) begin
+            errors++;
+            $display("FAILED 2nd LBI TEST");
+        end
+
+        @(posedge clk);
+        @(negedge clk);
+        //Check 2nd Start F, should stall the cpu now and not issue a startF, since accelerator still calculating
+        if(iProcessor.iCPU.instruction != 32'h8B200000 || iProcessor.iCPU.iDecode.isSignExtend != 1'b1 || iProcessor.iCPU.iDecode.isIType1 != 1'b1  || iProcessor.iCPU.iDecode.memWrite != 1'b1) begin
+            errors++;
+            $display("FAILED 2nd StartF TEST");
+        end
         // data should be in cache
         // startF should be executing soon.
         while (op_actual != 2'b01) begin
