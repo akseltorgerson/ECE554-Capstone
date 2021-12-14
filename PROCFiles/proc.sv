@@ -76,22 +76,22 @@ module proc(
     //The signal number that the accelerator will operate on
     logic [17:0] sigNum;
 
-    //TODO: ?
+    
     logic accelBlockWrittenToHost;
 
-    //TODO: ?
+    
     logic loadInFifo;
 
-    //TODO: ?
+    
     logic [511:0] mcAccelIn;
 
-    //TODO: ?
+    
     logic [511:0] mcAccelOut;
 
-    //TODO: ?
+    
     logic outFifoReady;
 
-    //TODO: ?
+    
     logic mcAccelDataOutValid;
 
     //The accelerator is done with it's signal
