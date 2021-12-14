@@ -183,8 +183,11 @@ module proc_tb();
         if(iProcessor.iCPU.instruction != 32'h83280000 || iProcessor.iCPU.iDecode.isSignExtend != 1'b1 || iProcessor.iCPU.iDecode.isIType1 != 1'b1  || iProcessor.iCPU.iDecode.memWrite != 1'b1 || iProcessor.iCPU.iDecode.read2Data != 32'h3002) begin
             errors++;
             $display("FAILED ST 3rd Check TEST");
-        end
+        end 
 
+        //wait two clk cycles for state machine
+        @(posedge clk);
+        @(negedge clk);
         @(posedge clk);
         @(negedge clk);
         //should have a cache hit here so no stalling
@@ -196,7 +199,7 @@ module proc_tb();
         @(posedge clk);
         @(negedge clk);
         //Check StartF singals
-        if(iProcessor.iCPU.instruction != 32'h10000000 || iProcessor.iCPU.iDecode.isSignExtend != 1'b1 || iProcessor.iCPU.iDecode.isIType1 != 1'b1  || iProcessor.iCPU.iDecode.memWrite != 1'b1) begin
+        if(iProcessor.iCPU.instruction != 32'h10000000 || iProcessor.startF != 1'b1) begin
             errors++;
             $display("FAILED StartF TEST");
         end
