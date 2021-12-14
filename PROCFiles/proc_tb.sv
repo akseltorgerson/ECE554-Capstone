@@ -309,8 +309,7 @@ module proc_tb();
         end
 
         //accelerator should be done now
-        @(posedge clk);
-        @(negedge clk);
+        //Check that startF is asserted now
         if(iProcessor.iCPU.instruction != 32'h10000000 || iProcessor.startF != 1'b1) begin
             errors++;
             $display("Failed last startF test");
