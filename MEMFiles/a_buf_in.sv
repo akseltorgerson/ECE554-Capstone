@@ -77,11 +77,19 @@ module a_buf_in (
         end
     end
 
+    always_ff @(posedge clk) begin
+        if (rst) begin
+            bufferFullInt <= 1'b0;
+        end else begin
+            bufferFullInt <= bufferFull;
+        end  
+    end
+
     /********************************************************
     *                    Empty Sequence                     *
     ********************************************************/
     always_ff @(posedge clk) begin
-        if (bufferFull) begin
+        if (bufferFullInt) begin
             if (&outIndex) begin
                 bufferFull <= 1'b0;
                 fifoEmpty <= 1'b1;
