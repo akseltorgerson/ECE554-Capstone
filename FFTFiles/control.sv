@@ -75,8 +75,10 @@ module control(
             // LOADI
             IDLE_LOADI: begin
                 calculating = 1'b1;
-                if(startLoadingRam)
+                if(startLoadingRam) begin
                     next_state = LOADI;
+                    loadExternal = 1'b1;
+                end
             end
 
             LOADI: begin

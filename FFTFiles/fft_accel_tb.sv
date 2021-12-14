@@ -98,19 +98,26 @@ module fft_accel_tb();
             $stop();
         end
 
+        // loadExternal should be set high (WAM is being loaded)
+        if (iDUT.loadExternal !== 1'b1) begin
+            $display("ERROR: loadExternal was not set high when it should have been");
+            $stop();
+        end
+
         @(posedge clk);
         @(negedge clk);
 
 
-        for(loadRamCounter = 0; loadRamCounter < 1024; loadRamCounter++) begin
+        for(loadRamCounter = 1; loadRamCounter < 1024; loadRamCounter++) begin
             // loadExternal should be set high (WAM is being loaded)
             if (iDUT.loadExternal !== 1'b1) begin
                 $display("ERROR: loadExternal was not set high when it should have been");
                 $stop();
             end
-        end
 
-        
+            @(posedge clk);
+            @(negedge clk);
+        end
 
         // loadExternal should still be being loaded ?????? CHECK THIS FOR TIMING
         if (iDUT.loadExternal !== 1'b1) begin
