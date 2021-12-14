@@ -183,8 +183,6 @@ module fft_alg_tb();
 
         for (j = 0; j < 1024; j++) begin
 
-            outIndex = {j[0], j[1], j[2], j[3], j[4], j[5], j[6], j[7], j[8], j[9]};
-
             @(posedge clk);
             @(negedge clk);
 
