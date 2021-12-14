@@ -275,12 +275,21 @@ module proc_tb();
             j += 1;
         end
 
-        // Arb should go back to idle here
-        //repeat (1040) begin
-            // tons of data being loaded into the buffer,
-            // should start transform process
-        //    @(posedge clk);
-        //end
+        //wait for the accelerator to finish
+        @(posedge iProcessor.done);
+        @(posedge clk);
+        @(negedge clk);
+        if(iProcessor.iCPU.instruction != 32'h10000000 || iProcessor.startF != 1'b1) begin
+            errors++;
+            $display("Failed last startF test");
+        end
+
+        @(posedge clk);
+        @(negedge clk);
+        if(iProcessor.iCPU.instruction != 32'h00000000 || iProcessor.startF != 1'b1) begin
+            errors++;
+            $display("Failed Halt test");
+        end 
 
         while (op_actual != 2'b11) begin
             @(posedge clk);
@@ -314,22 +323,6 @@ module proc_tb();
             @(negedge clk);
             j += 1;
         end
-        
-        //wait for the accelerator to finish
-        @(posedge iProcessor.done);
-        @(posedge clk);
-        @(negedge clk);
-        if(iProcessor.iCPU.instruction != 32'h10000000 || iProcessor.startF != 1'b1) begin
-            errors++;
-            $display("Failed last startF test");
-        end
-
-        @(posedge clk);
-        @(negedge clk);
-        if(iProcessor.iCPU.instruction != 32'h00000000 || iProcessor.startF != 1'b1) begin
-            errors++;
-            $display("Failed Halt test");
-        end 
 
         fid = $fopen("./fftOutputFull.txt", "w");
 
