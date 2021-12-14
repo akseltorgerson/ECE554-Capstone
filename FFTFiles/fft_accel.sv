@@ -103,7 +103,7 @@ module fft_accel(
                  .load(loadInternal), 
                  .externalLoad(loadExternal), 
                  .indexA(loadExternal ? loadRamCounter : 
-                         loadOutBuffer ? fifoCounterReversal :
+                         loadOutBuffer ? loadFifoCounter :
                         indexA), 
                  .indexB(indexB), 
                  .A_real_i(loadExternal ? fifo_real_out : butterfly_to_ram_RealA), 

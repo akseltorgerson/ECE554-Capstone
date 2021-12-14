@@ -12,6 +12,8 @@ module proc_tb();
     logic [31:0] io_addr_actual, io_addr_expected;
     logic [63:0] cv_value_actual, cv_value_expected;
 
+    logic [9:0] outIndex;
+
     //Probably want some memory here
     logic [31:0] instrMemory[2048];     // instructions     // 0x0000_0000 - 0x0000_7fff
     logic [31:0] accelMemory[2048];     // accelerator      // 0x1000_0000 - 0x1000_7fff
@@ -281,8 +283,19 @@ module proc_tb();
         // fuck around and find out
         for (k = 0; k < 1024; k++) begin
 
-            $fdisplay(fid, "%h", accelMemory[2*k]);
-            $fdisplay(fid, "%h", accelMemory[2*k + 1]);
+            outIndex = {k[0],
+                        k[1],
+                        k[2],
+                        k[3],
+                        k[4],
+                        k[5],
+                        k[6],
+                        k[7],
+                        k[8],
+                        k[9]};
+
+            $fdisplay(fid, "%h", accelMemory[2*outIndex]);
+            $fdisplay(fid, "%h", accelMemory[2*outIndex + 1]);
 
         end
 
