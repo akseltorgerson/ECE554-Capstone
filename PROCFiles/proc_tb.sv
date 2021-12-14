@@ -235,7 +235,7 @@ module proc_tb();
         //    @(posedge clk);
         //end
 
-        while (op_actual != 1'b11) begin
+        while (op_actual != 2'b11) begin
             @(posedge clk);
         end
 
