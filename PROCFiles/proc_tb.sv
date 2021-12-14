@@ -180,9 +180,9 @@ module proc_tb();
         @(negedge clk);
         rd_valid = 1'b0;
         //Check ST Signals again to show the writeback data is now valid
-        if(iProcessor.iCPU.instruction != 32'h83280000 || iProcessor.iCPU.iDecode.isSignExtend != 1'b1 || iProcessor.iCPU.iDecode.isIType1 != 1'b1  || iProcessor.iCPU.iDecode.memWrite != 1'b1 || iProcessor.iCPU.iDecode.writeData != 32'h3002) begin
+        if(iProcessor.iCPU.instruction != 32'h83280000 || iProcessor.iCPU.iDecode.isSignExtend != 1'b1 || iProcessor.iCPU.iDecode.isIType1 != 1'b1  || iProcessor.iCPU.iDecode.memWrite != 1'b1 || iProcessor.iCPU.iDecode.read2Data != 32'h3002) begin
             errors++;
-            $display("FAILED ST TEST");
+            $display("FAILED ST 3rd Check TEST");
         end
 
         @(posedge clk);
