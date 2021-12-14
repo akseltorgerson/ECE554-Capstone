@@ -1,27 +1,27 @@
 module control(
     //Inputs
-    input startF, 
-          startI,  
-          loadExternalDone, 
-          doFilter, 
-          done, 
+    input startF,                           // start FFT
+          startI,                           // start IFFT
+          loadExternalDone,                 // Tells when the ram is done being loaded from the FIFO
+          doFilter,                         // Tells the control unit to filter (unused)
+          done,                             // Indicates that the calculation portion is complete
           clk, 
           rst, 
-          outLoadDone, 
-          outFifoReady, 
-          startLoadingRam,
-          transformComplete,
-          inFifoEmpty,
+          outLoadDone,                      // Indicates that the out FIFO is loaded and ready to be pushed to mem (unused)
+          outFifoReady,                     // Indicates that the out FIFO is loaded and ready to be pushed to mem
+          startLoadingRam,                  // Indicates to start loading the accelerator ram
+          transformComplete,                // Indicates that the data from the out fifo has been loaded
+          inFifoEmpty,                      // Indicates that the in FIFO has been emptied
     input [17:0] sigNum, 
     //Outputs
-    output reg calculating, 
-               loadExternal, 
-               loadInternal, 
-               writeFilter, 
-               isIFFT, 
-               fDone, 
-               aDone, 
-               loadOutBuffer
+    output reg calculating,                 // Indicates that the accelerator is in the middle of calculating
+               loadExternal,                // Indicates to load the RAM from FIFO
+               loadInternal,                // Indicates to load the RAM with Butterfly data
+               writeFilter,                 // Indicates to write to the filter
+               isIFFT,                      // Indicates that process is an inverse
+               fDone,                       // Indicates that the filter is complete
+               aDone,                       // Indicates that the accelerator is done
+               loadOutBuffer                // Indicates to load the output buffer
 );
 
     ////////////////////
