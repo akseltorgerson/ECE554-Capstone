@@ -216,7 +216,7 @@ module proc_tb();
                                     accelMemory[(j*16)+3],
                                     accelMemory[(j*16)+2],
                                     accelMemory[(j*16)+1],
-                                    accelMemory[(j*16)];
+                                    accelMemory[(j*16)]};
             @(posedge clk);
             // ACCEL_RD_DONE stage
             @(negedge clk);
