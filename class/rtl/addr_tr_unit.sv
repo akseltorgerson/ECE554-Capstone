@@ -9,11 +9,10 @@
 module addr_tr_unit
 #(
 	parameter ADDR_BITCOUNT = 64
-	parameter VIRT_ADDR_BITCOUNT = 32
+
 )
 (
-	input logic [VIRT_ADDR_BITCOUNT-1:0] short_virtual_addr,
-
+	input logic [31:0] short_virtual_addr,
 	input logic [ADDR_BITCOUNT-1:0] base_address_s0,
 	input logic [ADDR_BITCOUNT-1:0] base_address_s1,
 	input logic [ADDR_BITCOUNT-1:0] base_address_s2,

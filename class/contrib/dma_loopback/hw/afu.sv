@@ -137,7 +137,7 @@ module afu
    // Address Translation module
    addr_tr_unit
    atu(
-       .virtual_addr(cpu_addr),
+       .short_virtual_addr(cpu_addr),
        .base_address_s0(wr_addr_s0),
        .base_address_s1(wr_addr_s1),
        .base_address_s2(wr_addr_s2),
