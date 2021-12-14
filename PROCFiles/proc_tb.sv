@@ -64,8 +64,11 @@ module proc_tb();
         // load data and accel mem with acending values
         for (i = 0; i < 2048; i++) begin
             dataMemory[i] = i;
-            accelMemory[i] = i;
+            //accelMemory[i] = i;
         end
+
+        // LOAD TEST DATA INTO ACCELMEM
+        $readmemh("testSignalHex.mem", accelMemory);
 
         //RESET
         rst = 1'b1;
