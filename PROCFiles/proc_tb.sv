@@ -223,7 +223,7 @@ module proc_tb();
         @(posedge clk);
         @(negedge clk);
         //Check 2nd Start F, should stall the cpu now and not issue a startF, since accelerator still calculating
-        if(iProcessor.iCPU.instruction != 32'h10000000 || iProcessor.iCPU.iDecode.isSignExtend != 1'b1 || iProcessor.iCPU.iDecode.isIType1 != 1'b1  || iProcessor.iCPU.iDecode.memWrite != 1'b1) begin
+        if(iProcessor.iCPU.instruction != 32'h10000000 || iProcessor.startF != 1'b0) begin
             errors++;
             $display("FAILED 2nd StartF TEST");
         end
