@@ -19,6 +19,7 @@ module a_buf_in (
     logic [(WIDTH/2)-1:0] dataInUnpacked [7:0][1:0];
     logic [$clog2(DEPTH)-1:0] index;
     logic [$clog2(DEPTH)-1:0] outIndex;
+    logic bufferFullInt;
 
     // every data in holds 8 data points, 128 dataIn cycles fill buffer
     // dataIn formatting
