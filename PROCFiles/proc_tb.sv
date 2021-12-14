@@ -286,7 +286,7 @@ module proc_tb();
 
         @(posedge clk);
         @(negedge clk);
-        if(iProcessor.iCPU.instruction != 32'h00000000 || iProcessor.startF != 1'b1) begin
+        if(iProcessor.iCPU.instruction != 32'h00000000) begin
             errors++;
             $display("Failed Halt test");
         end 
