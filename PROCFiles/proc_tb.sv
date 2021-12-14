@@ -181,7 +181,7 @@ module proc_tb();
         rd_valid = 1'b0;
         //should have a cache hit here so no stalling
         //Check LD signals
-        if(iProcessor.iCPU.instruction != 32'h8B200000 || iProcessor.iCPU.iDecode.memRead != 1'b1 || iProcessor.iCPU.iDecode.memToReg != 1'b1 || iProcessor.iCPU.iDecode.isSignExtend != 1'b1 || iProcessor.iCPU.iDecode.iType1 != 1'b1 || iProcessor.iCPU.iDecode.regWrite != 1'b1 || iProcessor.iCPU.iDecode.writeRegSel != 4'b0100 || iProcessor.iCPU.iDecode.writeData != 32'h3002) begin
+        if(iProcessor.iCPU.instruction != 32'h8B200000 || iProcessor.iCPU.iDecode.memRead != 1'b1 || iProcessor.iCPU.iDecode.memToReg != 1'b1 || iProcessor.iCPU.iDecode.isSignExtend != 1'b1 || iProcessor.iCPU.iDecode.isIType1 != 1'b1 || iProcessor.iCPU.iDecode.regWrite != 1'b1 || iProcessor.iCPU.iDecode.writeRegSel != 4'b0100 || iProcessor.iCPU.iDecode.writeData != 32'h3002) begin
             errors++;
             $display("FAILED LD TEST");
         end
