@@ -16,8 +16,7 @@ module proc_tb();
     logic [31:0] instrMemory[2048];     // instructions     // 0x0000_0000 - 0x0000_7fff
     logic [31:0] accelMemory[2048];     // accelerator      // 0x1000_0000 - 0x1000_7fff
     logic [31:0] dataMemory[2048];      // cpu data         // 0x2000_0000 - 0x2000_7fff
-    integer i;
-    logic j;
+    integer i, j;
     integer errors = 0;
     
     proc iProcessor(.clk(clk),
@@ -197,7 +196,7 @@ module proc_tb();
             errors += 1;
         end
 
-        j = 1'b0;
+        j = 0;
         @(negedge clk);
         repeat (128) begin
             tx_done = 1'b1;
@@ -217,6 +216,11 @@ module proc_tb();
                                     accelMemory[(j*16)+2],
                                     accelMemory[(j*16)+1],
                                     accelMemory[(j*16)]};
+            $display("common_data_bus_in: %512h", common_data_bus_in);
+            // 000000f000000e000000d0000000c00000b0000a0000000090000008000000700000060000050.....0000000
+            // 0000001f0000001e0000001d00......00000010
+            // ...
+            // 00007ff0000007fe00007fd....00000700
             @(posedge clk);
             // ACCEL_RD_DONE stage
             @(negedge clk);
