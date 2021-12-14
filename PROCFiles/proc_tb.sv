@@ -192,13 +192,18 @@ module proc_tb();
         @(negedge clk);
         //should have a cache hit here so no stalling
         //Check LD signals
-        if(iProcessor.iCPU.instruction != 32'h8B200000 || iProcessor.iCPU.iDecode.memRead != 1'b1 || iProcessor.iCPU.iDecode.memToReg != 1'b1 || iProcessor.iCPU.iDecode.isSignExtend != 1'b1 || iProcessor.iCPU.iDecode.isIType1 != 1'b1 || iProcessor.iCPU.iDecode.regWrite != 1'b1 || iProcessor.iCPU.iDecode.writeRegSel != 4'b0100 || /*iProcessor.iCPU.iDecode.writeData != 32'h3002*/) begin
+        if(iProcessor.iCPU.instruction != 32'h8B200000 || iProcessor.iCPU.iDecode.memRead != 1'b1 || iProcessor.iCPU.iDecode.memToReg != 1'b1 || iProcessor.iCPU.iDecode.isSignExtend != 1'b1 || iProcessor.iCPU.iDecode.isIType1 != 1'b1 || iProcessor.iCPU.iDecode.regWrite != 1'b1 || iProcessor.iCPU.iDecode.writeRegSel != 4'b0100) begin
             errors++;
             $display("FAILED LD TEST");
         end
         //2 cycles for state machine
         @(posedge clk);
         @(negedge clk);
+        //writeData should be ready now
+        if(iProcessor.iCPU.instruction != 32'h8B200000 || iProcessor.iCPU.iDecode.memRead != 1'b1 || iProcessor.iCPU.iDecode.memToReg != 1'b1 || iProcessor.iCPU.iDecode.isSignExtend != 1'b1 || iProcessor.iCPU.iDecode.isIType1 != 1'b1 || iProcessor.iCPU.iDecode.regWrite != 1'b1 || iProcessor.iCPU.iDecode.writeRegSel != 4'b0100 || iProcessor.iCPU.iDecode.writeData != 32'h3002) begin
+            errors++;
+            $display("FAILED 2nd LD TEST");
+        end
         @(posedge clk);
         @(negedge clk);
         //Check StartF singals
