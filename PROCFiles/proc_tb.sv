@@ -111,7 +111,7 @@ module proc_tb();
         // back to idle stage in mem_arb; instructions can start processing
         //SHOULD BE ON LBI INSTRUCTION HERE
         //Check LBI signals
-        if(iProcessor.iCPU.instruction != 32'hA3003000 || iProcessor.iCPU.iDecode.rsWrite != 1'b1 || iProcessor.iCPU.iDecode.regWrite != 1'b1 || iProcessor.iDecode.writeData != 32'h3000 || iProcessor.iDecode.writeRegSel != 4'b0110) begin
+        if(iProcessor.iCPU.instruction != 32'hA3003000 || iProcessor.iCPU.iDecode.rsWrite != 1'b1 || iProcessor.iCPU.iDecode.regWrite != 1'b1 || iProcessor.iCPU.iDecode.writeData != 32'h3000 || iProcessor.iCPU.iDecode.writeRegSel != 4'b0110) begin
             errors++;
             $display("FAILED LBI TEST");
         end
@@ -119,7 +119,7 @@ module proc_tb();
         @(posedge clk);
         @(negedge clk);
         //Check ADDI Signals
-        if(iProcessor.iCPU.instruction != 32'h43280002 || iProcessor.iCPU.iDecode.isIType1 != 1'b1 || iProcessor.iCPU.iDecode.isSignExtend != 1'b1 || iProcessor.iCPU.iDecode.regWrite != 1'b1 || iProcessor.iDecode.writeData != 32'h3002 || iProcessor.iDecode.writeRegSel != 4'b0101) begin
+        if(iProcessor.iCPU.instruction != 32'h43280002 || iProcessor.iCPU.iDecode.isIType1 != 1'b1 || iProcessor.iCPU.iDecode.isSignExtend != 1'b1 || iProcessor.iCPU.iDecode.regWrite != 1'b1 || iProcessor.iCPU.iDecode.writeData != 32'h3002 || iProcessor.iCPU.iDecode.writeRegSel != 4'b0101) begin
             errors++;
             $display("FAILED ADDI TEST");
         end
@@ -127,7 +127,7 @@ module proc_tb();
         @(posedge clk);
         @(negedge clk);
         //Check SLBI Signals
-        if(iProcessor.iCPU.instruction != 32'h93000000 || iProcessor.iCPU.iDecode.isSLBI != 1'b1 || iProcessor.iCPU.iDecode.rsWrite != 1'b1  || iProcessor.iCPU.iDecode.regWrite != 1'b1 || iProcessor.iDecode.writeData != 32'h30000000 || iProcessor.iDecode.writeRegSel != 4'b0110) begin
+        if(iProcessor.iCPU.instruction != 32'h93000000 || iProcessor.iCPU.iDecode.isSLBI != 1'b1 || iProcessor.iCPU.iDecode.rsWrite != 1'b1  || iProcessor.iCPU.iDecode.regWrite != 1'b1 || iProcessor.iCPU.iDecode.writeData != 32'h30000000 || iProcessor.iCPU.iDecode.writeRegSel != 4'b0110) begin
             errors++;
             $display("FAILED SLBI TEST");
         end
