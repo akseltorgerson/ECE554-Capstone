@@ -27,7 +27,7 @@ module fft_accel_tb();
     /////////////////////////////
     integer loadInFifoLoop;                                          // loop vairable to load the in fifo
     integer cycleCounter, stageCounter;                              // for running the FFT
-    integer loadOutFifoLoop;                                         // counter for loading the out fifo
+    integer loadRamCounter;                                          // counter for loading the ram
 
     //////////////////////////////
     ///////// modules ////////////
@@ -101,14 +101,16 @@ module fft_accel_tb();
         @(posedge clk);
         @(negedge clk);
 
-        // loadExternal should be set high (WAM is being loaded)
-        if (iDUT.loadExternal !== 1'b1) begin
-            $display("ERROR: loadExternal was not set high when it should have been");
-            $stop();
+
+        for(loadRamCounter = 0; loadRamCounter < 1024; loadRamCounter++) begin
+            // loadExternal should be set high (WAM is being loaded)
+            if (iDUT.loadExternal !== 1'b1) begin
+                $display("ERROR: loadExternal was not set high when it should have been");
+                $stop();
+            end
         end
 
-        // await for the positive edge of loadExternalDone (RAM has been loaded)
-        @(posedge iDUT.loadExternalDone);
+        
 
         // loadExternal should still be being loaded ?????? CHECK THIS FOR TIMING
         if (iDUT.loadExternal !== 1'b1) begin
@@ -147,57 +149,6 @@ module fft_accel_tb();
                 @(negedge clk);
 
             end
-        end
-
-        // make sure that load internal is set low
-        @(posedge clk);
-        @(negedge clk);
-
-        // loadInternal should be low
-        if (iDUT.loadInternal !== 1'b0) begin
-            $display("ERROR: load Internal should be set low.");
-            $stop();
-        end
-
-        if (iDUT.doneCalculating !== 1'b1) begin
-            $display("ERROR: doneCalculating should be set high.");
-            $stop();
-        end
-
-        @(posedge clk);
-        @(negedge clk);
-
-        for (loadOutFifoLoop = 0; loadOutFifoLoop < 1024; loadOutFifoLoop++) begin
-            // should start loading the out FIFO
-            if (iDUT.loadOutBuffer !== 1'b1) begin
-                $display("ERROR: loadOutBuffer should be set high.");
-                $stop();
-            end
-
-            @(posedge clk);
-            @(negedge clk);
-
-        end
-
-        // make sure loadOutBuffer is set low
-        if (iDUT.loadOutBuffer !== 1'b0) begin
-                $display("ERROR: loadOutBuffer should be set low.");
-                $stop();
-        end
-
-        // outFifo should be high
-        if (iDUT.outFifoReady !== 1'b1) begin
-            $display("ERROR: outFifoReady should be set high after");
-            $stop();
-        end
-
-        @(posedge clk);
-        @(negedge clk);
-
-        // outFifo should be high
-        if (done !== 1'b1) begin
-            $display("ERROR: done should be asserted.");
-            $stop();
         end
 
         $display("YAHOO! ALL TESTS PASSED");

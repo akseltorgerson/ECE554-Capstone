@@ -216,7 +216,7 @@ module proc_tb();
                                     accelMemory[(j*16)+2],
                                     accelMemory[(j*16)+1],
                                     accelMemory[(j*16)]};
-            $display("common_data_bus_in: %512h", common_data_bus_in);
+            
             // 000000f000000e000000d0000000c00000b0000a0000000090000008000000700000060000050.....0000000
             // 0000001f0000001e0000001d00......00000010
             // ...
