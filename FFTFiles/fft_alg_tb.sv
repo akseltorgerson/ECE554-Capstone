@@ -179,7 +179,7 @@ module fft_alg_tb();
         
         
 
-        fd = $fopen("./fftOutput.txt","w");
+        fd = $fopen("./fftOutputSoftware.txt","w");
 
         for (j = 0; j < 1024; j++) begin
 

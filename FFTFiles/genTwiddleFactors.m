@@ -20,5 +20,4 @@ for fm = 1:1:(fft_length/2)
     fprintf(fid,'%.10f\n',real_twiddle(fm));
     fprintf(fid,'%.10f\n',im_twiddle(fm));
 end
-
-fclose(fid);
+    fclose(fid);

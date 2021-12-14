@@ -10,8 +10,8 @@ int main()
 {
     ifstream myfile; 
     ofstream outputFile; 
-    myfile.open("fftOutputSoftware.txt");
-    outputFile.open("fftOutputDec.txt");
+    myfile.open("fftOutputIntegration.txt");
+    outputFile.open("fftOutputIntegrationDec.txt");
     if(myfile.is_open() && outputFile.is_open()) {
         std::string tp;
         unsigned int intValue;

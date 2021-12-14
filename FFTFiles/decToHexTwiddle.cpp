@@ -10,8 +10,8 @@ int main()
 {
 	ifstream myfile;
 	ofstream outputFile;
-	myfile.open("testSignalDec.txt");
-	outputFile.open("testSignalHex.txt");
+	myfile.open("twiddleFactorList.txt");
+	outputFile.open("twiddleHex.mem");
 
 	if (myfile.is_open() && outputFile.is_open())
 	{
