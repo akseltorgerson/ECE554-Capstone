@@ -1,4 +1,4 @@
-// 32KB instruction cache
+// 16KB instruction cache
 
 localparam BLOCKS = 256;        // 256 cache lines
 localparam BLOCK_SIZE = 512;    // 512b (64B) cache line size

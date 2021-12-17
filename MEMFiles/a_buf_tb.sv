@@ -6,6 +6,7 @@ module a_buf_tb();
     logic mcWrEn;
     logic [511:0] mcDataIn;
     logic [63:0] accelDataIn;
+    logic accelWrBlkDone;
 
     // outputs
     logic outBufferFull;
@@ -33,6 +34,7 @@ module a_buf_tb();
         mcWrEn = 1'b0;
         mcDataIn = 512'b0;
         accelDataIn = 64'b0;
+        accelWrBlkDone = 1'b0;
 
         // Load test memory with acending data
         for (i = 0; i < 8192; i++) begin
